@@ -46,7 +46,7 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
         const now = new Date();
         const nowString = this.options.format(now);
 
-        this.animationTime = (this.animationTime + 0.1) % 1000; // TODO this is just to slow down
+        this.animationTime = (this.animationTime + 1) % 1000; // TODO this is just to slow down
         // this.animationTime = now.getMilliseconds();
 
         const next = new Date(now);

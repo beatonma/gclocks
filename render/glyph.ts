@@ -261,8 +261,14 @@ export abstract class BaseGlyph implements Glyph {
         progress: number,
         paints: Paints
     ): void {
-        canvas.fillStyle = "#00000033";
-        canvas.fillRect(0, 0, this.getWidthAtProgress(progress), this.height);
+        // canvas.fillStyle = "#00000033";
+        canvas.fillRect(
+            0,
+            0,
+            this.getWidthAtProgress(progress),
+            this.height,
+            "#00000033"
+        );
 
         switch (this.key) {
             case "0":

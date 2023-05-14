@@ -1,4 +1,5 @@
 import { toRadians } from "./math";
+import { Canvas } from "./types";
 
 export const canvasExtensions = () => {
     Object.defineProperty(CanvasRenderingContext2D.prototype, "text", {
@@ -52,8 +53,9 @@ export const canvasExtensions = () => {
         "rotateWithPivot",
         {
             value: function (angle: number, pivotX: number, pivotY: number) {
+                const rads = toRadians(angle);
                 this.translate(pivotX, pivotY);
-                this.rotate(angle, angle);
+                this.rotate(rads, rads);
                 this.translate(-pivotX, -pivotY);
             },
         }
@@ -82,6 +84,39 @@ export const canvasExtensions = () => {
                 toRadians(startAngle),
                 toRadians(startAngle + sweepAngle)
             );
+        },
+    });
+
+    Object.defineProperty(CanvasRenderingContext2D.prototype, "withPath", {
+        value: function (block: () => void) {
+            this.beginPath();
+            block();
+        },
+    });
+
+    Object.defineProperty(
+        CanvasRenderingContext2D.prototype,
+        "withCheckpoint",
+        {
+            value: function (block: () => void) {
+                this.save();
+                block();
+                this.restore();
+            },
+        }
+    );
+
+    Object.defineProperty(CanvasRenderingContext2D.prototype, "fillRect", {
+        value: function (
+            left: number,
+            top: number,
+            right: number,
+            bottom: number,
+            color: string
+        ) {
+            this.beginPath();
+            this.rect(left, top, right - left, bottom - top);
+            this.fillPaint(color);
         },
     });
 };
