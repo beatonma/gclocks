@@ -2,15 +2,18 @@ import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./clocks.scss";
 import { DebugRenderer } from "./debug-clock/debug-renderer";
+import { FormRenderer } from "./form";
 import { TimeFormat } from "./render";
 import { Options, Paints, ClockRenderer } from "./render/types";
-// import { ClockRenderer } from "./render/renderer";
+import { canvasExtensions } from "./render/canvas";
+
+canvasExtensions();
 
 const CONTAINER_ID = "clocks_container";
 
 enum Clocks {
     Debug,
-    // Form,
+    Form,
     // Io16,
     // Io18,
 }
@@ -26,12 +29,13 @@ const defaultOptions: Options = {
 
 const renderers: Record<Clocks, () => ClockRenderer<any, any>> = {
     [Clocks.Debug]: () => new DebugRenderer(defaultPaints, defaultOptions),
+    [Clocks.Form]: () => new FormRenderer(),
 };
 
 export const Clock = () => {
     const [width, setWidth] = useState(window.innerWidth);
     const [height, setHeight] = useState(window.innerHeight);
-    const [clock, setClock] = useState(Clocks.Debug);
+    const [clock, setClock] = useState(Clocks.Form);
     const [renderer, setRenderer] = useState<ClockRenderer<any, any>>(
         renderers[clock]
     );

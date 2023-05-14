@@ -1,11 +1,54 @@
 import { BaseGlyph } from "../render";
+import { decelerate5, interpolate, progress as prog } from "../render/math";
 import { Canvas, Paints } from "../render/types";
 
-export class DebugGlyph extends BaseGlyph {
-    height = 100;
+export class FormGlyph extends BaseGlyph {
+    height = 144;
 
     draw0_1 = (canvas: Canvas, progress: number, paints: Paints): void => {
-        canvas.text("0_1", 50, 50, paints.colors[0]);
+        const d1 = decelerate5(prog(progress, 0, 0.5));
+        const d2 = decelerate5(prog(progress, 0.5, 1));
+
+        // 0
+        canvas.save();
+        canvas.translate(interpolate(d1, 0, interpolate(d2, 24, 0)), 0);
+        canvas.scaleWithPivot(interpolate(d1, 1, 2 / 3), 72, 144);
+        canvas.scaleWithPivot(interpolate(d2, 1, 0.7), 72, 96);
+        canvas.rotateWithPivot(interpolate(d1, 45, 0), 72, 72);
+        canvas.rect(0, 0, this.getWidthAtProgress(progress), this.height);
+
+        const stretchX = interpolate(d1, 0, interpolate(d2, 72, -36));
+        canvas.beginPath();
+        canvas.moveTo(72 - stretchX, 144);
+        canvas.boundedArc(-stretchX, 0, 144 - stretchX, 144, 90, 180);
+        canvas.lineTo(72 + stretchX, 0);
+        canvas.lineTo(72 + stretchX, 144);
+        canvas.lineTo(72 - stretchX, 144);
+        canvas.closePath();
+        canvas.fillPaint(paints.colors[1]);
+
+        canvas.beginPath();
+        // canvas.moveTo(stretchX, 0);
+        canvas.boundedArc(stretchX, 0, 144 + stretchX, 144, -90, 180);
+        canvas.closePath();
+        canvas.fillPaint(paints.colors[2]);
+        canvas.restore();
+
+        // 1
+        if (d2 > 0) {
+            canvas.beginPath();
+            canvas.rect(
+                interpolate(d2, 28, 0),
+                interpolate(d2, 72, 0),
+                100,
+                interpolate(d2, 144, 48)
+            );
+            canvas.strokePaint(paints.colors[1]);
+
+            canvas.beginPath();
+            canvas.rect(28, interpolate(d2, 144, 48), 100, 144);
+            canvas.strokePaint(paints.colors[2]);
+        }
     };
 
     draw1_2 = (canvas: Canvas, progress: number, paints: Paints): void => {
@@ -73,7 +116,8 @@ export class DebugGlyph extends BaseGlyph {
         progress: number,
         paints: Paints
     ): void => {
-        canvas.text(":", 50, 50, paints.colors[0]);
+        canvas.fillCircle(24, 24, 24, paints.colors[1]);
+        canvas.fillCircle(24, 120, 24, paints.colors[2]);
     };
 
     draw_ = (canvas: Canvas, progress: number, paints: Paints): void => {
@@ -88,5 +132,19 @@ export class DebugGlyph extends BaseGlyph {
         canvas.text("__2", 50, 50, paints.colors[0]);
     };
 
-    getWidthAtProgress = (progress: number): number => 100;
+    getWidthAtProgress = (progress: number): number => {
+        switch (this.key) {
+            case "0_1":
+                return interpolate(
+                    decelerate5(prog(progress, 0.5, 1)),
+                    interpolate(decelerate5(prog(progress, 0, 0.5)), 144, 192),
+                    100
+                );
+            case ":":
+                return 48;
+
+            default:
+                return this.height;
+        }
+    };
 }

@@ -1,6 +1,7 @@
 import { Font } from "./font";
 import { Rect, rect } from "./geometry";
 import { Glyph, GlyphStateLock } from "./glyph";
+import { progress } from "./math";
 import { Options, Paints } from "./types";
 
 export interface ClockRenderer<T extends Font<G>, G extends Glyph> {
@@ -52,8 +53,11 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
         const nextString = this.options.format(next);
 
         this.updateGlyphs(nowString, nextString);
-        //
-        // this.updateGlyphs("01:23:45", "01:23:46");
+
+        // console.log(`${nowString} -> ${nextString}`);
+
+        this.updateGlyphs("01:23:45", "01:23:46");
+        // this.updateGlyphs("00:00:00", "00:00:01");
     }
 
     updateGlyphs(now: string, next: string) {
@@ -96,6 +100,7 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
             ctx.save();
             ctx.translate(rect.left, rect.top);
             glyph.draw(ctx, glyphAnimationProgress, this.paints);
+            // glyph.draw(ctx, 0, this.paints); // TODO
             ctx.restore();
         });
     }
@@ -163,9 +168,3 @@ type LayoutPassCallback = (
     glyphAnimationProgress: number,
     rect: Rect
 ) => void;
-
-/**
- * Return normalized progress (0..1) of value relative to the range of min..max.
- */
-const progress = (value: number, min: number, max: number): number =>
-    Math.max(0, Math.min(1, (value - min) / (max - min)));
