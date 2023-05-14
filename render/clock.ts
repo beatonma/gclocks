@@ -1,3 +1,7 @@
+import { Font } from "./font";
+import { Glyph } from "./glyph";
+import { BaseClockRenderer } from "./renderer";
+
 abstract class BaseClock<
     T extends BaseClockRenderer<F, G>,
     F extends Font<G>,

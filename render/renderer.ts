@@ -1,36 +1,22 @@
-const hoursMinsSeconds = (date: Date) => {
-    return {
-        hours: date.getHours(),
-        minutes: date.getMinutes(),
-        seconds: date.getSeconds(),
-    };
-};
+import { Font } from "./font";
+import { Rect, rect } from "./geometry";
+import { Glyph, GlyphStateLock } from "./glyph";
+import { Options, Paints } from "./types";
 
-type TimeFormatter = (date: Date) => string;
-const TimeFormat: Record<string, (date: Date) => string> = {
-    HH_MM_SS_24: (date: Date) => {
-        const { hours, minutes, seconds } = hoursMinsSeconds(date);
-        return `${hours}:${minutes}:${seconds}`;
-    },
-};
-
-interface Options {
-    format: TimeFormatter;
-    glyphMorphDuration: 800;
-}
-
-interface ClockRenderer<T extends Font<G>, G extends Glyph> {
+export interface ClockRenderer<T extends Font<G>, G extends Glyph> {
     options: Options;
     update: () => void;
     updateGlyphs: (now: string, next: string) => void;
+    draw: (ctx: CanvasRenderingContext2D) => void;
 }
 
-abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
+export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
     implements ClockRenderer<T, G>
 {
     font: T;
     glyphs: G[];
-    glyphCount: number;
+    locks: GlyphStateLock[];
+    stringLength: number;
     untilNextFrameMillis: number = 0;
     animatedGlyphCount: number = 0;
     animatedGlyphIndices: number[] = [];
@@ -43,26 +29,38 @@ abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
     constructor(paints: Paints, options: Options) {
         this.options = options;
         this.paints = paints;
+        this.font = this.buildFont();
+
+        this.stringLength = options.format(new Date()).length;
+        this.glyphs = new Array(this.stringLength);
+        this.locks = new Array(this.stringLength);
+
+        for (let i = 0; i < this.stringLength; i++) {
+            this.glyphs[i] = this.font.getGlyph(i);
+            this.locks[i] = GlyphStateLock.None;
+        }
     }
 
-    update() {
-        // const now = new Date();
-        // const nowString = this.options.format(now);
-        //
-        // const next = new Date(now);
-        // next.setSeconds(now.getSeconds() + 1, 0);
-        // const nextString = this.options.format(next);
-        //
-        // this.updateGlyphs(nowString, nextString);
+    abstract buildFont(): T;
 
-        this.updateGlyphs("01", "02");
+    update() {
+        const now = new Date();
+        const nowString = this.options.format(now);
+
+        const next = new Date(now);
+        next.setSeconds(now.getSeconds() + 1, 0);
+        const nextString = this.options.format(next);
+
+        this.updateGlyphs(nowString, nextString);
+        //
+        // this.updateGlyphs("01:23:45", "01:23:46");
     }
 
     updateGlyphs(now: string, next: string) {
         let animatedGlyphCount = 0;
         let glyphCount = 0;
 
-        for (let i = 0; i < now.length; i++) {
+        for (let i = 0; i < this.stringLength; i++) {
             const fromChar = now[i];
             const nextChar = next[i];
 
@@ -83,7 +81,7 @@ abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
         // TODO reverse animated glyph indices?
         //  Not sure why but it was done in original.
 
-        this.glyphCount = glyphCount;
+        // this.glyphCount = glyphCount;
         this.animatedGlyphCount = animatedGlyphCount;
         this.animationTime = 0;
     }
@@ -97,7 +95,7 @@ abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
 
             ctx.save();
             ctx.translate(rect.left, rect.top);
-            glyph.draw(ctx, glyphAnimationProgress);
+            glyph.draw(ctx, glyphAnimationProgress, this.paints);
             ctx.restore();
         });
     }
@@ -110,7 +108,7 @@ abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
         const scale = 1;
         let x = 0;
 
-        for (let i = 0; i < this.glyphCount; i++) {
+        for (let i = 0; i < this.stringLength; i++) {
             const glyph = this.glyphs[i];
             glyph.scale = scale;
 
@@ -156,7 +154,7 @@ abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
             return 0;
         }
 
-        return progress(this.animationTime, 0, this.options.glyphMorphDuration);
+        return progress(this.animationTime, 0, this.options.glyphMorphMillis);
     }
 }
 
