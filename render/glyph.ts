@@ -65,102 +65,102 @@ export abstract class BaseGlyph implements Glyph {
     abstract getWidthAtProgress: (progress: number) => number;
     abstract draw0_1: (
         canvas: CanvasRenderingContext2D,
-        progress: number,
+        glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw1_2: (
         canvas: CanvasRenderingContext2D,
-        progress: number,
+        glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw2_3: (
         canvas: CanvasRenderingContext2D,
-        progress: number,
+        glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw3_4: (
         canvas: CanvasRenderingContext2D,
-        progress: number,
+        glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw4_5: (
         canvas: CanvasRenderingContext2D,
-        progress: number,
+        glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw5_6: (
         canvas: CanvasRenderingContext2D,
-        progress: number,
+        glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw6_7: (
         canvas: CanvasRenderingContext2D,
-        progress: number,
+        glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw7_8: (
         canvas: CanvasRenderingContext2D,
-        progress: number,
+        glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw8_9: (
         canvas: CanvasRenderingContext2D,
-        progress: number,
+        glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw9_0: (
         canvas: CanvasRenderingContext2D,
-        progress: number,
+        glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw__1: (
         canvas: CanvasRenderingContext2D,
-        progress: number,
+        glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw__2: (
         canvas: CanvasRenderingContext2D,
-        progress: number,
+        glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw1__: (
         canvas: CanvasRenderingContext2D,
-        progress: number,
+        glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw2__: (
         canvas: CanvasRenderingContext2D,
-        progress: number,
+        glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw2_1: (
         canvas: CanvasRenderingContext2D,
-        progress: number,
+        glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw2_0: (
         canvas: CanvasRenderingContext2D,
-        progress: number,
+        glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw3_0: (
         canvas: CanvasRenderingContext2D,
-        progress: number,
+        glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw5_0: (
         canvas: CanvasRenderingContext2D,
-        progress: number,
+        glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw_: (
         canvas: CanvasRenderingContext2D,
-        progress: number,
+        glyphProgress: number,
         paints: Paints
     ) => void;
     abstract drawSeparator: (
         canvas: CanvasRenderingContext2D,
-        progress: number,
+        glyphProgress: number,
         paints: Paints
     ) => void;
 
@@ -261,7 +261,6 @@ export abstract class BaseGlyph implements Glyph {
         progress: number,
         paints: Paints
     ): void {
-        // canvas.fillStyle = "#00000033";
         canvas.fillRect(
             0,
             0,
