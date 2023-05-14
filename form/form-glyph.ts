@@ -43,11 +43,11 @@ export class FormGlyph extends BaseGlyph {
                 100,
                 interpolate(d2, 144, 48)
             );
-            canvas.strokePaint(paints.colors[1]);
+            canvas.fillPaint(paints.colors[1]);
 
             canvas.beginPath();
             canvas.rect(28, interpolate(d2, 144, 48), 100, 144);
-            canvas.strokePaint(paints.colors[2]);
+            canvas.fillPaint(paints.colors[2]);
         }
     };
 

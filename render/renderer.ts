@@ -18,11 +18,9 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
     glyphs: G[];
     locks: GlyphStateLock[];
     stringLength: number;
-    untilNextFrameMillis: number = 0;
     animatedGlyphCount: number = 0;
-    animatedGlyphIndices: number[] = [];
+    animatedGlyphIndices: number[];
     animationTime: number = 0;
-    characterHeight: number;
 
     options: Options;
     paints: Paints;
@@ -48,19 +46,20 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
         const now = new Date();
         const nowString = this.options.format(now);
 
+        this.animationTime = (this.animationTime + 0.1) % 1000; // TODO this is just to slow down
+        // this.animationTime = now.getMilliseconds();
+
         const next = new Date(now);
         next.setSeconds(now.getSeconds() + 1, 0);
         const nextString = this.options.format(next);
 
-        this.updateGlyphs(nowString, nextString);
+        // this.updateGlyphs(nowString, nextString);
 
-        // console.log(`${nowString} -> ${nextString}`);
-
-        this.updateGlyphs("01:23:45", "01:23:46");
-        // this.updateGlyphs("00:00:00", "00:00:01");
+        this.updateGlyphs("01:23:45", "12:34:56");
     }
 
     updateGlyphs(now: string, next: string) {
+        this.animatedGlyphIndices = [];
         let animatedGlyphCount = 0;
         let glyphCount = 0;
 
@@ -82,12 +81,7 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
             this.glyphs[glyphCount++] = glyph;
         }
 
-        // TODO reverse animated glyph indices?
-        //  Not sure why but it was done in original.
-
-        // this.glyphCount = glyphCount;
         this.animatedGlyphCount = animatedGlyphCount;
-        this.animationTime = 0;
     }
 
     draw(ctx: CanvasRenderingContext2D) {
@@ -100,7 +94,6 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
             ctx.save();
             ctx.translate(rect.left, rect.top);
             glyph.draw(ctx, glyphAnimationProgress, this.paints);
-            // glyph.draw(ctx, 0, this.paints); // TODO
             ctx.restore();
         });
     }
@@ -135,7 +128,7 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
             }
 
             const glyphWidth = glyph.getWidthAtProgress(glyphProgress);
-            const glyphHeight = this.characterHeight * scale;
+            const glyphHeight = glyph.height * scale;
             const left = x;
             const top = 0;
             const right = left + glyphWidth + this.paints.strokeWidth;
@@ -154,6 +147,7 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
                 break;
             }
         }
+
         if (index < 0) {
             // Glyphs that are not currently animating rendered at t=0.
             return 0;

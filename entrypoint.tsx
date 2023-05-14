@@ -87,9 +87,7 @@ const Canvas = (props: CanvasProps) => {
             if (canvas != undefined) {
                 renderer(canvas, width, height);
             }
-            setTimeout(() => {
-                tickRef.current = requestAnimationFrame(tick);
-            }, 1000);
+            tickRef.current = requestAnimationFrame(tick);
         };
 
         tickRef.current = requestAnimationFrame(tick);

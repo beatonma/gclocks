@@ -40,6 +40,7 @@ export interface Glyph {
     setAppearing: () => void;
     setDisappearing: () => void;
 
+    height: number;
     getWidthAtProgress: (progress: number) => number;
 
     getCanonicalStartGlyph: () => string;
@@ -59,7 +60,7 @@ export abstract class BaseGlyph implements Glyph {
 
     stateAnimTime: number = 0;
     deactivationStartedTime: number = 0;
-    height: number;
+    abstract height: number;
 
     abstract getWidthAtProgress: (progress: number) => number;
     abstract draw0_1: (
