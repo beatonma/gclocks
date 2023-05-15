@@ -1,10 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./clocks.scss";
-import { DebugRenderer } from "./debug-clock/debug-renderer";
 import { FormRenderer } from "./form";
-import { TimeFormat } from "./render";
-import { Options, Paints, ClockRenderer } from "./render/types";
+import { ClockRenderer } from "./render/renderer";
 import { canvasExtensions } from "./render/canvas";
 
 canvasExtensions();
@@ -12,23 +10,12 @@ canvasExtensions();
 const CONTAINER_ID = "clocks_container";
 
 enum Clocks {
-    Debug,
     Form,
     // Io16,
     // Io18,
 }
 
-const defaultPaints: Paints = {
-    strokeWidth: 2,
-    colors: ["red", "black", "blue", "green"],
-};
-const defaultOptions: Options = {
-    format: TimeFormat.HH_MM_SS_24,
-    glyphMorphMillis: 800,
-};
-
 const renderers: Record<Clocks, () => ClockRenderer<any, any>> = {
-    [Clocks.Debug]: () => new DebugRenderer(defaultPaints, defaultOptions),
     [Clocks.Form]: () => new FormRenderer(),
 };
 
@@ -48,6 +35,10 @@ export const Clock = () => {
         window.addEventListener("resize", resize);
         return () => window.removeEventListener("resize", resize);
     }, []);
+
+    useEffect(() => {
+        renderer.setAvailableSize(width, height);
+    }, [renderer, width, height]);
 
     useEffect(() => {
         setRenderer(renderers[clock]);

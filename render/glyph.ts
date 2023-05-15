@@ -27,11 +27,7 @@ export interface Glyph {
     onStateChange?: OnStateChange;
     scale: number;
 
-    draw: (
-        canvas: CanvasRenderingContext2D,
-        progress: number,
-        paints: Paints
-    ) => void;
+    draw: (canvas: Canvas, progress: number, paints: Paints) => void;
 
     setActivating: () => void;
     setDeactivating: () => void;
@@ -42,6 +38,7 @@ export interface Glyph {
 
     height: number;
     getWidthAtProgress: (progress: number) => number;
+    maxWidth: number;
 
     getCanonicalStartGlyph: () => string;
     getCanonicalEndGlyph: () => string;
@@ -61,105 +58,106 @@ export abstract class BaseGlyph implements Glyph {
     stateAnimTime: number = 0;
     deactivationStartedTime: number = 0;
     abstract height: number;
+    abstract maxWidth: number;
 
     abstract getWidthAtProgress: (progress: number) => number;
     abstract draw0_1: (
-        canvas: CanvasRenderingContext2D,
+        canvas: Canvas,
         glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw1_2: (
-        canvas: CanvasRenderingContext2D,
+        canvas: Canvas,
         glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw2_3: (
-        canvas: CanvasRenderingContext2D,
+        canvas: Canvas,
         glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw3_4: (
-        canvas: CanvasRenderingContext2D,
+        canvas: Canvas,
         glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw4_5: (
-        canvas: CanvasRenderingContext2D,
+        canvas: Canvas,
         glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw5_6: (
-        canvas: CanvasRenderingContext2D,
+        canvas: Canvas,
         glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw6_7: (
-        canvas: CanvasRenderingContext2D,
+        canvas: Canvas,
         glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw7_8: (
-        canvas: CanvasRenderingContext2D,
+        canvas: Canvas,
         glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw8_9: (
-        canvas: CanvasRenderingContext2D,
+        canvas: Canvas,
         glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw9_0: (
-        canvas: CanvasRenderingContext2D,
+        canvas: Canvas,
         glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw__1: (
-        canvas: CanvasRenderingContext2D,
+        canvas: Canvas,
         glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw__2: (
-        canvas: CanvasRenderingContext2D,
+        canvas: Canvas,
         glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw1__: (
-        canvas: CanvasRenderingContext2D,
+        canvas: Canvas,
         glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw2__: (
-        canvas: CanvasRenderingContext2D,
+        canvas: Canvas,
         glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw2_1: (
-        canvas: CanvasRenderingContext2D,
+        canvas: Canvas,
         glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw2_0: (
-        canvas: CanvasRenderingContext2D,
+        canvas: Canvas,
         glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw3_0: (
-        canvas: CanvasRenderingContext2D,
+        canvas: Canvas,
         glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw5_0: (
-        canvas: CanvasRenderingContext2D,
+        canvas: Canvas,
         glyphProgress: number,
         paints: Paints
     ) => void;
     abstract draw_: (
-        canvas: CanvasRenderingContext2D,
+        canvas: Canvas,
         glyphProgress: number,
         paints: Paints
     ) => void;
     abstract drawSeparator: (
-        canvas: CanvasRenderingContext2D,
+        canvas: Canvas,
         glyphProgress: number,
         paints: Paints
     ) => void;
@@ -256,19 +254,7 @@ export abstract class BaseGlyph implements Glyph {
         return this.key[this.key.length - 1];
     }
 
-    draw(
-        canvas: CanvasRenderingContext2D,
-        progress: number,
-        paints: Paints
-    ): void {
-        canvas.fillRect(
-            0,
-            0,
-            this.getWidthAtProgress(progress),
-            this.height,
-            "#00000033"
-        );
-
+    draw(canvas: Canvas, progress: number, paints: Paints): void {
         switch (this.key) {
             case "0":
             case "0_1":
@@ -335,18 +321,14 @@ export abstract class BaseGlyph implements Glyph {
                 this.draw5_0(canvas, progress, paints);
                 break;
             case " ":
+            case "_":
                 this.draw_(canvas, progress, paints);
                 break;
             case ":":
                 this.drawSeparator(canvas, progress, paints);
                 break;
             default:
-                console.warn(`Unknown key ${this.key}`);
+                throw `Glyph.draw: unknown key ${this.key}`;
         }
-    }
-
-    stroke(canvas: Canvas, paints: Paints, colorIndex: number) {
-        canvas.strokeStyle = `${paints.strokeWidth}px ${paints.colors[colorIndex]}`;
-        canvas.stroke();
     }
 }

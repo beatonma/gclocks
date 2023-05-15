@@ -2,13 +2,14 @@ import { Font } from "./font";
 import { Rect, rect } from "./geometry";
 import { Glyph, GlyphStateLock } from "./glyph";
 import { progress } from "./math";
-import { Options, Paints } from "./types";
+import { Canvas, Options, Paints } from "./types";
 
 export interface ClockRenderer<T extends Font<G>, G extends Glyph> {
     options: Options;
     update: () => void;
     updateGlyphs: (now: string, next: string) => void;
-    draw: (ctx: CanvasRenderingContext2D) => void;
+    draw: (ctx: Canvas) => void;
+    setAvailableSize: (width: number, height: number) => void;
 }
 
 export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
@@ -21,18 +22,27 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
     animatedGlyphCount: number = 0;
     animatedGlyphIndices: number[];
     animationTime: number = 0;
+    maxWidth: number = 0;
+
+    availableWidth: number = 0;
+    availableHeight: number = 0;
+    scale: number = 1;
 
     options: Options;
     paints: Paints;
+
+    abstract buildFont(): T;
 
     constructor(paints: Paints, options: Options) {
         this.options = options;
         this.paints = paints;
         this.font = this.buildFont();
 
-        this.stringLength = options.format(new Date()).length;
+        // this.stringLength = options.format(new Date()).length;
+        this.stringLength = 19;
         this.glyphs = new Array(this.stringLength);
         this.locks = new Array(this.stringLength);
+        this.maxWidth = this.stringLength * this.font.getGlyph(0).maxWidth;
 
         for (let i = 0; i < this.stringLength; i++) {
             this.glyphs[i] = this.font.getGlyph(i);
@@ -40,7 +50,10 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
         }
     }
 
-    abstract buildFont(): T;
+    setAvailableSize(width: number, height: number) {
+        this.availableWidth = width;
+        this.availableHeight = height;
+    }
 
     update() {
         const now = new Date();
@@ -55,7 +68,8 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
 
         // this.updateGlyphs(nowString, nextString);
 
-        this.updateGlyphs("01:23:45", "12:34:56");
+        // this.updateGlyphs("01:23:45", "12:34:56");
+        this.updateGlyphs("0123456789_:  12235", "1234567890_:12  000");
     }
 
     updateGlyphs(now: string, next: string) {
@@ -84,17 +98,16 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
         this.animatedGlyphCount = animatedGlyphCount;
     }
 
-    draw(ctx: CanvasRenderingContext2D) {
+    draw(ctx: Canvas) {
         this.layoutPass((glyph, glyphAnimationProgress, rect) => {
             if (glyphAnimationProgress == 1) {
                 glyph.key = glyph.getCanonicalEndGlyph();
                 glyphAnimationProgress = 0;
             }
 
-            ctx.save();
-            ctx.translate(rect.left, rect.top);
-            glyph.draw(ctx, glyphAnimationProgress, this.paints);
-            ctx.restore();
+            ctx.withTranslate(rect.left, rect.top, () => {
+                glyph.draw(ctx, glyphAnimationProgress, this.paints);
+            });
         });
     }
 
