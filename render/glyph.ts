@@ -116,11 +116,6 @@ export abstract class BaseGlyph implements Glyph {
         glyphProgress: number,
         paints: Paints
     ) => void;
-    abstract draw__2: (
-        canvas: Canvas,
-        glyphProgress: number,
-        paints: Paints
-    ) => void;
     abstract draw1__: (
         canvas: Canvas,
         glyphProgress: number,
@@ -299,9 +294,6 @@ export abstract class BaseGlyph implements Glyph {
             case " _1":
                 this.draw__1(canvas, progress, paints);
                 break;
-            case " _2":
-                this.draw__2(canvas, progress, paints);
-                break;
             case "1_ ":
                 this.draw1__(canvas, progress, paints);
                 break;
@@ -328,7 +320,7 @@ export abstract class BaseGlyph implements Glyph {
                 this.drawSeparator(canvas, progress, paints);
                 break;
             default:
-                throw `Glyph.draw: unknown key ${this.key}`;
+                throw `Glyph.draw: unknown key '${this.key}'`;
         }
     }
 }

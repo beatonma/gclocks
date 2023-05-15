@@ -17,6 +17,7 @@ export const canvasExtensions = () => {
         "text",
         function (text: string, x: number, y: number, color: string) {
             this.fillStyle = color;
+            this.font = "48px sans-serif";
             this.fillText(text, x, y);
         }
     );

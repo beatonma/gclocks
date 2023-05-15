@@ -26,7 +26,7 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
 
     availableWidth: number = 0;
     availableHeight: number = 0;
-    scale: number = 1;
+    scale: number = 0.6;
 
     options: Options;
     paints: Paints;
@@ -67,9 +67,7 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
         const nextString = this.options.format(next);
 
         // this.updateGlyphs(nowString, nextString);
-
-        // this.updateGlyphs("01:23:45", "12:34:56");
-        this.updateGlyphs("0123456789_:  12235", "1234567890_:12  000");
+        this.updateGlyphs("0123456789_: 212235", "1234567890_:11  000");
     }
 
     updateGlyphs(now: string, next: string) {
@@ -98,15 +96,17 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
         this.animatedGlyphCount = animatedGlyphCount;
     }
 
-    draw(ctx: Canvas) {
-        this.layoutPass((glyph, glyphAnimationProgress, rect) => {
-            if (glyphAnimationProgress == 1) {
-                glyph.key = glyph.getCanonicalEndGlyph();
-                glyphAnimationProgress = 0;
-            }
+    draw(canvas: Canvas) {
+        canvas.withScale(this.scale, 0, 0, () => {
+            this.layoutPass((glyph, glyphAnimationProgress, rect) => {
+                if (glyphAnimationProgress == 1) {
+                    glyph.key = glyph.getCanonicalEndGlyph();
+                    glyphAnimationProgress = 0;
+                }
 
-            ctx.withTranslate(rect.left, rect.top, () => {
-                glyph.draw(ctx, glyphAnimationProgress, this.paints);
+                canvas.withTranslate(rect.left, rect.top, () => {
+                    glyph.draw(canvas, glyphAnimationProgress, this.paints);
+                });
             });
         });
     }
