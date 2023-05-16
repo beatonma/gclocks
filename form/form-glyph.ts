@@ -777,9 +777,100 @@ export class FormGlyph extends BaseGlyph {
     };
 
     draw8_9 = (canvas: Canvas, glyphProgress: number, paints: Paints): void => {
-        // TODO
         const [color1, color2, color3] = paints.colors;
-        canvas.text(paints.colors[0], "8_9", 50, 50);
+        const d = decelerate5(progress(glyphProgress, 0, 0.5));
+        const d1 = decelerate5(progress(glyphProgress, 0.5, 1));
+
+        // 8
+        if (d < 1) {
+            // top
+            canvas.withTranslation(0, interpolate(d, 0, 48), () => {
+                canvas.paintRoundRect(color3, 24, 0, 120, 48, 24);
+            });
+
+            if (d == 0) {
+                // left + middle bottom
+                canvas.paintPath(color1, () => {
+                    canvas.moveTo(48, 48);
+                    canvas.lineTo(96, 48);
+                    canvas.lineTo(96, 144);
+                    canvas.lineTo(48, 144);
+                    canvas.boundedArc(0, 48, 96, 144, 90, 180);
+                });
+
+                // right bottom
+                canvas.paintBoundedArc(color2, 48, 48, 144, 144, -90, 180);
+            } else {
+                // bottom middle
+                canvas.paintRect(
+                    color1,
+                    interpolate(d, 48, 72) - 2,
+                    interpolate(d, 48, 0),
+                    interpolate(d, 96, 72) + 2,
+                    144
+                );
+
+                // left bottom
+                canvas.withScaleUniform(
+                    interpolate(d, 2 / 3, 1),
+                    0,
+                    144,
+                    () => {
+                        canvas.paintBoundedArc(color1, 0, 0, 144, 144, 90, 180);
+                    }
+                );
+
+                // right bottom
+                canvas.withScaleUniform(
+                    interpolate(d, 2 / 3, 1),
+                    144,
+                    144,
+                    () => {
+                        canvas.paintBoundedArc(
+                            color2,
+                            0,
+                            0,
+                            144,
+                            144,
+                            -90,
+                            180
+                        );
+                    }
+                );
+            }
+        } else {
+            // 9
+            canvas.withRotation(interpolate(d1, -90, -180), 72, 72, () => {
+                canvas.paintPath(color3, () => {
+                    // parallelogram
+                    canvas.moveTo(0, 72);
+                    canvas.lineTo(
+                        interpolate(d1, 0, 36),
+                        interpolate(d1, 72, 0)
+                    );
+                    canvas.lineTo(
+                        interpolate(d1, 72, 108),
+                        interpolate(d1, 72, 0)
+                    );
+                    canvas.lineTo(72, 72);
+                    canvas.lineTo(0, 72);
+                });
+
+                // vanishing arc
+                canvas.paintBoundedArc(
+                    color1,
+                    0,
+                    0,
+                    144,
+                    144,
+                    -180,
+                    interpolate(d1, 180, 0)
+                );
+
+                // primary arc
+                canvas.paintBoundedArc(color2, 0, 0, 144, 144, 0, 180);
+            });
+        }
     };
 
     draw9_0 = (canvas: Canvas, glyphProgress: number, paints: Paints): void => {
