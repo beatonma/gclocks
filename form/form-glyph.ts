@@ -310,9 +310,51 @@ export class FormGlyph extends BaseGlyph {
     };
 
     draw3_0 = (canvas: Canvas, glyphProgress: number, paints: Paints): void => {
-        // TODO
         const [color1, color2, color3] = paints.colors;
-        canvas.text("3_0", 50, 50, paints.colors[0]);
+        const d1 = 1 - decelerate5(progress(glyphProgress, 0, 0.5));
+        const d2 = decelerate5(progress(glyphProgress, 0.5, 1));
+
+        canvas.withCheckpoint(() => {
+            canvas.rotateWithPivot(interpolate(d2, 0, 45), 72, 72);
+            canvas.translate(interpolate(d1, interpolate(d2, 16, -8), 0), 0);
+
+            if (d1 > 0) {
+                // top part of 3 with triangle
+                canvas.withTranslate(0, interpolate(d1, 48, 0), () => {
+                    canvas.paintPath(color3, () => {
+                        const x = interpolate(d1, 48, 0);
+                        canvas.moveTo(128 - x, 0);
+                        canvas.lineTo(80 - x, 48);
+                        canvas.lineTo(80 - x, 0);
+                    });
+                    canvas.paintRect(interpolate(d1, 32, 0), 0, 80, 48, color3);
+                });
+            }
+
+            // bottom rectangle in 3
+            canvas.paintRect(
+                interpolate(d1, interpolate(d2, 32, 80), 0),
+                96,
+                80,
+                144,
+                color1
+            );
+
+            // middle rectangle
+            canvas.paintRect(interpolate(d2, 32, 80), 48, 80, 96, color2);
+
+            // 0
+            // half-circles
+            canvas.scaleWithPivot(interpolate(d2, 2 / 3, 1), 80, 144);
+            canvas.translate(8, 0);
+            if (d2 > 0) {
+                canvas.withRotation(interpolate(d2, -180, 0), 72, 72, () => {
+                    canvas.paintBoundedArc(0, 0, 144, 144, 90, 180, color2);
+                });
+            }
+
+            canvas.paintBoundedArc(0, 0, 144, 144, -90, 180, color3);
+        });
     };
 
     draw3_4 = (canvas: Canvas, glyphProgress: number, paints: Paints): void => {
@@ -723,14 +765,15 @@ export class FormGlyph extends BaseGlyph {
                     128,
                     144
                 );
+            case "2_0":
             case " ":
+            case "_":
                 return 0;
             case ":":
                 return 48;
 
             default:
-                // noinspection JSSuspiciousNameCombination
-                return this.height;
+                throw `getWidthAtProgress unhandled key ${this.key}`;
         }
     };
 }
