@@ -3,9 +3,7 @@ interface CanvasRenderingContext2D {
 
     text(text: string, x: number, y: number, color: string): void;
 
-    strokePaint(color: string): void;
-
-    fillPaint(color: string): void;
+    paint(color: string, style?: PaintStyle): void;
 
     paintCircle(
         centerX: number,
@@ -31,8 +29,17 @@ interface CanvasRenderingContext2D {
         right: number,
         bottom: number,
         startAngle: number,
+        sweepAngle: number
+    ): void;
+
+    paintBoundedArc(
+        left: number,
+        top: number,
+        right: number,
+        bottom: number,
+        startAngle: number,
         sweepAngle: number,
-        color?: string
+        color: string
     ): void;
 
     scaleWithPivot(scale: number, pivotX: number, pivotY: number): void;
@@ -59,5 +66,5 @@ interface CanvasRenderingContext2D {
         block: () => void
     ): void;
 
-    paint(color: string, style?: PaintStyle): void;
+    withPaintStyle(paintStyle: PaintStyle, block: () => void): void;
 }

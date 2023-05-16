@@ -22,31 +22,17 @@ export const canvasExtensions = () => {
         }
     );
 
-    addExtension("paint", function (color: string, type?: PaintStyle) {
-        if (!type) {
-            type = this.paintStyle;
+    addExtension(
+        "paint",
+        function (color: string, type: PaintStyle = this.paintStyle) {
+            switch (type) {
+                case PaintStyle.Fill:
+                    return fillPaint(this, color);
+                case PaintStyle.Stroke:
+                    return strokePaint(this, color);
+            }
         }
-        switch (type) {
-            case PaintStyle.Fill:
-                this.fillPaint(color);
-                return;
-            case PaintStyle.Stroke:
-                this.strokePaint(color);
-                return;
-            default:
-                throw "canvas.paint: PaintStyle is required.";
-        }
-    });
-
-    addExtension("strokePaint", function (color: string) {
-        this.strokeStyle = color;
-        this.stroke();
-    });
-
-    addExtension("fillPaint", function (color: string) {
-        this.fillStyle = color;
-        this.fill();
-    });
+    );
 
     addExtension(
         "paintCircle",
@@ -56,9 +42,9 @@ export const canvasExtensions = () => {
             radius: number,
             color: string
         ) {
-            this.beginPath();
-            this.arc(centerX, centerY, radius, 0, Math.PI * 2);
-            this.paint(color);
+            this.paintPath(color, () => {
+                this.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            });
         }
     );
 
@@ -72,9 +58,9 @@ export const canvasExtensions = () => {
             bottom: number,
             color: string
         ) {
-            this.beginPath();
-            this.rect(left, top, right - left, bottom - top);
-            this.paint(color);
+            this.paintPath(color, () => {
+                this.rect(left, top, right - left, bottom - top);
+            });
         }
     );
 
@@ -105,12 +91,8 @@ export const canvasExtensions = () => {
             right: number,
             bottom: number,
             startAngle: number,
-            sweepAngle: number,
-            color?: string
+            sweepAngle: number
         ) {
-            if (color != undefined) {
-                this.beginPath();
-            }
             const centerX = (left + right) / 2;
             const centerY = (top + bottom) / 2;
             const radiusX = (right - left) / 2;
@@ -125,10 +107,30 @@ export const canvasExtensions = () => {
                 toRadians(startAngle),
                 toRadians(startAngle + sweepAngle)
             );
+        }
+    );
 
-            if (color != undefined) {
-                this.paint(color);
-            }
+    addExtension(
+        "paintBoundedArc",
+        function (
+            left: number,
+            top: number,
+            right: number,
+            bottom: number,
+            startAngle: number,
+            sweepAngle: number,
+            color: string
+        ) {
+            this.paintPath(color, () => {
+                this.boundedArc(
+                    left,
+                    top,
+                    right,
+                    bottom,
+                    startAngle,
+                    sweepAngle
+                );
+            });
         }
     );
 
@@ -183,4 +185,24 @@ export const canvasExtensions = () => {
             });
         }
     );
+
+    addExtension(
+        "withPaintStyle",
+        function (paintStyle: PaintStyle, block: () => void) {
+            const previous = this.paintStyle;
+            this.paintStyle = paintStyle;
+            block();
+            this.paintStyle = previous;
+        }
+    );
+};
+
+const strokePaint = (canvas: CanvasRenderingContext2D, color: string) => {
+    canvas.strokeStyle = color;
+    canvas.stroke();
+};
+
+const fillPaint = (canvas: CanvasRenderingContext2D, color: string) => {
+    canvas.fillStyle = color;
+    canvas.fill();
 };

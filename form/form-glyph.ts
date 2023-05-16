@@ -28,7 +28,7 @@ export class FormGlyph extends BaseGlyph {
                 canvas.closePath();
             });
 
-            canvas.boundedArc(
+            canvas.paintBoundedArc(
                 stretchX,
                 0,
                 144 + stretchX,
@@ -70,7 +70,7 @@ export class FormGlyph extends BaseGlyph {
             });
 
             canvas.withTranslate(108, interpolate(d1, 72, 0), () => {
-                canvas.boundedArc(-36, 0, 36, 72, -90, 180, color1);
+                canvas.paintBoundedArc(-36, 0, 36, 72, -90, 180, color1);
             });
 
             canvas.withTranslate(0, interpolate(d1, 72, 0), () => {
@@ -147,7 +147,7 @@ export class FormGlyph extends BaseGlyph {
                 interpolate(d, 108, 64),
                 interpolate(d1, 0, 72),
                 () => {
-                    canvas.boundedArc(-36, 0, 36, 72, -90, 180, color1);
+                    canvas.paintBoundedArc(-36, 0, 36, 72, -90, 180, color1);
                 }
             );
 
@@ -205,7 +205,7 @@ export class FormGlyph extends BaseGlyph {
                         canvas.closePath();
                     });
                 } else {
-                    canvas.boundedArc(
+                    canvas.paintBoundedArc(
                         108 - 36,
                         interpolate(d, 0, 72),
                         108 + 36,
@@ -291,7 +291,7 @@ export class FormGlyph extends BaseGlyph {
                 });
 
                 canvas.withTranslate(108, interpolate(d, 0, 72), () => {
-                    canvas.boundedArc(-36, 0, 36, 72, -90, 180, color1);
+                    canvas.paintBoundedArc(-36, 0, 36, 72, -90, 180, color1);
                 });
 
                 canvas.paintRect(
@@ -334,7 +334,7 @@ export class FormGlyph extends BaseGlyph {
 
                 // half-circle
                 canvas.withScale(interpolate(d1, 0.7, 1), 128, 144, () => {
-                    canvas.boundedArc(32, 48, 128, 144, -90, 180, color3);
+                    canvas.paintBoundedArc(32, 48, 128, 144, -90, 180, color3);
                 });
 
                 // bottom rectangle
@@ -464,7 +464,7 @@ export class FormGlyph extends BaseGlyph {
             canvas.withCheckpoint(() => {
                 canvas.scaleWithPivot(interpolate(d1, 0.75, 1), 0, 144);
                 canvas.translate(interpolate(d1, -48, 0), 0);
-                canvas.boundedArc(32, 48, 128, 144, -90, 180, color3);
+                canvas.paintBoundedArc(32, 48, 128, 144, -90, 180, color3);
             });
 
             // bottom rectangle
@@ -516,12 +516,12 @@ export class FormGlyph extends BaseGlyph {
             // half-circles
             if (d1 > 0) {
                 canvas.withRotation(interpolate(d1, -180, 0), 72, 72, () => {
-                    canvas.boundedArc(0, 0, 144, 144, 90, 180, color2);
+                    canvas.paintBoundedArc(0, 0, 144, 144, 90, 180, color2);
                 });
             }
 
             canvas.translate(interpolate(d1, 8, 0), 0);
-            canvas.boundedArc(0, 0, 144, 144, -90, 180, color3);
+            canvas.paintBoundedArc(0, 0, 144, 144, -90, 180, color3);
         });
     };
 
@@ -547,11 +547,11 @@ export class FormGlyph extends BaseGlyph {
         // half-circle
         canvas.withRotation(interpolate(d1, 0, 90), 72, 72, () => {
             if (d1 == 0) {
-                canvas.boundedArc(32, 48, 128, 144, -90, 180, color3);
+                canvas.paintBoundedArc(32, 48, 128, 144, -90, 180, color3);
             } else {
                 canvas.scaleWithPivot(interpolate(d1, 2 / 3, 1), 80, 144);
                 canvas.translate(interpolate(d1, 8, 0), 0);
-                canvas.boundedArc(0, 0, 144, 144, -90, 180, color3);
+                canvas.paintBoundedArc(0, 0, 144, 144, -90, 180, color3);
             }
 
             // 6 (just the parallelogram)
