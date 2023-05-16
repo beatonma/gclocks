@@ -1,26 +1,35 @@
 interface CanvasRenderingContext2D {
     paintStyle: PaintStyle;
 
-    text(text: string, x: number, y: number, color: string): void;
+    text(color: string, text: string, x: number, y: number): void;
 
     paint(color: string, style?: PaintStyle): void;
 
     paintCircle(
+        color: string,
         centerX: number,
         centerY: number,
-        radius: number,
-        color: string
+        radius: number
     );
 
     /**
      * Beware that we are using right and bottom, not width and height.
      */
     paintRect(
+        color: string,
+        left: number,
+        top: number,
+        right: number,
+        bottom: number
+    ): void;
+
+    paintRoundRect(
+        color: string,
         left: number,
         top: number,
         right: number,
         bottom: number,
-        color: string
+        ...radii: number[]
     ): void;
 
     boundedArc(
@@ -34,17 +43,24 @@ interface CanvasRenderingContext2D {
     ): void;
 
     paintBoundedArc(
+        color: string,
         left: number,
         top: number,
         right: number,
         bottom: number,
         startAngle: number,
         sweepAngle: number,
-        color: string,
         counterClockwise: boolean = false
     ): void;
 
-    scaleWithPivot(scale: number, pivotX: number, pivotY: number): void;
+    scaleWithPivot(
+        scaleX: number,
+        scaleY: number,
+        pivotX: number,
+        pivotY: number
+    ): void;
+
+    scaleUniformWithPivot(scale: number, pivotX: number, pivotY: number): void;
 
     rotateWithPivot(angleDegrees: number, pivotX: number, pivotY: number): void;
 
@@ -52,9 +68,17 @@ interface CanvasRenderingContext2D {
 
     withCheckpoint(block: () => void): void;
 
-    withTranslate(x: number, y: number, block: () => void): void;
+    withTranslation(x: number, y: number, block: () => void): void;
 
     withScale(
+        scaleX: number,
+        scaleY: number,
+        pivotX: number = 0,
+        pivotY = 0,
+        block: () => void
+    ): void;
+
+    withScaleUniform(
         scale: number,
         pivotX: number = 0,
         pivotY = 0,

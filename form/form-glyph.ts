@@ -14,8 +14,8 @@ export class FormGlyph extends BaseGlyph {
         // 0
         canvas.withCheckpoint(() => {
             canvas.translate(interpolate(d1, 0, interpolate(d2, 24, 0)), 0);
-            canvas.scaleWithPivot(interpolate(d1, 1, 2 / 3), 72, 144);
-            canvas.scaleWithPivot(interpolate(d2, 1, 0.7), 72, 96);
+            canvas.scaleUniformWithPivot(interpolate(d1, 1, 2 / 3), 72, 144);
+            canvas.scaleUniformWithPivot(interpolate(d2, 1, 0.7), 72, 96);
             canvas.rotateWithPivot(interpolate(d1, 45, 0), 72, 72);
 
             const stretchX = interpolate(d1, 0, interpolate(d2, 72, -36));
@@ -29,26 +29,26 @@ export class FormGlyph extends BaseGlyph {
             });
 
             canvas.paintBoundedArc(
+                color3,
                 stretchX,
                 0,
                 144 + stretchX,
                 144,
                 -90,
-                180,
-                color3
+                180
             );
         });
 
         // 1
         if (d2 > 0) {
             canvas.paintRect(
+                color2,
                 interpolate(d2, 28, 0),
                 interpolate(d2, 72, 0),
                 100,
-                interpolate(d2, 144, 48),
-                color2
+                interpolate(d2, 144, 48)
             );
-            canvas.paintRect(28, interpolate(d2, 144, 48), 100, 144, color3);
+            canvas.paintRect(color3, 28, interpolate(d2, 144, 48), 100, 144);
         }
     };
 
@@ -60,7 +60,7 @@ export class FormGlyph extends BaseGlyph {
 
         // 2
         if (d1 > 0) {
-            canvas.withTranslate(interpolate(d2, 72, 0), 0, () => {
+            canvas.withTranslation(interpolate(d2, 72, 0), 0, () => {
                 canvas.paintPath(color3, () => {
                     canvas.moveTo(0, 144);
                     canvas.lineTo(72, 72);
@@ -69,34 +69,34 @@ export class FormGlyph extends BaseGlyph {
                 });
             });
 
-            canvas.withTranslate(108, interpolate(d1, 72, 0), () => {
-                canvas.paintBoundedArc(-36, 0, 36, 72, -90, 180, color1);
+            canvas.withTranslation(108, interpolate(d1, 72, 0), () => {
+                canvas.paintBoundedArc(color1, -36, 0, 36, 72, -90, 180);
             });
 
-            canvas.withTranslate(0, interpolate(d1, 72, 0), () => {
+            canvas.withTranslation(0, interpolate(d1, 72, 0), () => {
                 canvas.paintRect(
+                    color1,
                     interpolate(d2, 72, 8),
                     0,
                     interpolate(d2, 144, 108),
-                    72,
-                    color1
+                    72
                 );
             });
 
-            canvas.paintRect(72, 72, 144, 144, color2);
+            canvas.paintRect(color2, 72, 72, 144, 144);
         }
 
         // 1
         if (d > 0) {
-            canvas.withTranslate(interpolate(d, 44, 0), 0, () => {
+            canvas.withTranslation(interpolate(d, 44, 0), 0, () => {
                 canvas.paintRect(
+                    color2,
                     interpolate(d, 28, 0),
                     interpolate(d, 72, 0),
                     100,
-                    interpolate(d, 144, 48),
-                    color2
+                    interpolate(d, 144, 48)
                 );
-                canvas.paintRect(28, interpolate(d, 144, 48), 100, 144, color3);
+                canvas.paintRect(color3, 28, interpolate(d, 144, 48), 100, 144);
             });
         }
     };
@@ -106,24 +106,24 @@ export class FormGlyph extends BaseGlyph {
         const d1 = decelerate5(progress(glyphProgress, 0, 0.5));
         const d2 = decelerate5(progress(glyphProgress, 0.5, 1));
 
-        canvas.scaleWithPivot(interpolate(d2, 1, 0), 0, 144);
+        canvas.scaleUniformWithPivot(interpolate(d2, 1, 0), 0, 144);
         canvas.paintRect(
+            color2,
             interpolate(d1, 0, 28),
             interpolate(d1, 0, 72),
             100,
-            interpolate(d1, 48, 144),
-            color2
+            interpolate(d1, 48, 144)
         );
 
         if (d1 < 1) {
-            canvas.paintRect(28, interpolate(d1, 48, 144), 100, 144, color3);
+            canvas.paintRect(color3, 28, interpolate(d1, 48, 144), 100, 144);
         }
     };
 
     draw2_0 = (canvas: Canvas, glyphProgress: number, paints: Paints): void => {
         // TODO
         const [color1, color2, color3] = paints.colors;
-        canvas.text("2_0", 50, 50, paints.colors[0]);
+        canvas.text(paints.colors[0], "2_0", 50, 50);
     };
 
     draw2_1 = (canvas: Canvas, glyphProgress: number, paints: Paints): void => {
@@ -134,7 +134,7 @@ export class FormGlyph extends BaseGlyph {
 
         // 2
         if (d1 < 1) {
-            canvas.withTranslate(interpolate(d, 0, 28), 0, () => {
+            canvas.withTranslation(interpolate(d, 0, 28), 0, () => {
                 canvas.paintPath(color3, () => {
                     canvas.moveTo(0, 144);
                     canvas.lineTo(72, 72);
@@ -143,37 +143,37 @@ export class FormGlyph extends BaseGlyph {
                 });
             });
 
-            canvas.withTranslate(
+            canvas.withTranslation(
                 interpolate(d, 108, 64),
                 interpolate(d1, 0, 72),
                 () => {
-                    canvas.paintBoundedArc(-36, 0, 36, 72, -90, 180, color1);
+                    canvas.paintBoundedArc(color1, -36, 0, 36, 72, -90, 180);
                 }
             );
 
-            canvas.withTranslate(0, interpolate(d1, 0, 72), () => {
+            canvas.withTranslation(0, interpolate(d1, 0, 72), () => {
                 canvas.paintRect(
+                    color1,
                     interpolate(d, 8, 28),
                     0,
                     interpolate(d, 108, 100),
-                    72,
-                    color1
+                    72
                 );
             });
 
-            canvas.withTranslate(interpolate(d, 0, -44), 0, () => {
-                canvas.paintRect(72, 72, 144, 144, color2);
+            canvas.withTranslation(interpolate(d, 0, -44), 0, () => {
+                canvas.paintRect(color2, 72, 72, 144, 144);
             });
         } else {
             // 1
             canvas.paintRect(
+                color2,
                 interpolate(d2, 28, 0),
                 interpolate(d2, 72, 0),
                 100,
-                interpolate(d2, 144, 48),
-                color2
+                interpolate(d2, 144, 48)
             );
-            canvas.paintRect(28, interpolate(d2, 144, 48), 100, 144, color3);
+            canvas.paintRect(color3, 28, interpolate(d2, 144, 48), 100, 144);
         }
     };
 
@@ -184,8 +184,8 @@ export class FormGlyph extends BaseGlyph {
 
         // 2
         if (d < 1) {
-            canvas.withTranslate(interpolate(d, 0, -16), 0, () => {
-                canvas.withTranslate(interpolate(d, 0, 72), 0, () => {
+            canvas.withTranslation(interpolate(d, 0, -16), 0, () => {
+                canvas.withTranslation(interpolate(d, 0, 72), 0, () => {
                     canvas.paintPath(color3, () => {
                         canvas.moveTo(0, 144);
                         canvas.lineTo(72, 72);
@@ -206,24 +206,24 @@ export class FormGlyph extends BaseGlyph {
                     });
                 } else {
                     canvas.paintBoundedArc(
+                        color1,
                         108 - 36,
                         interpolate(d, 0, 72),
                         108 + 36,
                         72 + interpolate(d, 0, 72),
                         -90,
-                        180,
-                        color1
+                        180
                     );
 
                     canvas.paintRect(
+                        color1,
                         interpolate(d, 8, 72),
                         interpolate(d, 0, 72),
                         interpolate(d, 108, 144),
-                        interpolate(d, 72, 144),
-                        color1
+                        interpolate(d, 72, 144)
                     );
                 }
-                canvas.paintRect(72, 72, 144, 144, color2);
+                canvas.paintRect(color2, 72, 72, 144, 144);
             });
             return;
         }
@@ -231,22 +231,22 @@ export class FormGlyph extends BaseGlyph {
         // half-circle
         canvas.withCheckpoint(() => {
             canvas.beginPath();
-            canvas.scaleWithPivot(interpolate(d1, 0.7, 1), 128, 144);
+            canvas.scaleUniformWithPivot(interpolate(d1, 0.7, 1), 128, 144);
             canvas.boundedArc(32, 48, 128, 144, -90, 180);
             canvas.paint(color3);
         });
 
         // bottom rectangle
         canvas.paintRect(
+            color1,
             interpolate(d1, 56, 0),
             interpolate(d1, 72, 96),
             interpolate(d1, 128, 80),
-            interpolate(d1, 144, 144),
-            color1
+            interpolate(d1, 144, 144)
         );
 
         // top part with triangle
-        canvas.withTranslate(0, interpolate(d1, 72, 0), () => {
+        canvas.withTranslation(0, interpolate(d1, 72, 0), () => {
             canvas.paintPath(color3, () => {
                 canvas.moveTo(128, 0);
                 canvas.lineTo(80, 48);
@@ -254,21 +254,21 @@ export class FormGlyph extends BaseGlyph {
                 canvas.closePath();
             });
             canvas.paintRect(
+                color3,
                 interpolate(d1, 56, 0),
                 0,
                 interpolate(d1, 128, 80),
-                interpolate(d1, 72, 48),
-                color3
+                interpolate(d1, 72, 48)
             );
         });
 
         // middle rectangle
         canvas.paintRect(
+            color2,
             interpolate(d1, 56, 32),
             interpolate(d1, 72, 48),
             interpolate(d1, 128, 80),
-            interpolate(d1, 144, 96),
-            color2
+            interpolate(d1, 144, 96)
         );
     };
 
@@ -278,9 +278,9 @@ export class FormGlyph extends BaseGlyph {
         const d1 = decelerate5(progress(glyphProgress, 0.5, 1.0));
 
         // 2
-        canvas.withTranslate(interpolate(d, 0, -72), 0, () => {
+        canvas.withTranslation(interpolate(d, 0, -72), 0, () => {
             if (d < 1) {
-                canvas.withTranslate(interpolate(d, 0, 72), 0, () => {
+                canvas.withTranslation(interpolate(d, 0, 72), 0, () => {
                     canvas.paintPath(color3, () => {
                         canvas.beginPath();
                         canvas.moveTo(0, 144);
@@ -290,21 +290,21 @@ export class FormGlyph extends BaseGlyph {
                     });
                 });
 
-                canvas.withTranslate(108, interpolate(d, 0, 72), () => {
-                    canvas.paintBoundedArc(-36, 0, 36, 72, -90, 180, color1);
+                canvas.withTranslation(108, interpolate(d, 0, 72), () => {
+                    canvas.paintBoundedArc(color1, -36, 0, 36, 72, -90, 180);
                 });
 
                 canvas.paintRect(
+                    color1,
                     interpolate(d, 8, 72),
                     interpolate(d, 0, 72),
                     interpolate(d, 108, 144),
-                    interpolate(d, 72, 144),
-                    color1
+                    interpolate(d, 72, 144)
                 );
             }
 
-            canvas.withScale(interpolate(d1, 1, 0), 72, 144, () => {
-                canvas.paintRect(72, 72, 144, 144, color2);
+            canvas.withScaleUniform(interpolate(d1, 1, 0), 72, 144, () => {
+                canvas.paintRect(color2, 72, 72, 144, 144);
             });
         });
     };
@@ -320,40 +320,40 @@ export class FormGlyph extends BaseGlyph {
 
             if (d1 > 0) {
                 // top part of 3 with triangle
-                canvas.withTranslate(0, interpolate(d1, 48, 0), () => {
+                canvas.withTranslation(0, interpolate(d1, 48, 0), () => {
                     canvas.paintPath(color3, () => {
                         const x = interpolate(d1, 48, 0);
                         canvas.moveTo(128 - x, 0);
                         canvas.lineTo(80 - x, 48);
                         canvas.lineTo(80 - x, 0);
                     });
-                    canvas.paintRect(interpolate(d1, 32, 0), 0, 80, 48, color3);
+                    canvas.paintRect(color3, interpolate(d1, 32, 0), 0, 80, 48);
                 });
             }
 
             // bottom rectangle in 3
             canvas.paintRect(
+                color1,
                 interpolate(d1, interpolate(d2, 32, 80), 0),
                 96,
                 80,
-                144,
-                color1
+                144
             );
 
             // middle rectangle
-            canvas.paintRect(interpolate(d2, 32, 80), 48, 80, 96, color2);
+            canvas.paintRect(color2, interpolate(d2, 32, 80), 48, 80, 96);
 
             // 0
             // half-circles
-            canvas.scaleWithPivot(interpolate(d2, 2 / 3, 1), 80, 144);
+            canvas.scaleUniformWithPivot(interpolate(d2, 2 / 3, 1), 80, 144);
             canvas.translate(8, 0);
             if (d2 > 0) {
                 canvas.withRotation(interpolate(d2, -180, 0), 72, 72, () => {
-                    canvas.paintBoundedArc(0, 0, 144, 144, 90, 180, color2);
+                    canvas.paintBoundedArc(color2, 0, 0, 144, 144, 90, 180);
                 });
             }
 
-            canvas.paintBoundedArc(0, 0, 144, 144, -90, 180, color3);
+            canvas.paintBoundedArc(color3, 0, 0, 144, 144, -90, 180);
         });
     };
 
@@ -364,32 +364,45 @@ export class FormGlyph extends BaseGlyph {
 
         // 3
         if (d1 > 0) {
-            canvas.withTranslate(interpolate(d1, 16, 0), 0, () => {
+            canvas.withTranslation(interpolate(d1, 16, 0), 0, () => {
                 // middle rectangle
                 canvas.paintRect(
+                    color2,
                     interpolate(d1, 56, 32),
                     interpolate(d1, 72, 48),
                     interpolate(d1, 128, 80),
-                    interpolate(d1, 144, 96),
-                    color2
+                    interpolate(d1, 144, 96)
                 );
 
                 // half-circle
-                canvas.withScale(interpolate(d1, 0.7, 1), 128, 144, () => {
-                    canvas.paintBoundedArc(32, 48, 128, 144, -90, 180, color3);
-                });
+                canvas.withScaleUniform(
+                    interpolate(d1, 0.7, 1),
+                    128,
+                    144,
+                    () => {
+                        canvas.paintBoundedArc(
+                            color3,
+                            32,
+                            48,
+                            128,
+                            144,
+                            -90,
+                            180
+                        );
+                    }
+                );
 
                 // bottom rectangle
                 canvas.paintRect(
+                    color1,
                     interpolate(d1, 56, 0),
                     interpolate(d1, 72, 96),
                     interpolate(d1, 128, 80),
-                    interpolate(d1, 144, 144),
-                    color1
+                    interpolate(d1, 144, 144)
                 );
 
                 // top part with triangle
-                canvas.withTranslate(0, interpolate(d1, 72, 0), () => {
+                canvas.withTranslation(0, interpolate(d1, 72, 0), () => {
                     canvas.beginPath();
                     canvas.moveTo(80, 0);
                     canvas.lineTo(128, 0);
@@ -404,11 +417,11 @@ export class FormGlyph extends BaseGlyph {
                         canvas.closePath();
                         canvas.paint(color3);
                         canvas.paintRect(
+                            color3,
                             interpolate(d1, 56, 0),
                             0,
                             interpolate(d1, 128, 80),
-                            interpolate(d1, 72, 48),
-                            color3
+                            interpolate(d1, 72, 48)
                         );
                     }
                 });
@@ -416,19 +429,19 @@ export class FormGlyph extends BaseGlyph {
         } else {
             // 4
             // bottom rectangle
-            canvas.paintRect(72, interpolate(d2, 144, 108), 144, 144, color2);
+            canvas.paintRect(color2, 72, interpolate(d2, 144, 108), 144, 144);
 
             // middle rectangle
             canvas.paintRect(
+                color1,
                 interpolate(d2, 72, 0),
                 interpolate(d2, 144, 72),
                 144,
-                interpolate(d2, 144, 108),
-                color1
+                interpolate(d2, 144, 108)
             );
 
             // triangle
-            canvas.withScale(d2, 144, 144, () => {
+            canvas.withScaleUniform(d2, 144, 144, () => {
                 canvas.beginPath();
                 canvas.moveTo(72, 72);
                 canvas.lineTo(72, 0);
@@ -439,11 +452,11 @@ export class FormGlyph extends BaseGlyph {
 
             // top rectangle
             canvas.paintRect(
+                color3,
                 72,
                 interpolate(d2, 72, 0),
                 144,
-                interpolate(d2, 144, 72),
-                color3
+                interpolate(d2, 144, 72)
             );
         }
     };
@@ -457,24 +470,24 @@ export class FormGlyph extends BaseGlyph {
         if (d < 1) {
             // bottom rectangle
             canvas.paintRect(
+                color2,
                 interpolate(d, 72, 0),
                 108,
                 interpolate(d, 144, 72),
-                144,
-                color2
+                144
             );
 
             // top rectangle
             canvas.paintRect(
+                color3,
                 interpolate(d, 72, 0),
                 interpolate(d, 0, 72),
                 interpolate(d, 144, 72),
-                interpolate(d, 72, 144),
-                color3
+                interpolate(d, 72, 144)
             );
 
             // triangle
-            canvas.withScale(1 - d, 0, 144, () => {
+            canvas.withScaleUniform(1 - d, 0, 144, () => {
                 canvas.paintPath(color2, () => {
                     canvas.moveTo(72, 72);
                     canvas.lineTo(72, 0);
@@ -485,40 +498,40 @@ export class FormGlyph extends BaseGlyph {
 
             // middle rectangle
             canvas.paintRect(
+                color1,
                 0,
                 72,
                 interpolate(d, 144, 72),
-                interpolate(d, 108, 144),
-                color1
+                interpolate(d, 108, 144)
             );
         } else {
             // 5
             // wing rectangle
             canvas.paintRect(
+                color2,
                 80,
                 interpolate(d1, 72, 0),
                 interpolate(d1, 80, 128),
-                interpolate(d1, 144, 48),
-                color2
+                interpolate(d1, 144, 48)
             );
 
             // half-circle
             canvas.withCheckpoint(() => {
-                canvas.scaleWithPivot(interpolate(d1, 0.75, 1), 0, 144);
+                canvas.scaleUniformWithPivot(interpolate(d1, 0.75, 1), 0, 144);
                 canvas.translate(interpolate(d1, -48, 0), 0);
-                canvas.paintBoundedArc(32, 48, 128, 144, -90, 180, color3);
+                canvas.paintBoundedArc(color3, 32, 48, 128, 144, -90, 180);
             });
 
             // bottom rectangle
-            canvas.paintRect(0, 96, 80, 144, color2);
+            canvas.paintRect(color2, 0, 96, 80, 144);
 
             // middle rectangle
             canvas.paintRect(
+                color1,
                 0,
                 interpolate(d1, 72, 0),
                 80,
-                interpolate(d1, 144, 96),
-                color1
+                interpolate(d1, 144, 96)
             );
         }
     };
@@ -533,37 +546,37 @@ export class FormGlyph extends BaseGlyph {
             if (d < 1) {
                 // wing rectangle
                 canvas.paintRect(
+                    color2,
                     80,
                     interpolate(d, 0, 48),
                     interpolate(d, 128, 80),
-                    interpolate(d, 48, 144),
-                    color2
+                    interpolate(d, 48, 144)
                 );
 
                 // bottom rectangle
-                canvas.paintRect(0, 96, 80, 144, color2);
+                canvas.paintRect(color2, 0, 96, 80, 144);
             }
 
             // middle rectangle
             canvas.paintRect(
+                color1,
                 interpolate(d1, 0, 80),
                 interpolate(d, 0, interpolate(d1, 48, 0)),
                 80,
-                interpolate(d, 96, 144),
-                color1
+                interpolate(d, 96, 144)
             );
 
-            canvas.scaleWithPivot(interpolate(d1, 2 / 3, 1), 80, 144);
+            canvas.scaleUniformWithPivot(interpolate(d1, 2 / 3, 1), 80, 144);
 
             // half-circles
             if (d1 > 0) {
                 canvas.withRotation(interpolate(d1, -180, 0), 72, 72, () => {
-                    canvas.paintBoundedArc(0, 0, 144, 144, 90, 180, color2);
+                    canvas.paintBoundedArc(color2, 0, 0, 144, 144, 90, 180);
                 });
             }
 
             canvas.translate(interpolate(d1, 8, 0), 0);
-            canvas.paintBoundedArc(0, 0, 144, 144, -90, 180, color3);
+            canvas.paintBoundedArc(color3, 0, 0, 144, 144, -90, 180);
         });
     };
 
@@ -574,26 +587,30 @@ export class FormGlyph extends BaseGlyph {
 
         // 5 (except half-circle)
         if (d < 1) {
-            canvas.withScale(interpolate(d, 1, 0.25), 108, 96, () => {
+            canvas.withScaleUniform(interpolate(d, 1, 0.25), 108, 96, () => {
                 // wing rectangle
-                canvas.paintRect(80, 0, 128, 48, color2);
+                canvas.paintRect(color2, 80, 0, 128, 48);
 
                 // bottom rectangle
-                canvas.paintRect(0, 96, 80, 144, color2);
+                canvas.paintRect(color2, 0, 96, 80, 144);
 
                 // middle rectangle
-                canvas.paintRect(0, 0, 80, 96, color1);
+                canvas.paintRect(color1, 0, 0, 80, 96);
             });
         }
 
         // half-circle
         canvas.withRotation(interpolate(d1, 0, 90), 72, 72, () => {
             if (d1 == 0) {
-                canvas.paintBoundedArc(32, 48, 128, 144, -90, 180, color3);
+                canvas.paintBoundedArc(color3, 32, 48, 128, 144, -90, 180);
             } else {
-                canvas.scaleWithPivot(interpolate(d1, 2 / 3, 1), 80, 144);
+                canvas.scaleUniformWithPivot(
+                    interpolate(d1, 2 / 3, 1),
+                    80,
+                    144
+                );
                 canvas.translate(interpolate(d1, 8, 0), 0);
-                canvas.paintBoundedArc(0, 0, 144, 144, -90, 180, color3);
+                canvas.paintBoundedArc(color3, 0, 0, 144, 144, -90, 180);
             }
 
             // 6 (just the parallelogram)
@@ -623,7 +640,7 @@ export class FormGlyph extends BaseGlyph {
         const d = decelerate5(glyphProgress);
 
         // 7 rectangle
-        canvas.paintRect(interpolate(d, 72, 0), 0, 72, 72, color3);
+        canvas.paintRect(color3, interpolate(d, 72, 0), 0, 72, 72);
 
         // 6 circle
         canvas.save();
@@ -632,13 +649,13 @@ export class FormGlyph extends BaseGlyph {
 
         if (d < 1) {
             canvas.paintBoundedArc(
+                color3,
                 0,
                 0,
                 144,
                 144,
                 interpolate(d, 180, -64),
                 -180,
-                color3,
                 true
             );
         }
@@ -656,21 +673,119 @@ export class FormGlyph extends BaseGlyph {
     };
 
     draw7_8 = (canvas: Canvas, glyphProgress: number, paints: Paints): void => {
-        // TODO
         const [color1, color2, color3] = paints.colors;
-        canvas.text("7_8", 50, 50, paints.colors[0]);
+        const d = decelerate5(progress(glyphProgress, 0, 0.5));
+        const d1 = decelerate5(progress(glyphProgress, 0.2, 0.5));
+        const d2 = decelerate5(progress(glyphProgress, 0.5, 1));
+
+        if (d == 0) {
+            // 7 'rectangle', drawn as a path to avoid unnecessary overlapping
+            // (because overlapping looks weird with transparent colors)
+            canvas.paintPath(color3, () => {
+                canvas.moveTo(0, 0);
+                canvas.lineTo(72, 0);
+                canvas.lineTo(36, 72);
+                canvas.lineTo(0, 72);
+                canvas.closePath();
+            });
+
+            // 7 parallelogram
+            canvas.paintPath(color2, () => {
+                canvas.moveTo(interpolate(d, 72, 48), interpolate(d, 0, 96));
+                canvas.lineTo(interpolate(d, 144, 96), interpolate(d, 0, 96));
+                canvas.lineTo(interpolate(d, 72, 96), 144);
+                canvas.lineTo(interpolate(d, 0, 48), 144);
+                canvas.closePath();
+            });
+        } else {
+            // 8
+            if (d1 > 0) {
+                if (d2 > 0) {
+                    // top
+                    canvas.withTranslation(0, interpolate(d2, 96, 0), () => {
+                        canvas.paintRoundRect(color3, 24, 0, 120, 48, 24);
+                    });
+                }
+
+                // left bottom
+                canvas.withCheckpoint(() => {
+                    canvas.translate(interpolate(d1, 24, 0), 0);
+                    canvas.scaleUniformWithPivot(
+                        interpolate(d2, 0.5, 1),
+                        48,
+                        144
+                    );
+                    canvas.paintBoundedArc(color1, 0, 48, 96, 144, 90, 180);
+                });
+
+                // right bottom
+                canvas.withCheckpoint(() => {
+                    canvas.translate(interpolate(d1, -24, 0), 0);
+                    canvas.scaleUniformWithPivot(
+                        interpolate(d2, 0.5, 1),
+                        96,
+                        144
+                    );
+                    canvas.paintBoundedArc(color2, 48, 48, 144, 144, -90, 180);
+                });
+
+                // bottom middle
+                canvas.withScale(interpolate(d1, 0, 1), 1, 72, 0, () => {
+                    canvas.paintRect(
+                        color1,
+                        48,
+                        interpolate(d2, 96, 48),
+                        96,
+                        144
+                    );
+                    canvas.paintRect(
+                        color2,
+                        interpolate(d2, 48, 96),
+                        interpolate(d2, 96, 48),
+                        96,
+                        144
+                    );
+                });
+            }
+
+            if (d < 1) {
+                // 7 rectangle
+                canvas.paintRect(
+                    color3,
+                    interpolate(d, 0, 48),
+                    interpolate(d, 0, 96),
+                    interpolate(d, 72, 96),
+                    interpolate(d, 72, 144)
+                );
+
+                // 7 parallelogram
+                canvas.paintPath(color2, () => {
+                    canvas.moveTo(
+                        interpolate(d, 72, 48),
+                        interpolate(d, 0, 96)
+                    );
+                    canvas.lineTo(
+                        interpolate(d, 144, 96),
+                        interpolate(d, 0, 96)
+                    );
+                    canvas.lineTo(interpolate(d, 72, 96), 144);
+                    canvas.lineTo(interpolate(d, 0, 48), 144);
+                    canvas.closePath();
+                });
+            }
+        }
     };
 
     draw8_9 = (canvas: Canvas, glyphProgress: number, paints: Paints): void => {
         // TODO
         const [color1, color2, color3] = paints.colors;
-        canvas.text("8_9", 50, 50, paints.colors[0]);
+        canvas.text(paints.colors[0], "8_9", 50, 50);
     };
 
     draw9_0 = (canvas: Canvas, glyphProgress: number, paints: Paints): void => {
         // TODO
         const [color1, color2, color3] = paints.colors;
-        canvas.text("9_0", 50, 50, paints.colors[0]);
+        canvas.text(paints.colors[0], "9_0", 50, 50);
     };
 
     drawSeparator = (
@@ -678,8 +793,8 @@ export class FormGlyph extends BaseGlyph {
         glyphProgress: number,
         paints: Paints
     ): void => {
-        canvas.paintCircle(24, 24, 24, paints.colors[1]);
-        canvas.paintCircle(24, 120, 24, paints.colors[2]);
+        canvas.paintCircle(paints.colors[1], 24, 24, 24);
+        canvas.paintCircle(paints.colors[2], 24, 120, 24);
     };
 
     draw_ = (canvas: Canvas, glyphProgress: number, paints: Paints): void => {
@@ -692,17 +807,17 @@ export class FormGlyph extends BaseGlyph {
         const d2 = decelerate5(progress(glyphProgress, 0.5, 1));
 
         // 1
-        canvas.scaleWithPivot(interpolate(d1, 0, 1), 0, 144);
+        canvas.scaleUniformWithPivot(interpolate(d1, 0, 1), 0, 144);
         canvas.paintRect(
+            color2,
             interpolate(d2, 28, 0),
             interpolate(d2, 72, 0),
             100,
-            interpolate(d2, 144, 48),
-            color2
+            interpolate(d2, 144, 48)
         );
 
         if (d2 > 0) {
-            canvas.paintRect(28, interpolate(d2, 144, 48), 100, 144, color3);
+            canvas.paintRect(color3, 28, interpolate(d2, 144, 48), 100, 144);
         }
     };
 

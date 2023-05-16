@@ -104,14 +104,14 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
     }
 
     draw(canvas: Canvas) {
-        canvas.withScale(this.scale, 0, 0, () => {
+        canvas.withScaleUniform(this.scale, 0, 0, () => {
             this.layoutPass((glyph, glyphAnimationProgress, rect) => {
                 if (glyphAnimationProgress == 1) {
                     glyph.key = glyph.getCanonicalEndGlyph();
                     glyphAnimationProgress = 0;
                 }
 
-                canvas.withTranslate(rect.left, rect.top, () => {
+                canvas.withTranslation(rect.left, rect.top, () => {
                     glyph.draw(canvas, glyphAnimationProgress, this.paints);
                 });
             });

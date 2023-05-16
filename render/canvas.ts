@@ -37,10 +37,10 @@ export const canvasExtensions = () => {
     addExtension(
         "paintCircle",
         function (
+            color: string,
             centerX: number,
             centerY: number,
-            radius: number,
-            color: string
+            radius: number
         ) {
             this.paintPath(color, () => {
                 this.arc(centerX, centerY, radius, 0, Math.PI * 2);
@@ -48,15 +48,14 @@ export const canvasExtensions = () => {
         }
     );
 
-    // Overrides native method.
     addExtension(
         "paintRect",
         function (
+            color: string,
             left: number,
             top: number,
             right: number,
-            bottom: number,
-            color: string
+            bottom: number
         ) {
             this.paintPath(color, () => {
                 this.rect(left, top, right - left, bottom - top);
@@ -65,10 +64,38 @@ export const canvasExtensions = () => {
     );
 
     addExtension(
-        "scaleWithPivot",
+        "paintRoundRect",
+        function (
+            color: string,
+            left: number,
+            top: number,
+            right: number,
+            bottom: number,
+            ...radii: number[]
+        ) {
+            this.paintPath(color, () => {
+                this.roundRect(left, top, right - left, bottom - top, radii);
+            });
+        }
+    );
+
+    addExtension(
+        "scaleUniformWithPivot",
         function (scale: number, pivotX: number, pivotY: number) {
+            this.scaleWithPivot(scale, scale, pivotX, pivotY);
+        }
+    );
+
+    addExtension(
+        "scaleWithPivot",
+        function (
+            scaleX: number,
+            scaleY: number,
+            pivotX: number,
+            pivotY: number
+        ) {
             this.translate(pivotX, pivotY);
-            this.scale(scale, scale);
+            this.scale(scaleX, scaleY);
             this.translate(-pivotX, -pivotY);
         }
     );
@@ -115,13 +142,13 @@ export const canvasExtensions = () => {
     addExtension(
         "paintBoundedArc",
         function (
+            color: string,
             left: number,
             top: number,
             right: number,
             bottom: number,
             startAngle: number,
             sweepAngle: number,
-            color: string,
             counterClockwise: boolean = false
         ) {
             this.paintPath(color, () => {
@@ -151,7 +178,7 @@ export const canvasExtensions = () => {
     });
 
     addExtension(
-        "withTranslate",
+        "withTranslation",
         function (x: number, y: number, block: () => void) {
             this.withCheckpoint(() => {
                 this.translate(x, y);
@@ -163,13 +190,29 @@ export const canvasExtensions = () => {
     addExtension(
         "withScale",
         function (
+            scaleX: number,
+            scaleY: number,
+            pivotX: number = 0,
+            pivotY = 0,
+            block: () => void
+        ) {
+            this.withCheckpoint(() => {
+                this.scaleWithPivot(scaleX, scaleY, pivotX, pivotY);
+                block();
+            });
+        }
+    );
+
+    addExtension(
+        "withScaleUniform",
+        function (
             scale: number,
             pivotX: number = 0,
             pivotY = 0,
             block: () => void
         ) {
             this.withCheckpoint(() => {
-                this.scaleWithPivot(scale, pivotX, pivotY);
+                this.scaleUniformWithPivot(scale, pivotX, pivotY);
                 block();
             });
         }
