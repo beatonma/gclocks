@@ -91,7 +91,8 @@ export const canvasExtensions = () => {
             right: number,
             bottom: number,
             startAngle: number,
-            sweepAngle: number
+            sweepAngle: number,
+            counterClockwise: boolean = false
         ) {
             const centerX = (left + right) / 2;
             const centerY = (top + bottom) / 2;
@@ -105,7 +106,8 @@ export const canvasExtensions = () => {
                 radiusY,
                 0,
                 toRadians(startAngle),
-                toRadians(startAngle + sweepAngle)
+                toRadians(startAngle + sweepAngle),
+                counterClockwise
             );
         }
     );
@@ -119,7 +121,8 @@ export const canvasExtensions = () => {
             bottom: number,
             startAngle: number,
             sweepAngle: number,
-            color: string
+            color: string,
+            counterClockwise: boolean = false
         ) {
             this.paintPath(color, () => {
                 this.boundedArc(
@@ -128,7 +131,8 @@ export const canvasExtensions = () => {
                     right,
                     bottom,
                     startAngle,
-                    sweepAngle
+                    sweepAngle,
+                    counterClockwise
                 );
             });
         }

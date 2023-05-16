@@ -4,6 +4,13 @@ import { Glyph, GlyphStateLock } from "./glyph";
 import { progress } from "./math";
 import { Canvas, Options, Paints } from "./types";
 
+const debugStartString = "0123456789_: 212235";
+const debugEndString = "1234567890_:11  000";
+// const debugStartString = "6";
+// const debugEndString = "7";
+const debugScale = 0.6;
+const debugTimeStep = 5;
+
 export interface ClockRenderer<T extends Font<G>, G extends Glyph> {
     options: Options;
     update: () => void;
@@ -26,20 +33,20 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
 
     availableWidth: number = 0;
     availableHeight: number = 0;
-    scale: number = 0.6;
+    scale: number = debugScale;
 
     options: Options;
     paints: Paints;
 
     abstract buildFont(): T;
 
-    constructor(paints: Paints, options: Options) {
+    protected constructor(paints: Paints, options: Options) {
         this.options = options;
         this.paints = paints;
         this.font = this.buildFont();
 
         // this.stringLength = options.format(new Date()).length;
-        this.stringLength = 19;
+        this.stringLength = debugStartString.length;
         this.glyphs = new Array(this.stringLength);
         this.locks = new Array(this.stringLength);
         this.maxWidth = this.stringLength * this.font.getGlyph(0).maxWidth;
@@ -59,7 +66,7 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
         const now = new Date();
         const nowString = this.options.format(now);
 
-        this.animationTime = (this.animationTime + 5) % 1000; // TODO this is just to slow down
+        this.animationTime = (this.animationTime + debugTimeStep) % 1000; // TODO this is just to slow down
         // this.animationTime = now.getMilliseconds();
 
         const next = new Date(now);
@@ -67,7 +74,7 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
         const nextString = this.options.format(next);
 
         // this.updateGlyphs(nowString, nextString);
-        this.updateGlyphs("0123456789_: 212235", "1234567890_:11  000");
+        this.updateGlyphs(debugStartString, debugEndString);
     }
 
     updateGlyphs(now: string, next: string) {

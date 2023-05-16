@@ -29,7 +29,8 @@ interface CanvasRenderingContext2D {
         right: number,
         bottom: number,
         startAngle: number,
-        sweepAngle: number
+        sweepAngle: number,
+        counterClockwise: boolean = false
     ): void;
 
     paintBoundedArc(
@@ -39,7 +40,8 @@ interface CanvasRenderingContext2D {
         bottom: number,
         startAngle: number,
         sweepAngle: number,
-        color: string
+        color: string,
+        counterClockwise: boolean = false
     ): void;
 
     scaleWithPivot(scale: number, pivotX: number, pivotY: number): void;

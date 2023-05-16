@@ -7,7 +7,7 @@ export class FormGlyph extends BaseGlyph {
     maxWidth = 144;
 
     draw0_1 = (canvas: Canvas, glyphProgress: number, paints: Paints): void => {
-        const [color1, color2, color3] = paints.colors;
+        const [_, color2, color3] = paints.colors;
         const d1 = decelerate5(progress(glyphProgress, 0, 0.5));
         const d2 = decelerate5(progress(glyphProgress, 0.5, 1));
 
@@ -102,7 +102,7 @@ export class FormGlyph extends BaseGlyph {
     };
 
     draw1__ = (canvas: Canvas, glyphProgress: number, paints: Paints): void => {
-        const [color1, color2, color3] = paints.colors;
+        const [_, color2, color3] = paints.colors;
         const d1 = decelerate5(progress(glyphProgress, 0, 0.5));
         const d2 = decelerate5(progress(glyphProgress, 0.5, 1));
 
@@ -619,9 +619,40 @@ export class FormGlyph extends BaseGlyph {
     };
 
     draw6_7 = (canvas: Canvas, glyphProgress: number, paints: Paints): void => {
-        // TODO
-        const [color1, color2, color3] = paints.colors;
-        canvas.text("6_7", 50, 50, paints.colors[0]);
+        const [_, color2, color3] = paints.colors;
+        const d = decelerate5(glyphProgress);
+
+        // 7 rectangle
+        canvas.paintRect(interpolate(d, 72, 0), 0, 72, 72, color3);
+
+        // 6 circle
+        canvas.save();
+
+        canvas.translate(interpolate(d, 0, 36), 0);
+
+        if (d < 1) {
+            canvas.paintBoundedArc(
+                0,
+                0,
+                144,
+                144,
+                interpolate(d, 180, -64),
+                -180,
+                color3,
+                true
+            );
+        }
+
+        // parallelogram
+        canvas.paintPath(color2, () => {
+            canvas.moveTo(36, 0);
+            canvas.lineTo(108, 0);
+            canvas.lineTo(interpolate(d, 72, 36), interpolate(d, 72, 144));
+            canvas.lineTo(interpolate(d, 0, -36), interpolate(d, 72, 144));
+            canvas.closePath();
+        });
+
+        canvas.restore();
     };
 
     draw7_8 = (canvas: Canvas, glyphProgress: number, paints: Paints): void => {
