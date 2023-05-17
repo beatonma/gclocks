@@ -874,9 +874,32 @@ export class FormGlyph extends BaseGlyph {
     };
 
     draw9_0 = (canvas: Canvas, glyphProgress: number, paints: Paints): void => {
-        // TODO
         const [color1, color2, color3] = paints.colors;
-        canvas.text(paints.colors[0], "9_0", 50, 50);
+        const d = decelerate5(glyphProgress);
+
+        // 9
+        canvas.withRotation(interpolate(d, -180, -225), 72, 72, () => {
+            // parallelogram
+            canvas.paintPath(color3, () => {
+                canvas.moveTo(0, 72);
+                canvas.lineTo(interpolate(d, 36, 0), interpolate(d, 0, 72));
+                canvas.lineTo(interpolate(d, 108, 72), interpolate(d, 0, 72));
+                canvas.lineTo(72, 72);
+                canvas.lineTo(0, 72);
+            });
+
+            canvas.paintBoundedArc(
+                color3,
+                0,
+                0,
+                144,
+                144,
+                interpolate(d, 180, 0),
+                180,
+                true
+            );
+            canvas.paintBoundedArc(color2, 0, 0, 144, 144, 0, 180);
+        });
     };
 
     drawSeparator = (
@@ -893,7 +916,7 @@ export class FormGlyph extends BaseGlyph {
     };
 
     draw__1 = (canvas: Canvas, glyphProgress: number, paints: Paints): void => {
-        const [color1, color2, color3] = paints.colors;
+        const [_, color2, color3] = paints.colors;
         const d1 = decelerate5(progress(glyphProgress, 0, 0.5));
         const d2 = decelerate5(progress(glyphProgress, 0.5, 1));
 
@@ -914,6 +937,7 @@ export class FormGlyph extends BaseGlyph {
 
     getWidthAtProgress = (glyphProgress: number): number => {
         switch (this.key) {
+            case "0":
             case "0_1":
                 return interpolate(
                     decelerate5(progress(glyphProgress, 0.5, 1)),
@@ -924,42 +948,51 @@ export class FormGlyph extends BaseGlyph {
                     ),
                     100
                 );
+            case "1":
             case "1_2":
                 return interpolate(
                     decelerate5(progress(glyphProgress, 0, 0.5)),
                     100,
                     144
                 );
+            case "2":
             case "2_3":
                 return interpolate(
                     decelerate5(progress(glyphProgress, 0, 0.5)),
                     144,
                     128
                 );
+            case "3":
             case "3_4":
                 return interpolate(
                     decelerate5(progress(glyphProgress, 0.5, 1)),
                     128,
                     144
                 );
+            case "4":
             case "4_5":
                 return interpolate(
                     decelerate5(progress(glyphProgress, 0, 0.5)),
                     144,
                     128
                 );
+            case "5":
             case "5_6":
                 return interpolate(
                     decelerate5(progress(glyphProgress, 0.1, 1)),
                     128,
                     144
                 );
+            case "6":
             case "6_7":
                 return 144;
+            case "7":
             case "7_8":
                 return 144;
+            case "8":
             case "8_9":
                 return 144;
+            case "9":
             case "9_0":
                 return 144;
             case " _1":
