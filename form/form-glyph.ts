@@ -643,33 +643,29 @@ export class FormGlyph extends BaseGlyph {
         canvas.paintRect(color3, interpolate(d, 72, 0), 0, 72, 72);
 
         // 6 circle
-        canvas.save();
+        canvas.withTranslation(interpolate(d, 0, 36), 0, () => {
+            if (d < 1) {
+                canvas.paintBoundedArc(
+                    color3,
+                    0,
+                    0,
+                    144,
+                    144,
+                    interpolate(d, 180, -64),
+                    -180,
+                    true
+                );
+            }
 
-        canvas.translate(interpolate(d, 0, 36), 0);
-
-        if (d < 1) {
-            canvas.paintBoundedArc(
-                color3,
-                0,
-                0,
-                144,
-                144,
-                interpolate(d, 180, -64),
-                -180,
-                true
-            );
-        }
-
-        // parallelogram
-        canvas.paintPath(color2, () => {
-            canvas.moveTo(36, 0);
-            canvas.lineTo(108, 0);
-            canvas.lineTo(interpolate(d, 72, 36), interpolate(d, 72, 144));
-            canvas.lineTo(interpolate(d, 0, -36), interpolate(d, 72, 144));
-            canvas.closePath();
+            // parallelogram
+            canvas.paintPath(color2, () => {
+                canvas.moveTo(36, 0);
+                canvas.lineTo(108, 0);
+                canvas.lineTo(interpolate(d, 72, 36), interpolate(d, 72, 144));
+                canvas.lineTo(interpolate(d, 0, -36), interpolate(d, 72, 144));
+                canvas.closePath();
+            });
         });
-
-        canvas.restore();
     };
 
     draw7_8 = (canvas: Canvas, glyphProgress: number, paints: Paints): void => {
@@ -778,17 +774,17 @@ export class FormGlyph extends BaseGlyph {
 
     draw8_9 = (canvas: Canvas, glyphProgress: number, paints: Paints): void => {
         const [color1, color2, color3] = paints.colors;
-        const d = decelerate5(progress(glyphProgress, 0, 0.5));
-        const d1 = decelerate5(progress(glyphProgress, 0.5, 1));
+        const d1 = decelerate5(progress(glyphProgress, 0, 0.5));
+        const d2 = decelerate5(progress(glyphProgress, 0.5, 1));
 
         // 8
-        if (d < 1) {
+        if (d1 < 1) {
             // top
-            canvas.withTranslation(0, interpolate(d, 0, 48), () => {
+            canvas.withTranslation(0, interpolate(d1, 0, 48), () => {
                 canvas.paintRoundRect(color3, 24, 0, 120, 48, 24);
             });
 
-            if (d == 0) {
+            if (d1 == 0) {
                 // left + middle bottom
                 canvas.paintPath(color1, () => {
                     canvas.moveTo(48, 48);
@@ -804,15 +800,15 @@ export class FormGlyph extends BaseGlyph {
                 // bottom middle
                 canvas.paintRect(
                     color1,
-                    interpolate(d, 48, 72) - 2,
-                    interpolate(d, 48, 0),
-                    interpolate(d, 96, 72) + 2,
+                    interpolate(d1, 48, 72) - 2,
+                    interpolate(d1, 48, 0),
+                    interpolate(d1, 96, 72) + 2,
                     144
                 );
 
                 // left bottom
                 canvas.withScaleUniform(
-                    interpolate(d, 2 / 3, 1),
+                    interpolate(d1, 2 / 3, 1),
                     0,
                     144,
                     () => {
@@ -822,7 +818,7 @@ export class FormGlyph extends BaseGlyph {
 
                 // right bottom
                 canvas.withScaleUniform(
-                    interpolate(d, 2 / 3, 1),
+                    interpolate(d1, 2 / 3, 1),
                     144,
                     144,
                     () => {
@@ -840,17 +836,17 @@ export class FormGlyph extends BaseGlyph {
             }
         } else {
             // 9
-            canvas.withRotation(interpolate(d1, -90, -180), 72, 72, () => {
+            canvas.withRotation(interpolate(d2, -90, -180), 72, 72, () => {
                 canvas.paintPath(color3, () => {
                     // parallelogram
                     canvas.moveTo(0, 72);
                     canvas.lineTo(
-                        interpolate(d1, 0, 36),
-                        interpolate(d1, 72, 0)
+                        interpolate(d2, 0, 36),
+                        interpolate(d2, 72, 0)
                     );
                     canvas.lineTo(
-                        interpolate(d1, 72, 108),
-                        interpolate(d1, 72, 0)
+                        interpolate(d2, 72, 108),
+                        interpolate(d2, 72, 0)
                     );
                     canvas.lineTo(72, 72);
                     canvas.lineTo(0, 72);
@@ -863,8 +859,8 @@ export class FormGlyph extends BaseGlyph {
                     0,
                     144,
                     144,
-                    -180,
-                    interpolate(d1, 180, 0)
+                    interpolate(d2, 180, 0),
+                    -180
                 );
 
                 // primary arc
@@ -965,7 +961,7 @@ export class FormGlyph extends BaseGlyph {
             case "3":
             case "3_4":
                 return interpolate(
-                    decelerate5(progress(glyphProgress, 0.5, 1)),
+                    decelerate5(progress(glyphProgress, 0, 0.5)),
                     128,
                     144
                 );
@@ -985,7 +981,20 @@ export class FormGlyph extends BaseGlyph {
                 );
             case "6":
             case "6_7":
-                return 144;
+                const turningPoint = 0.8;
+                const maxChange = 31;
+                const d = decelerate5(glyphProgress);
+                if (d < turningPoint)
+                    return (
+                        144 +
+                        interpolate(progress(d, 0, turningPoint), 0, maxChange)
+                    );
+                return (
+                    144 +
+                    maxChange -
+                    interpolate(progress(d, turningPoint, 1), 0, maxChange)
+                );
+
             case "7":
             case "7_8":
                 return 144;
@@ -1036,6 +1045,7 @@ export class FormGlyph extends BaseGlyph {
                     144
                 );
             case "2_0":
+                return 144;
             case " ":
             case "_":
                 return 0;
