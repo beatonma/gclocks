@@ -1,13 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import "./clocks.scss";
 import { FormRenderer } from "./form";
+import { FormOptions } from "./form/form-renderer";
+import { TimeFormat } from "./render";
+import { Rect, Size } from "./render/geometry";
 import { ClockRenderer } from "./render/renderer";
 import { canvasExtensions } from "./render/canvas";
+import "./clocks.scss";
 
 canvasExtensions();
 
 const CONTAINER_ID = "clocks_container";
+const container = () => document.getElementById(CONTAINER_ID);
 
 enum Clocks {
     Form,
@@ -15,78 +19,91 @@ enum Clocks {
     // Io18,
 }
 
-const renderers: Record<Clocks, () => ClockRenderer<any, any>> = {
-    [Clocks.Form]: () => new FormRenderer(),
+const renderers: Record<Clocks, (debug: boolean) => ClockRenderer<any, any>> = {
+    [Clocks.Form]: (debug: boolean) =>
+        new FormRenderer({ ...FormOptions }, { debug: debug }),
 };
 
-export const Clock = () => {
-    const [width, setWidth] = useState(window.innerWidth);
-    const [height, setHeight] = useState(window.innerHeight);
-    const [clock, setClock] = useState(Clocks.Form);
+interface ClockProps {
+    clock: Clocks;
+    debug?: boolean;
+}
+export const Clock = (props: ClockProps) => {
+    const { clock: defaultClock, debug = false } = props;
+    const [size, setSize] = useState<Size>(Size.ofElement(container()));
+    const [clock, setClock] = useState(defaultClock);
     const [renderer, setRenderer] = useState<ClockRenderer<any, any>>(
-        renderers[clock]
+        renderers[clock](debug)
     );
+    const canvasRef = useRef<HTMLCanvasElement>();
 
     useEffect(() => {
-        const resize = () => {
-            setWidth(window.innerWidth);
-            setHeight(window.innerHeight);
+        const resize = (toElement: Element = container()) => {
+            setSize(renderer.setAvailableSize(Size.ofElement(toElement)));
         };
-        window.addEventListener("resize", resize);
-        return () => window.removeEventListener("resize", resize);
-    }, []);
+        window.addEventListener("resize", () => resize());
+        renderer.attach(canvasRef.current);
+        resize(canvasRef.current);
+
+        return () => {
+            renderer.detach();
+            window.removeEventListener("resize", () => resize());
+        };
+    }, [renderer]);
 
     useEffect(() => {
-        renderer.setAvailableSize(width, height);
-    }, [renderer, width, height]);
-
-    useEffect(() => {
-        setRenderer(renderers[clock]);
+        setRenderer(renderers[clock](debug));
     }, [clock]);
 
     return (
-        <Canvas
-            width={width}
-            height={height}
-            renderer={(ctx, w, h) => {
-                ctx.clearRect(0, 0, w, h);
-                renderer.update();
-                renderer.draw(ctx);
-            }}
+        <canvas
+            ref={canvasRef}
+            className="clock"
+            width={size.width}
+            height={size.height}
         />
     );
 };
 
-interface CanvasProps {
-    width: number;
-    height: number;
-    renderer: (
-        canvas: CanvasRenderingContext2D,
-        width: number,
-        height: number
-    ) => void;
-    animated?: boolean;
-}
-const Canvas = (props: CanvasProps) => {
-    const { width, height, renderer, animated = true } = props;
-    const canvasRef = useRef<HTMLCanvasElement>();
-    const tickRef = useRef<number>();
-
+export const DebugMeasureClock = () => {
     useEffect(() => {
-        const tick = () => {
-            const canvas = canvasRef.current?.getContext("2d");
-            if (canvas != undefined) {
-                renderer(canvas, width, height);
-            }
-            tickRef.current = requestAnimationFrame(tick);
-        };
+        const time = new Date(2023, 5, 16, 0, 0, 0);
+        let renderer = new FormRenderer({
+            ...FormOptions,
+            format: TimeFormat.SS,
+        });
 
-        tickRef.current = requestAnimationFrame(tick);
+        const secondsBounds = new Rect();
+        for (let s = 0; s < 60; s++) {
+            time.setSeconds(s);
+            renderer.debugMeasure(time, secondsBounds);
+        }
+        console.log(`Seconds: ${secondsBounds}`);
 
-        return () => cancelAnimationFrame(tickRef.current);
-    }, [width, height]);
+        renderer = new FormRenderer({
+            ...FormOptions,
+            format: TimeFormat.MM,
+        });
+        const minutesBounds = new Rect();
+        for (let m = 0; m < 60; m++) {
+            time.setMinutes(m);
+            renderer.debugMeasure(time, minutesBounds);
+        }
+        console.log(`Minutes: ${minutesBounds}`);
 
-    return <canvas ref={canvasRef} width={width} height={height} />;
+        renderer = new FormRenderer({
+            ...FormOptions,
+            format: TimeFormat.HH_24,
+        });
+        const hoursBounds = new Rect();
+        for (let h = 0; h < 24; h++) {
+            time.setHours(h);
+            renderer.debugMeasure(time, hoursBounds);
+        }
+        console.log(`Hours: ${hoursBounds}`);
+    }, []);
+
+    return <></>;
 };
 
 const attachApp = (dom: Document | Element = document) => {
@@ -94,7 +111,13 @@ const attachApp = (dom: Document | Element = document) => {
 
     if (container) {
         const root = createRoot(container);
-        root.render(<Clock />);
+        root.render(
+            <>
+                {/*<DebugMeasureClock />*/}
+                {/*<Clock clock={Clocks.Form} debug={true} />*/}
+                <Clock clock={Clocks.Form} />
+            </>
+        );
     } else {
         console.warn(`Root container not found! #${CONTAINER_ID}`);
     }

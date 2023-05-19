@@ -1,27 +1,77 @@
 import { Font } from "./font";
-import { Rect, rect } from "./geometry";
+import { Rect, Size } from "./geometry";
 import { Glyph, GlyphStateLock } from "./glyph";
 import { progress } from "./math";
-import { Canvas, Options, Paints } from "./types";
+import { Canvas, Options, Paints, PaintStyle } from "./types";
 
-const debugStartString = "0123456789_: 212235";
-const debugEndString = "1234567890_:11  000";
-// const debugStartString = "6";
-// const debugEndString = "7";
-const debugScale = 0.6;
-const debugTimeStep = 5;
+// const debugMap = [
+//     ["0", "1"],
+//     // ["1", "2"],
+//     // ["2", "3"],
+//     // ["3", "4"],
+//     // ["4", "5"],
+//     // ["5", "6"],
+//     // ["6", "7"],
+//     // ["7", "8"],
+//     // ["8", "9"],
+//     ["9", "0"],
+//     // ["_", "_"],
+//     // [":", ":"],
+//     // ["2", "1"],
+//     // ["1", "1"],
+//     // ["3", "0"],
+//     // ["5", "0"],
+//     // ["2", " "],
+//     // ["2", "0"],
+// ];
+
+const debugMap = [
+    [0, 1],
+    [0, 1],
+    [":", ":"],
+    [0, 1],
+    [0, 1],
+    [":", ":"],
+    [0, 1],
+    [0, 1],
+];
+
+const debugStartString = debugMap.map(it => it[0].toString()).join("");
+const debugEndString = debugMap.map(it => it[1].toString()).join("");
+
+const debugTimeStep = 1;
 
 export interface ClockRenderer<T extends Font<G>, G extends Glyph> {
     options: Options;
     update: () => void;
     updateGlyphs: (now: string, next: string) => void;
     draw: (ctx: Canvas) => void;
-    setAvailableSize: (width: number, height: number) => void;
+    setAvailableSize: (availableSize: Size) => Size;
+    attach: (canvasElement: HTMLCanvasElement) => void;
+    detach: () => void;
 }
+
+export enum MeasureStrategy {
+    Fit, // Respect the existing boundaries of the container.
+    Fill, // Use existing value for either width or height to determine the other.
+}
+
+export interface RenderOptions {
+    debug?: boolean;
+    measureStrategy?: MeasureStrategy;
+}
+
+export const DefaultRenderOptions: RenderOptions = {
+    debug: false,
+    measureStrategy: MeasureStrategy.Fit,
+};
 
 export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
     implements ClockRenderer<T, G>
 {
+    canvas: Canvas = undefined;
+    animationFrameRef: number = undefined;
+
     font: T;
     glyphs: G[];
     locks: GlyphStateLock[];
@@ -29,51 +79,110 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
     animatedGlyphCount: number = 0;
     animatedGlyphIndices: number[];
     animationTime: number = 0;
-    maxWidth: number = 0;
 
-    availableWidth: number = 0;
-    availableHeight: number = 0;
-    scale: number = debugScale;
+    availableSize: Size = new Size();
+    measuredSize: Size = new Size();
+    nativeSize: Size = new Size();
+    scale: number = 1;
+    measureStrategy: MeasureStrategy;
+    isDebug: boolean;
 
     options: Options;
     paints: Paints;
 
     abstract buildFont(): T;
 
-    protected constructor(paints: Paints, options: Options) {
+    protected constructor(
+        paints: Paints,
+        options: Options,
+        renderOptions: RenderOptions = DefaultRenderOptions
+    ) {
         this.options = options;
         this.paints = paints;
         this.font = this.buildFont();
+        this.measureStrategy =
+            renderOptions.measureStrategy ??
+            DefaultRenderOptions.measureStrategy;
+        this.isDebug = renderOptions.debug ?? DefaultRenderOptions.debug;
 
-        // this.stringLength = options.format(new Date()).length;
-        this.stringLength = debugStartString.length;
+        this.stringLength = options.format.apply(new Date()).length;
+        if (this.isDebug) {
+            this.stringLength = debugStartString.length;
+        }
         this.glyphs = new Array(this.stringLength);
         this.locks = new Array(this.stringLength);
-        this.maxWidth = this.stringLength * this.font.getGlyph(0).maxWidth;
 
         for (let i = 0; i < this.stringLength; i++) {
-            this.glyphs[i] = this.font.getGlyph(i);
+            this.glyphs[i] = this.options.format.applyRole(
+                this.font.getGlyph(i),
+                i
+            );
             this.locks[i] = GlyphStateLock.None;
+        }
+        this.nativeSize = this.font.measure(
+            options.format,
+            options.layout,
+            options.spacingPx
+        );
+    }
+
+    setAvailableSize(available: Size): Size {
+        this.availableSize = available;
+
+        const { width: availableWidth, height: availableHeight } = available;
+        if (availableWidth === 0 && availableHeight === 0) {
+            this.scale = 0;
+            return;
+        }
+        const { width: nativeWidth, height: nativeHeight } = this.nativeSize;
+
+        const strategy =
+            availableHeight === 0 ? MeasureStrategy.Fill : this.measureStrategy;
+
+        switch (strategy) {
+            case MeasureStrategy.Fit:
+                const widthRatio = availableWidth / nativeWidth;
+                const heightRatio = availableHeight / nativeHeight;
+                const scale = Math.min(widthRatio, heightRatio);
+
+                return this.setScale(scale);
+
+            case MeasureStrategy.Fill:
+                if (availableWidth > 0) {
+                    return this.setScale(availableWidth / nativeWidth);
+                } else {
+                    return this.setScale(availableHeight / nativeHeight);
+                }
         }
     }
 
-    setAvailableSize(width: number, height: number) {
-        this.availableWidth = width;
-        this.availableHeight = height;
+    /**
+     * Returns measuredSize after applying the given scale.
+     */
+    setScale(scale: number): Size {
+        this.scale = scale;
+        this.measuredSize = this.nativeSize.scaledBy(scale);
+        return this.measuredSize;
     }
 
-    update() {
-        const now = new Date();
-        const nowString = this.options.format(now);
+    update(date?: Date) {
+        if (this.isDebug) return this.updateDebug();
 
-        this.animationTime = (this.animationTime + debugTimeStep) % 1000; // TODO this is just to slow down
-        // this.animationTime = now.getMilliseconds();
+        const now = date ?? new Date();
+        const nowString = this.options.format.apply(now);
 
         const next = new Date(now);
         next.setSeconds(now.getSeconds() + 1, 0);
-        const nextString = this.options.format(next);
+        const nextString = this.options.format.apply(next);
 
-        // this.updateGlyphs(nowString, nextString);
+        this.animationTime = now.getMilliseconds();
+        this.updateGlyphs(nowString, nextString);
+    }
+
+    updateDebug() {
+        this.animationTime =
+            (this.animationTime + debugTimeStep) %
+            this.options.glyphMorphMillis;
         this.updateGlyphs(debugStartString, debugEndString);
     }
 
@@ -104,8 +213,26 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
     }
 
     draw(canvas: Canvas) {
+        if (this.scale === 0) return;
+        canvas.clearRect(
+            0,
+            0,
+            this.availableSize.width,
+            this.availableSize.height
+        );
+        canvas.paintStyle = this.paints.defaultPaintStyle;
         canvas.withScaleUniform(this.scale, 0, 0, () => {
             this.layoutPass((glyph, glyphAnimationProgress, rect) => {
+                canvas.withPaintStyle(PaintStyle.Stroke, () => {
+                    canvas.paintRect(
+                        "black",
+                        rect.left,
+                        rect.top,
+                        rect.right,
+                        rect.bottom
+                    );
+                });
+
                 if (glyphAnimationProgress == 1) {
                     glyph.key = glyph.getCanonicalEndGlyph();
                     glyphAnimationProgress = 0;
@@ -123,12 +250,10 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
     }
 
     layoutPassHorizontal(visitGlyph: LayoutPassCallback) {
-        const scale = 1;
         let x = 0;
 
         for (let i = 0; i < this.stringLength; i++) {
             const glyph = this.glyphs[i];
-            glyph.scale = scale;
 
             const glyphProgress = this.getGlyphAnimationProgress(i);
 
@@ -147,15 +272,20 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
                 }
             }
 
-            const glyphWidth = glyph.getWidthAtProgress(glyphProgress);
-            const glyphHeight = glyph.height * scale;
+            const glyphWidth =
+                glyph.getWidthAtProgress(glyphProgress) * glyph.scale;
+            const glyphHeight = glyph.layoutInfo.height * glyph.scale;
             const left = x;
             const top = 0;
-            const right = left + glyphWidth + this.paints.strokeWidth;
-            const bottom = top + glyphHeight + this.paints.strokeWidth;
+            const right = left + glyphWidth;
+            const bottom = top + glyphHeight;
 
-            visitGlyph(glyph, glyphProgress, rect(left, top, right, bottom));
-            x += glyphWidth + this.paints.strokeWidth;
+            visitGlyph(
+                glyph,
+                glyphProgress,
+                new Rect(left, top, right, bottom)
+            );
+            x += glyphWidth;
         }
     }
 
@@ -174,6 +304,35 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
         }
 
         return progress(this.animationTime, 0, this.options.glyphMorphMillis);
+    }
+
+    tick() {
+        if (!this.canvas) return;
+        this.update();
+        this.draw(this.canvas);
+        this.animationFrameRef = requestAnimationFrame(() => this.tick());
+    }
+
+    attach(canvas: HTMLCanvasElement) {
+        this.canvas = canvas.getContext("2d");
+        this.tick();
+    }
+
+    detach() {
+        console.log("detach");
+        cancelAnimationFrame(this.animationFrameRef);
+        this.canvas = null;
+    }
+
+    debugMeasure(date: Date, bounds: Rect): Rect {
+        this.update(date);
+        for (let ms = 0; ms < this.options.glyphMorphMillis; ms++) {
+            this.animationTime = ms;
+            this.layoutPass((glyph, glyphAnimationProgress, rect) => {
+                bounds.include(rect);
+            });
+        }
+        return bounds;
     }
 }
 

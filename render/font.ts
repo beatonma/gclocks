@@ -1,18 +1,21 @@
-import { TimeFormat } from "./format";
+import { Size } from "./geometry";
 import { Glyph } from "./glyph";
+import { Layout, TimeFormatter } from "./types";
 
 export interface Font<G extends Glyph> {
     getGlyph: (index: number) => G;
-    getWidestTime: () => Record<keyof typeof TimeFormat, string>;
+    /**
+     * Return the maximum possible Size of the clock with native (1x) scaling.
+     */
+    measure: (format: TimeFormatter, layout: Layout, spacingPx: number) => Size;
 }
 
 export abstract class BaseFont<G extends Glyph> implements Font<G> {
     abstract getGlyph: (index: number) => G;
 
-    getWidestTime = (): Record<keyof typeof TimeFormat, string> => {
-        return {
-            HH_MM_SS_24: "00:00:00",
-            HH_MM_SS_12: "00:00:00",
-        };
-    };
+    abstract measure(
+        format: TimeFormatter,
+        layout: Layout,
+        spacingPx: number
+    ): Size;
 }

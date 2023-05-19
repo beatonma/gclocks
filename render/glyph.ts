@@ -20,12 +20,28 @@ export enum GlyphStateLock {
     Inactive,
 }
 
+export enum GlyphRole {
+    Default,
+    Hour,
+    Minute,
+    Second,
+    Separator,
+}
+
+export interface GlyphLayoutInfo {
+    height: number;
+    width?: number;
+    isMonospace: boolean;
+}
+
 export interface Glyph {
     state: GlyphState;
     lock: GlyphStateLock;
+    layoutInfo: GlyphLayoutInfo;
     key: string;
-    onStateChange?: OnStateChange;
     scale: number;
+    role: GlyphRole;
+    onStateChange?: OnStateChange;
 
     draw: (canvas: Canvas, progress: number, paints: Paints) => void;
 
@@ -36,12 +52,14 @@ export interface Glyph {
     setAppearing: () => void;
     setDisappearing: () => void;
 
-    height: number;
     getWidthAtProgress: (progress: number) => number;
-    maxWidth: number;
 
     getCanonicalStartGlyph: () => string;
     getCanonicalEndGlyph: () => string;
+}
+
+export namespace Glyph {
+    export const SecondScale = 0.5;
 }
 
 export abstract class BaseGlyph implements Glyph {
@@ -49,16 +67,27 @@ export abstract class BaseGlyph implements Glyph {
     lock: GlyphStateLock = GlyphStateLock.None;
     key = "0";
     onStateChange?: OnStateChange;
+    role = GlyphRole.Default;
     scale: number = 1;
+    abstract layoutInfo: GlyphLayoutInfo;
 
-    constructor(onStateChange?: OnStateChange) {
+    constructor(role?: GlyphRole, onStateChange?: OnStateChange) {
+        this.role = role ?? GlyphRole.Default;
+        this.scale = this.getScaleForRole(role);
         this.onStateChange = onStateChange;
+    }
+
+    getScaleForRole(role: GlyphRole): number {
+        switch (role) {
+            case GlyphRole.Second:
+                return Glyph.SecondScale;
+            default:
+                return 1;
+        }
     }
 
     stateAnimTime: number = 0;
     deactivationStartedTime: number = 0;
-    abstract height: number;
-    abstract maxWidth: number;
 
     abstract getWidthAtProgress: (progress: number) => number;
     abstract draw0_1: (
@@ -322,5 +351,25 @@ export abstract class BaseGlyph implements Glyph {
             default:
                 throw `Glyph.draw: unknown key '${this.key}'`;
         }
+    }
+
+    /**
+     * Mark the center and boundaries of the glyph according to the canvas
+     * coordinate space.
+     */
+    debugDrawBounds(canvas: Canvas, glyphProgress: number) {
+        const width = this.getWidthAtProgress(glyphProgress);
+        const centerX = this.getWidthAtProgress(glyphProgress) / 2;
+        // const centerY = this.height / 2;
+        const centerY = this.layoutInfo.height / 2;
+        canvas.paintRect(
+            "black",
+            centerX - 2,
+            centerY - 2,
+            centerX + 2,
+            centerY + 2
+        );
+
+        canvas.paintRect("#00000033", 0, 0, width, this.layoutInfo.height);
     }
 }

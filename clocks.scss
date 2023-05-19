@@ -1,12 +1,25 @@
-body {
-  overflow: clip;
+html {
   height: 100%;
 }
 
+body {
+  overflow: clip;
+  height: 100%;
+  background-color: black;
+}
+
 #clocks_container {
+  max-width: 100vw;
   background-color: #0e84b5;
 
   canvas {
-
+    display: block;
+    margin-block: 1em;
+    background-color: #ffffff22;
   }
+}
+
+canvas.clock {
+  display: block;
+  max-width: 100vw;
 }

@@ -1,24 +1,27 @@
-import { BaseClockRenderer, TimeFormat } from "../render";
-import { Options, Paints } from "../render/types";
+import { BaseClockRenderer, DefaultOptions, TimeFormat } from "../render";
+import { DefaultRenderOptions, RenderOptions } from "../render/renderer";
+import { Options, Paints, PaintStyle } from "../render/types";
 import { FormFont } from "./form-font";
 import { FormGlyph } from "./form-glyph";
 
-const defaultPaints: Paints = {
-    strokeWidth: 0,
+export const FormPaints: Paints = {
+    defaultPaintStyle: PaintStyle.Fill,
+    strokeWidth: 8,
     colors: ["#FF6D00", "#FFC400", "#FFFFFF"],
 };
 
-const defaultOptions: Options = {
-    glyphMorphMillis: 800,
-    format: TimeFormat.Default,
+export const FormOptions: Options = {
+    ...DefaultOptions,
+    format: TimeFormat.HH_MM_SS_24,
 };
 
 export class FormRenderer extends BaseClockRenderer<FormFont, FormGlyph> {
     constructor(
-        paints: Paints = defaultPaints,
-        options: Options = defaultOptions
+        options: Options = FormOptions,
+        renderOptions: RenderOptions = DefaultRenderOptions,
+        paints: Paints = FormPaints
     ) {
-        super(paints, options);
+        super(paints, options, renderOptions);
     }
 
     buildFont(): FormFont {

@@ -1,6 +1,8 @@
 import { toRadians } from "./math";
 import { PaintStyle } from "./types";
 
+const fontSizePx = 48;
+
 export const canvasExtensions = () => {
     const addExtension = <T>(name: string, func: (...args: any) => T) => {
         Object.defineProperty(CanvasRenderingContext2D.prototype, name, {
@@ -15,10 +17,10 @@ export const canvasExtensions = () => {
 
     addExtension(
         "text",
-        function (text: string, x: number, y: number, color: string) {
+        function (color: string, text: string, x: number, y: number) {
             this.fillStyle = color;
-            this.font = "48px sans-serif";
-            this.fillText(text, x, y);
+            this.font = `${fontSizePx}px sans-serif`;
+            this.fillText(text, x, y + fontSizePx);
         }
     );
 
