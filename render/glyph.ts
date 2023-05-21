@@ -1,4 +1,4 @@
-import { Canvas, Paints } from "./types";
+import { Canvas, Paints, PaintStyle } from "./types";
 
 type OnStateChange = (state: GlyphState) => void;
 
@@ -360,7 +360,6 @@ export abstract class BaseGlyph implements Glyph {
     debugDrawBounds(canvas: Canvas, glyphProgress: number) {
         const width = this.getWidthAtProgress(glyphProgress);
         const centerX = this.getWidthAtProgress(glyphProgress) / 2;
-        // const centerY = this.height / 2;
         const centerY = this.layoutInfo.height / 2;
         canvas.paintRect(
             "black",
@@ -369,6 +368,12 @@ export abstract class BaseGlyph implements Glyph {
             centerX + 2,
             centerY + 2
         );
+        canvas.withPaintStyle(PaintStyle.Stroke, () => {
+            canvas.paintPath("red", () => {
+                canvas.moveTo(centerX, centerY);
+                canvas.lineTo(centerX, 0);
+            });
+        });
 
         canvas.paintRect("#00000033", 0, 0, width, this.layoutInfo.height);
     }
