@@ -41,7 +41,7 @@ const timeFormatter = (
         roles: roles,
         apply: apply,
         applyRole: <T extends Glyph>(glyph: T, index: number): T => {
-            glyph.role = roles[index];
+            glyph.setRole(roles[index]);
             return glyph;
         },
     };

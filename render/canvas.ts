@@ -194,8 +194,8 @@ export const canvasExtensions = () => {
         function (
             scaleX: number,
             scaleY: number,
-            pivotX: number = 0,
-            pivotY = 0,
+            pivotX: number,
+            pivotY: number,
             block: () => void
         ) {
             this.withCheckpoint(() => {
@@ -209,8 +209,8 @@ export const canvasExtensions = () => {
         "withScaleUniform",
         function (
             scale: number,
-            pivotX: number = 0,
-            pivotY = 0,
+            pivotX: number,
+            pivotY: number,
             block: () => void
         ) {
             this.withCheckpoint(() => {
@@ -224,8 +224,8 @@ export const canvasExtensions = () => {
         "withRotation",
         function (
             angleDegrees: number,
-            pivotX: number = 0,
-            pivotY = 0,
+            pivotX: number,
+            pivotY: number,
             block: () => void
         ) {
             this.withCheckpoint(() => {

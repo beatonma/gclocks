@@ -73,22 +73,22 @@ interface CanvasRenderingContext2D {
     withScale(
         scaleX: number,
         scaleY: number,
-        pivotX: number = 0,
-        pivotY = 0,
+        pivotX: number,
+        pivotY: number,
         block: () => void
     ): void;
 
     withScaleUniform(
         scale: number,
-        pivotX: number = 0,
-        pivotY = 0,
+        pivotX: number,
+        pivotY: number,
         block: () => void
     ): void;
 
     withRotation(
         angleDegrees: number,
-        pivotX: number = 0,
-        pivotY = 0,
+        pivotX: number,
+        pivotY: number,
         block: () => void
     ): void;
 

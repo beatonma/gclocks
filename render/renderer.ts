@@ -239,7 +239,9 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
                 }
 
                 canvas.withTranslation(rect.left, rect.top, () => {
-                    glyph.draw(canvas, glyphAnimationProgress, this.paints);
+                    canvas.withScaleUniform(glyph.scale, 0, 0, () => {
+                        glyph.draw(canvas, glyphAnimationProgress, this.paints);
+                    });
                 });
             });
         });
@@ -250,6 +252,7 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
     }
 
     layoutPassHorizontal(visitGlyph: LayoutPassCallback) {
+        const [alignX, alignY] = Align.split(this.options.alignment);
         let x = 0;
 
         for (let i = 0; i < this.stringLength; i++) {
@@ -276,7 +279,12 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
                 glyph.getWidthAtProgress(glyphProgress) * glyph.scale;
             const glyphHeight = glyph.layoutInfo.height * glyph.scale;
             const left = x;
-            const top = 0;
+            const top = Align.applyVertical(
+                0,
+                glyphHeight,
+                glyph.layoutInfo.height,
+                alignY
+            );
             const right = left + glyphWidth;
             const bottom = top + glyphHeight;
 

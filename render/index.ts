@@ -5,12 +5,17 @@ export { BaseFont } from "./font";
 import "./canvas";
 
 import { TimeFormat } from "./format";
-import { Alignment, Layout, Options } from "./types";
+import {
+    HorizontalAlignment,
+    Layout,
+    Options,
+    VerticalAlignment,
+} from "./types";
 
 export const DefaultOptions: Options = {
     format: TimeFormat.HH_MM_SS_24,
     glyphMorphMillis: 800,
     spacingPx: 4,
-    alignment: Alignment.Center,
+    alignment: HorizontalAlignment.Center | VerticalAlignment.Bottom,
     layout: Layout.Horizontal,
 };

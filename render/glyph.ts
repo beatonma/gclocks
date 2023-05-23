@@ -45,6 +45,7 @@ export interface Glyph {
 
     draw: (canvas: Canvas, progress: number, paints: Paints) => void;
 
+    setRole: (role: GlyphRole) => void;
     setActivating: () => void;
     setDeactivating: () => void;
     setActive: () => void;
@@ -65,16 +66,19 @@ export namespace Glyph {
 export abstract class BaseGlyph implements Glyph {
     state: GlyphState = GlyphState.Appearing;
     lock: GlyphStateLock = GlyphStateLock.None;
-    key = "0";
+    key: string = "0";
     onStateChange?: OnStateChange;
-    role = GlyphRole.Default;
-    scale: number = 1;
+    role: GlyphRole;
+    scale: number;
     abstract layoutInfo: GlyphLayoutInfo;
 
-    constructor(role?: GlyphRole, onStateChange?: OnStateChange) {
-        this.role = role ?? GlyphRole.Default;
-        this.scale = this.getScaleForRole(role);
+    constructor(onStateChange?: OnStateChange) {
         this.onStateChange = onStateChange;
+    }
+
+    setRole(role: GlyphRole) {
+        this.role = role;
+        this.scale = this.getScaleForRole(role);
     }
 
     getScaleForRole(role: GlyphRole): number {
