@@ -15,7 +15,7 @@ import {
 export const DefaultOptions: Options = {
     format: TimeFormat.HH_MM_SS_24,
     glyphMorphMillis: 800,
-    spacingPx: 4,
-    alignment: HorizontalAlignment.Center | VerticalAlignment.Bottom,
+    spacingPx: 16,
+    alignment: HorizontalAlignment.None | VerticalAlignment.Bottom,
     layout: Layout.Horizontal,
 };

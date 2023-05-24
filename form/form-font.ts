@@ -1,4 +1,4 @@
-import { BaseFont, TimeFormat } from "../render";
+import { BaseFont } from "../render";
 import { Size } from "../render/geometry";
 import { Glyph } from "../render/glyph";
 import { Layout, TimeFormatter } from "../render/types";
@@ -15,7 +15,7 @@ export class FormFont extends BaseFont<FormGlyph> {
         switch (layout) {
             case Layout.Horizontal:
                 return new Size(
-                    (hasSeconds ? 1104 : 672) +
+                    (hasSeconds ? 843 : 672) +
                         spacingPx * (format.roles.length - 1),
                     lineHeight
                 );

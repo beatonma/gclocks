@@ -17,10 +17,10 @@ interface CanvasRenderingContext2D {
      */
     paintRect(
         color: string,
-        left: number,
-        top: number,
-        right: number,
-        bottom: number
+        leftOrRect: number | Rect,
+        top?: number,
+        right?: number,
+        bottom?: number
     ): void;
 
     paintRoundRect(

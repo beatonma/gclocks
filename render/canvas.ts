@@ -54,13 +54,23 @@ export const canvasExtensions = () => {
         "paintRect",
         function (
             color: string,
-            left: number,
-            top: number,
-            right: number,
-            bottom: number
+            leftOrRect: number | Rect,
+            top?: number,
+            right?: number,
+            bottom?: number
         ) {
             this.paintPath(color, () => {
-                this.rect(left, top, right - left, bottom - top);
+                if (leftOrRect instanceof Rect) {
+                    const [left_, top_, right_, bottom_] = leftOrRect;
+                    this.rect(left_, top_, right_ - left_, bottom_ - top_);
+                } else {
+                    this.rect(
+                        leftOrRect,
+                        top,
+                        right - leftOrRect,
+                        bottom - top
+                    );
+                }
             });
         }
     );

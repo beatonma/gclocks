@@ -29,31 +29,27 @@ interface ClockProps {
     debug?: boolean;
 }
 export const Clock = (props: ClockProps) => {
-    const { clock: defaultClock, debug = false } = props;
+    const { clock, debug = false } = props;
     const [size, setSize] = useState<Size>(Size.ofElement(container()));
-    const [clock, setClock] = useState(defaultClock);
-    const [renderer, setRenderer] = useState<ClockRenderer<any, any>>(
-        renderers[clock](debug)
-    );
+    const renderer = useRef(renderers[clock](debug));
     const canvasRef = useRef<HTMLCanvasElement>();
 
     useEffect(() => {
         const resize = (toElement: Element = container()) => {
-            setSize(renderer.setAvailableSize(Size.ofElement(toElement)));
+            setSize(
+                renderer.current.setAvailableSize(Size.ofElement(toElement))
+            );
         };
+
         window.addEventListener("resize", () => resize());
-        renderer.attach(canvasRef.current);
+        renderer.current.attach(canvasRef.current);
         resize(canvasRef.current);
 
         return () => {
-            renderer.detach();
+            renderer.current?.detach();
             window.removeEventListener("resize", () => resize());
         };
-    }, [renderer]);
-
-    useEffect(() => {
-        setRenderer(renderers[clock](debug));
-    }, [clock]);
+    }, [canvasRef.current]);
 
     return (
         <canvas
@@ -113,8 +109,6 @@ const attachApp = (dom: Document | Element = document) => {
         const root = createRoot(container);
         root.render(
             <>
-                {/*<DebugMeasureClock />*/}
-                {/*<Clock clock={Clocks.Form} debug={true} />*/}
                 <Clock clock={Clocks.Form} />
             </>
         );

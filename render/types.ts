@@ -36,12 +36,14 @@ export enum HorizontalAlignment {
     Start = 1 << 0,
     Center = 1 << 1,
     End = 1 << 2,
+    None = 1 << 3,
 }
 
 export enum VerticalAlignment {
-    Top = 1 << 3,
-    Center = 1 << 4,
-    Bottom = 1 << 5,
+    Top = 2 << 4,
+    Center = 2 << 5,
+    Bottom = 2 << 6,
+    None = 2 << 7,
 }
 
 export type Alignment = HorizontalAlignment | VerticalAlignment;

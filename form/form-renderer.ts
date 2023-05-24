@@ -6,7 +6,7 @@ import { FormGlyph } from "./form-glyph";
 
 export const FormPaints: Paints = {
     defaultPaintStyle: PaintStyle.Fill,
-    strokeWidth: 8,
+    strokeWidth: 0,
     colors: ["#FF6D00", "#FFC400", "#FFFFFF"],
 };
 

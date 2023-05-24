@@ -2,26 +2,26 @@ import { Alignment, HorizontalAlignment, VerticalAlignment } from "./types";
 
 export namespace Align {
     export const apply = (
-        x: number,
-        y: number,
+        alignment: Alignment,
         objectWidth: number,
         objectHeight: number,
         spaceWidth: number,
         spaceHeight: number,
-        alignment: Alignment
+        x: number = 0,
+        y: number = 0
     ): [number, number] => {
         return [
             applyHorizontal(
-                x,
+                getHorizontalAlignment(alignment),
                 objectWidth,
                 spaceWidth,
-                getHorizontalAlignment(alignment)
+                x
             ),
             applyVertical(
-                y,
+                getVerticalAlignment(alignment),
                 objectHeight,
                 spaceHeight,
-                getVerticalAlignment(alignment)
+                y
             ),
         ];
     };
@@ -34,11 +34,17 @@ export namespace Align {
     ];
 
     export const applyHorizontal = (
-        originalX: number,
+        gravity: HorizontalAlignment,
         objectWidth: number,
         spaceWidth: number,
-        gravity: HorizontalAlignment
+        originalX: number = 0
     ): number => {
+        if (
+            HorizontalAlignment.Start ===
+            (gravity & HorizontalAlignment.Start)
+        ) {
+            return 0;
+        }
         if (
             HorizontalAlignment.Center ===
             (gravity & HorizontalAlignment.Center)
@@ -53,11 +59,14 @@ export namespace Align {
     };
 
     export const applyVertical = (
-        originalY: number,
+        gravity: VerticalAlignment,
         objectHeight: number,
         spaceHeight: number,
-        gravity: VerticalAlignment
+        originalY: number = 0
     ): number => {
+        if (VerticalAlignment.Top === (gravity & VerticalAlignment.Top)) {
+            return 0;
+        }
         if (VerticalAlignment.Center === (gravity & VerticalAlignment.Center)) {
             return (spaceHeight - objectHeight) / 2;
         }

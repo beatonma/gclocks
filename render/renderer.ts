@@ -1,3 +1,4 @@
+import { Align } from "./alignment";
 import { Font } from "./font";
 import { Rect, Size } from "./geometry";
 import { Glyph, GlyphStateLock } from "./glyph";
@@ -43,6 +44,7 @@ const debugTimeStep = 1;
 
 export interface ClockRenderer<T extends Font<G>, G extends Glyph> {
     options: Options;
+    paints: Paints;
     update: () => void;
     updateGlyphs: (now: string, next: string) => void;
     draw: (ctx: Canvas) => void;
@@ -71,6 +73,7 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
 {
     canvas: Canvas = undefined;
     animationFrameRef: number = undefined;
+    nextFrameDelayRef: ReturnType<typeof setTimeout> = undefined;
 
     font: T;
     glyphs: G[];
@@ -78,12 +81,17 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
     stringLength: number;
     animatedGlyphCount: number = 0;
     animatedGlyphIndices: number[];
-    animationTime: number = 0;
+
+    /**
+     * Current position of the animation.
+     */
+    animationTimeMillis: number = 0;
 
     availableSize: Size = new Size();
     measuredSize: Size = new Size();
     nativeSize: Size = new Size();
-    scale: number = 1;
+
+    scale: number = 0;
     measureStrategy: MeasureStrategy;
     isDebug: boolean;
 
@@ -162,6 +170,12 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
     setScale(scale: number): Size {
         this.scale = scale;
         this.measuredSize = this.nativeSize.scaledBy(scale);
+
+        clearTimeout(this.nextFrameDelayRef);
+        cancelAnimationFrame(this.animationFrameRef);
+
+        this.tick();
+
         return this.measuredSize;
     }
 
@@ -175,13 +189,13 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
         next.setSeconds(now.getSeconds() + 1, 0);
         const nextString = this.options.format.apply(next);
 
-        this.animationTime = now.getMilliseconds();
+        this.animationTimeMillis = now.getMilliseconds();
         this.updateGlyphs(nowString, nextString);
     }
 
     updateDebug() {
-        this.animationTime =
-            (this.animationTime + debugTimeStep) %
+        this.animationTimeMillis =
+            (this.animationTimeMillis + debugTimeStep) %
             this.options.glyphMorphMillis;
         this.updateGlyphs(debugStartString, debugEndString);
     }
@@ -212,8 +226,20 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
         this.animatedGlyphCount = animatedGlyphCount;
     }
 
+    measureFrame(): Size {
+        const drawBounds = new Rect();
+
+        this.layoutPass((glyph, glyphAnimationProgress, rect) => {
+            drawBounds.include(rect);
+        });
+        return drawBounds.toSize().scaledBy(this.scale);
+    }
+
     draw(canvas: Canvas) {
         if (this.scale === 0) return;
+        if (this.measuredSize.isEmpty()) return;
+
+        // Reset canvas and paint attributes
         canvas.clearRect(
             0,
             0,
@@ -221,27 +247,38 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
             this.availableSize.height
         );
         canvas.paintStyle = this.paints.defaultPaintStyle;
-        canvas.withScaleUniform(this.scale, 0, 0, () => {
-            this.layoutPass((glyph, glyphAnimationProgress, rect) => {
-                canvas.withPaintStyle(PaintStyle.Stroke, () => {
-                    canvas.paintRect(
-                        "black",
-                        rect.left,
-                        rect.top,
-                        rect.right,
-                        rect.bottom
-                    );
-                });
+        canvas.lineCap = this.canvas.lineJoin = "round";
+        canvas.lineWidth = this.paints.strokeWidth;
 
-                if (glyphAnimationProgress == 1) {
-                    glyph.key = glyph.getCanonicalEndGlyph();
-                    glyphAnimationProgress = 0;
-                }
+        const [frameWidth, frameHeight] = this.measureFrame();
 
-                canvas.withTranslation(rect.left, rect.top, () => {
-                    canvas.withScaleUniform(glyph.scale, 0, 0, () => {
-                        glyph.draw(canvas, glyphAnimationProgress, this.paints);
+        const [x, y] = Align.apply(
+            this.options.alignment,
+            frameWidth,
+            frameHeight,
+            this.measuredSize.width,
+            this.measuredSize.height
+        );
+
+        canvas.withTranslation(x, y, () => {
+            canvas.withScaleUniform(this.scale, 0, 0, () => {
+                this.layoutPass((glyph, glyphAnimationProgress, rect) => {
+                    canvas.withTranslation(rect.left, rect.top, () => {
+                        canvas.withScaleUniform(glyph.scale, 0, 0, () => {
+                            glyph.draw(
+                                canvas,
+                                glyphAnimationProgress,
+                                this.paints
+                            );
+                        });
                     });
+
+                    if (this.isDebug) {
+                        // Show boundary
+                        canvas.withPaintStyle(PaintStyle.Stroke, () => {
+                            canvas.paintRect("black", rect);
+                        });
+                    }
                 });
             });
         });
@@ -254,11 +291,19 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
     layoutPassHorizontal(visitGlyph: LayoutPassCallback) {
         const [alignX, alignY] = Align.split(this.options.alignment);
         let x = 0;
+        const spacingPx = this.options.spacingPx;
+        const rect = new Rect();
 
         for (let i = 0; i < this.stringLength; i++) {
             const glyph = this.glyphs[i];
+            if (glyph.scale === 0) continue;
 
-            const glyphProgress = this.getGlyphAnimationProgress(i);
+            let glyphProgress = this.getGlyphAnimationProgress(i);
+
+            if (glyphProgress === 1) {
+                glyph.key = glyph.getCanonicalEndGlyph();
+                glyphProgress = 0;
+            }
 
             if (glyphProgress !== 0) {
                 glyph.setActivating();
@@ -278,12 +323,12 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
             const glyphWidth =
                 glyph.getWidthAtProgress(glyphProgress) * glyph.scale;
             const glyphHeight = glyph.layoutInfo.height * glyph.scale;
+
             const left = x;
             const top = Align.applyVertical(
-                0,
+                alignY,
                 glyphHeight,
-                glyph.layoutInfo.height,
-                alignY
+                glyph.layoutInfo.height
             );
             const right = left + glyphWidth;
             const bottom = top + glyphHeight;
@@ -291,9 +336,9 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
             visitGlyph(
                 glyph,
                 glyphProgress,
-                new Rect(left, top, right, bottom)
+                rect.set(left, top, right, bottom)
             );
-            x += glyphWidth;
+            x += glyphWidth + spacingPx * glyph.scale;
         }
     }
 
@@ -311,31 +356,46 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
             return 0;
         }
 
-        return progress(this.animationTime, 0, this.options.glyphMorphMillis);
+        return progress(
+            this.animationTimeMillis,
+            0,
+            this.options.glyphMorphMillis
+        );
     }
 
     tick() {
         if (!this.canvas) return;
         this.update();
         this.draw(this.canvas);
-        this.animationFrameRef = requestAnimationFrame(() => this.tick());
+
+        if (this.animationTimeMillis < this.options.glyphMorphMillis) {
+            this.animationFrameRef = requestAnimationFrame(() => this.tick());
+        } else {
+            const nextFrameDelay = 1000 - this.animationTimeMillis;
+            this.nextFrameDelayRef = setTimeout(() => {
+                this.animationFrameRef = requestAnimationFrame(() =>
+                    this.tick()
+                );
+            }, nextFrameDelay);
+        }
     }
 
-    attach(canvas: HTMLCanvasElement) {
-        this.canvas = canvas.getContext("2d");
+    attach(canvasElement: HTMLCanvasElement) {
+        this.canvas = canvasElement.getContext("2d");
+
         this.tick();
     }
 
     detach() {
-        console.log("detach");
-        cancelAnimationFrame(this.animationFrameRef);
         this.canvas = null;
+        clearTimeout(this.nextFrameDelayRef);
+        cancelAnimationFrame(this.animationFrameRef);
     }
 
     debugMeasure(date: Date, bounds: Rect): Rect {
         this.update(date);
         for (let ms = 0; ms < this.options.glyphMorphMillis; ms++) {
-            this.animationTime = ms;
+            this.animationTimeMillis = ms;
             this.layoutPass((glyph, glyphAnimationProgress, rect) => {
                 bounds.include(rect);
             });
