@@ -1,5 +1,6 @@
 import { describe, expect, test } from "@jest/globals";
 import { Align } from "./alignment";
+import { Size } from "./geometry";
 import { HorizontalAlignment, VerticalAlignment } from "./types";
 
 describe("Alignment tests", () => {
@@ -33,12 +34,8 @@ describe("Alignment tests", () => {
         expect(
             Align.apply(
                 VerticalAlignment.Center | HorizontalAlignment.Center,
-                13,
-                17,
-                19,
-                29,
-                3,
-                11
+                new Size(13, 17),
+                new Size(19, 29)
             )
         ).toEqual([3, 6]);
     });

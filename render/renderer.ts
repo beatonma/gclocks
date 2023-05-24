@@ -261,10 +261,8 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
 
         const [x, y] = Align.apply(
             this.options.alignment,
-            frameWidth,
-            frameHeight,
-            this.measuredSize.width,
-            this.measuredSize.height
+            this.measureFrame(),
+            this.measuredSize
         );
 
         canvas.withTranslation(x, y, () => {
