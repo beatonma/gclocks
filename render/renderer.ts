@@ -4,7 +4,7 @@ import { Rect, Size } from "./geometry";
 import { Glyph, GlyphStateLock } from "./glyph";
 import { progress } from "./math";
 import { PerformanceTracker } from "./metrics";
-import { Canvas, Options, Paints, PaintStyle } from "./types";
+import { Canvas, Layout, Options, Paints, PaintStyle } from "./types";
 
 // const debugMap = [
 //     ["0", "1"],
@@ -28,14 +28,25 @@ import { Canvas, Options, Paints, PaintStyle } from "./types";
 // ];
 
 const debugMap = [
+    [9, 0],
     [0, 1],
-    [0, 1],
+    [1, 2],
+    [2, 3],
+    [3, 4],
+    [4, 5],
+    [5, 6],
+    [6, 7],
+    [7, 8],
+    [8, 9],
+    [9, 0],
+    ["_", "_"],
     [":", ":"],
-    [0, 1],
-    [0, 1],
-    [":", ":"],
-    [0, 1],
-    [0, 1],
+    [2, 1],
+    [1, 1],
+    [3, 0],
+    [5, 0],
+    [2, " "],
+    [2, 0],
 ];
 
 const debugStartString = debugMap.map(it => it[0].toString()).join("");
@@ -83,6 +94,7 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
     animatedGlyphCount: number = 0;
     animatedGlyphIndices: number[];
 
+    animationTimeAbsolute: Date;
     /**
      * Current position of the animation.
      */
@@ -196,6 +208,7 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
         next.setSeconds(now.getSeconds() + 1, 0);
         const nextString = this.options.format.apply(next);
 
+        this.animationTimeAbsolute = now;
         this.animationTimeMillis = now.getMilliseconds();
         this.updateGlyphs(nowString, nextString);
     }
@@ -246,18 +259,14 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
         if (this.scale === 0) return;
         if (this.measuredSize.isEmpty()) return;
 
-        // Reset canvas and paint attributes
-        canvas.clearRect(
-            0,
-            0,
-            this.availableSize.width,
-            this.availableSize.height
-        );
-        canvas.paintStyle = this.paints.defaultPaintStyle;
-        canvas.lineCap = this.canvas.lineJoin = "round";
-        canvas.lineWidth = this.paints.strokeWidth;
+        const [availableWidth, availableHeight] = this.availableSize;
+        const { paints, scale } = this;
 
-        const [frameWidth, frameHeight] = this.measureFrame();
+        // Reset canvas and paint attributes
+        canvas.clearRect(0, 0, availableWidth, availableHeight);
+        canvas.paintStyle = paints.defaultPaintStyle;
+        canvas.lineCap = canvas.lineJoin = "round";
+        canvas.lineWidth = paints.strokeWidth;
 
         const [x, y] = Align.apply(
             this.options.alignment,
@@ -266,15 +275,11 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
         );
 
         canvas.withTranslation(x, y, () => {
-            canvas.withScaleUniform(this.scale, 0, 0, () => {
+            canvas.withScaleUniform(scale, 0, 0, () => {
                 this.layoutPass((glyph, glyphAnimationProgress, rect) => {
                     canvas.withTranslation(rect.left, rect.top, () => {
                         canvas.withScaleUniform(glyph.scale, 0, 0, () => {
-                            glyph.draw(
-                                canvas,
-                                glyphAnimationProgress,
-                                this.paints
-                            );
+                            glyph.draw(canvas, glyphAnimationProgress, paints);
                         });
                     });
 
@@ -292,17 +297,23 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
     }
 
     layoutPass(callback: LayoutPassCallback) {
-        this.layoutPassHorizontal(callback);
+        switch (this.options.layout) {
+            case Layout.Horizontal:
+                return this.layoutPassHorizontal(callback);
+            case Layout.Vertical:
+            case Layout.Wrapped:
+                throw `Unhandled layout: ${this.options.layout}`;
+        }
     }
 
     layoutPassHorizontal(visitGlyph: LayoutPassCallback) {
-        const [alignX, alignY] = Align.split(this.options.alignment);
+        const { glyphs, stringLength } = this;
+        const { spacingPx, alignment } = this.options;
         let x = 0;
-        const spacingPx = this.options.spacingPx;
         const rect = new Rect();
 
-        for (let i = 0; i < this.stringLength; i++) {
-            const glyph = this.glyphs[i];
+        for (let i = 0; i < stringLength; i++) {
+            const glyph = glyphs[i];
             if (glyph.scale === 0) continue;
 
             let glyphProgress = this.getGlyphAnimationProgress(i);
@@ -315,7 +326,7 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
             if (glyphProgress !== 0) {
                 glyph.setActivating();
                 if (i > 0) {
-                    const previousGlyph = this.glyphs[i - 1];
+                    const previousGlyph = glyphs[i - 1];
                     const previousCanonical =
                         previousGlyph.getCanonicalStartGlyph();
                     if (
@@ -333,7 +344,7 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
 
             const left = x;
             const top = Align.applyVertical(
-                alignY,
+                alignment,
                 glyphHeight,
                 glyph.layoutInfo.height
             );
@@ -375,15 +386,18 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
         this.update();
         this.draw(this.canvas);
 
-        if (this.animationTimeMillis < this.options.glyphMorphMillis) {
+        const { animationTimeMillis } = this;
+        const { glyphMorphMillis, format } = this.options;
+
+        const scheduleNext = () => {
             this.animationFrameRef = requestAnimationFrame(() => this.tick());
+        };
+
+        if (animationTimeMillis < glyphMorphMillis) {
+            scheduleNext();
         } else {
-            const nextFrameDelay = 1000 - this.animationTimeMillis;
-            this.nextFrameDelayRef = setTimeout(() => {
-                this.animationFrameRef = requestAnimationFrame(() =>
-                    this.tick()
-                );
-            }, nextFrameDelay);
+            const nextFrameDelay = 1000 - animationTimeMillis;
+            this.nextFrameDelayRef = setTimeout(scheduleNext, nextFrameDelay);
         }
     }
 
