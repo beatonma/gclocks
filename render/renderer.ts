@@ -3,6 +3,7 @@ import { Font } from "./font";
 import { Rect, Size } from "./geometry";
 import { Glyph, GlyphStateLock } from "./glyph";
 import { progress } from "./math";
+import { PerformanceTracker } from "./metrics";
 import { Canvas, Options, Paints, PaintStyle } from "./types";
 
 // const debugMap = [
@@ -98,6 +99,8 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
     options: Options;
     paints: Paints;
 
+    performanceTracker: PerformanceTracker;
+
     abstract buildFont(): T;
 
     protected constructor(
@@ -132,6 +135,10 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
             options.layout,
             options.spacingPx
         );
+
+        if (renderOptions.debug) {
+            this.performanceTracker = new PerformanceTracker();
+        }
     }
 
     setAvailableSize(available: Size): Size {
@@ -282,6 +289,8 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
                 });
             });
         });
+
+        this.performanceTracker?.frameComplete(canvas);
     }
 
     layoutPass(callback: LayoutPassCallback) {
