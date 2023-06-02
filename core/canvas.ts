@@ -1,5 +1,5 @@
 import { toRadians } from "./math";
-import { PaintStyle } from "./types";
+import { PaintStyle } from "./render/types";
 
 const fontSizePx = 48;
 
@@ -54,20 +54,23 @@ export const canvasExtensions = () => {
         "paintRect",
         function (
             color: string,
-            leftOrRect: number | Rect,
+            leftOrGeometry: number | Rect | Size,
             top?: number,
             right?: number,
             bottom?: number
         ) {
             this.paintPath(color, () => {
-                if (leftOrRect instanceof Rect) {
-                    const [left_, top_, right_, bottom_] = leftOrRect;
+                if (leftOrGeometry instanceof Rect) {
+                    const [left_, top_, right_, bottom_] = leftOrGeometry;
                     this.rect(left_, top_, right_ - left_, bottom_ - top_);
+                } else if (leftOrGeometry instanceof Size) {
+                    const [right_, bottom_] = leftOrGeometry;
+                    this.rect(0, 0, right_, bottom_);
                 } else {
                     this.rect(
-                        leftOrRect,
+                        leftOrGeometry,
                         top,
-                        right - leftOrRect,
+                        right - leftOrGeometry,
                         bottom - top
                     );
                 }
@@ -183,6 +186,12 @@ export const canvasExtensions = () => {
         this.paint(color);
     });
 
+    addExtension("strokePath", function (color: string, block: () => void) {
+        this.beginPath();
+        block();
+        strokePaint(this, color);
+    });
+
     addExtension("withCheckpoint", function (block: () => void) {
         this.save();
         block();
@@ -252,6 +261,15 @@ export const canvasExtensions = () => {
             this.paintStyle = paintStyle;
             block();
             this.paintStyle = previous;
+        }
+    );
+
+    addExtension(
+        "withTranslationAndScale",
+        function (x: number, y: number, scale: number, block: () => void) {
+            this.withTranslation(x, y, () => {
+                this.withScaleUniform(scale, 0, 0, block);
+            });
         }
     );
 };

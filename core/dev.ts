@@ -1,4 +1,4 @@
-import { Canvas } from "./types";
+import { Canvas } from "./render/types";
 
 export const timeit = (block: () => void) => {
     const start = performance.now();

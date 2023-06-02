@@ -1,6 +1,6 @@
 import { describe, expect, test } from "@jest/globals";
 import { Align } from "./alignment";
-import { Size } from "./geometry";
+import { Size } from "../geometry";
 import { HorizontalAlignment, VerticalAlignment } from "./types";
 
 describe("Alignment tests", () => {

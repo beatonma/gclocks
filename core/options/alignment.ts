@@ -1,4 +1,4 @@
-import { Size } from "./geometry";
+import { Size } from "../geometry";
 import { Alignment, HorizontalAlignment, VerticalAlignment } from "./types";
 
 export namespace Align {

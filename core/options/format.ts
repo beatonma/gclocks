@@ -1,4 +1,5 @@
-import { Glyph, GlyphRole } from "./glyph";
+import { Glyph, GlyphRole } from "../glyph";
+
 import { TimeFormatter } from "./types";
 
 export enum TimeResolution {

@@ -17,7 +17,7 @@ interface CanvasRenderingContext2D {
      */
     paintRect(
         color: string,
-        leftOrRect: number | Rect,
+        leftOrGeometry: number | Rect | Size,
         top?: number,
         right?: number,
         bottom?: number
@@ -89,6 +89,13 @@ interface CanvasRenderingContext2D {
         angleDegrees: number,
         pivotX: number,
         pivotY: number,
+        block: () => void
+    ): void;
+
+    withTranslationAndScale(
+        x: number,
+        y: number,
+        scale: number,
         block: () => void
     ): void;
 

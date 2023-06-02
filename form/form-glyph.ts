@@ -1,6 +1,7 @@
-import { BaseGlyph } from "../render";
-import { decelerate5, interpolate, progress } from "../render/math";
-import { Canvas, Paints } from "../render/types";
+import { BaseGlyph } from "../core";
+import { GlyphLayoutInfo } from "../core/glyph";
+import { decelerate5, interpolate, progress } from "../core/math";
+import { Canvas, Paints } from "../core/render/types";
 
 export class FormGlyph extends BaseGlyph {
     height = 144;

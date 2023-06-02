@@ -1,8 +1,8 @@
-import { BaseFont } from "../render";
-import { TimeResolution } from "../render/format";
-import { Size } from "../render/geometry";
-import { Glyph } from "../render/glyph";
-import { Layout, TimeFormatter } from "../render/types";
+import { BaseFont } from "../core";
+import { TimeResolution } from "../core/options/format";
+import { Size } from "../core/geometry";
+import { Glyph } from "../core/glyph";
+import { Layout, TimeFormatter } from "../core/options/types";
 import { FormGlyph, StaticFormGlyph } from "./form-glyph";
 
 export class FormFont extends BaseFont<FormGlyph> {

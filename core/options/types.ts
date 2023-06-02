@@ -1,5 +1,5 @@
+import { Glyph, GlyphRole } from "../glyph";
 import { TimeResolution } from "./format";
-import { Glyph, GlyphRole } from "./glyph";
 
 export type TimeFormatter = {
     name: string;
@@ -8,7 +8,6 @@ export type TimeFormatter = {
     applyRole: <T extends Glyph>(glyph: T, index: number) => T;
     resolution: TimeResolution;
 };
-export type Canvas = CanvasRenderingContext2D;
 
 export interface Options {
     format: TimeFormatter;
@@ -16,17 +15,6 @@ export interface Options {
     spacingPx: number;
     alignment: Alignment;
     layout: Layout;
-}
-
-export interface Paints {
-    defaultPaintStyle: PaintStyle;
-    colors: string[];
-    strokeWidth: number;
-}
-
-export enum PaintStyle {
-    Fill,
-    Stroke,
 }
 
 export enum Layout {

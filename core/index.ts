@@ -1,16 +1,16 @@
-export { BaseClockRenderer } from "./renderer";
-export { TimeFormat } from "./format";
+export { ClockRenderer } from "./render/renderer";
+export { TimeFormat } from "./options/format";
 export { BaseGlyph } from "./glyph";
 export { BaseFont } from "./font";
 import "./canvas";
 
-import { TimeFormat } from "./format";
+import { TimeFormat } from "./options/format";
 import {
     HorizontalAlignment,
     Layout,
     Options,
     VerticalAlignment,
-} from "./types";
+} from "./options/types";
 
 export const DefaultOptions: Options = {
     format: TimeFormat.HH_MM_SS_24,

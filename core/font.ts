@@ -1,6 +1,6 @@
 import { Size } from "./geometry";
 import { Glyph } from "./glyph";
-import { Layout, TimeFormatter } from "./types";
+import { Layout, TimeFormatter } from "./options/types";
 
 export interface Font<G extends Glyph> {
     getGlyph: (index: number) => G;

@@ -1,4 +1,4 @@
-import { Canvas, Paints, PaintStyle } from "./types";
+import { Canvas, Paints, PaintStyle } from "./render/types";
 
 type OnStateChange = (state: GlyphState) => void;
 
