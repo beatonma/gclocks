@@ -1,6 +1,13 @@
 import { BaseClockRenderer, DefaultOptions, TimeFormat } from "../render";
 import { DefaultRenderOptions, RenderOptions } from "../render/renderer";
-import { Options, Paints, PaintStyle } from "../render/types";
+import {
+    HorizontalAlignment,
+    Layout,
+    Options,
+    Paints,
+    PaintStyle,
+    VerticalAlignment,
+} from "../render/types";
 import { FormFont } from "./form-font";
 import { FormGlyph } from "./form-glyph";
 
@@ -13,6 +20,8 @@ export const FormPaints: Paints = {
 export const FormOptions: Options = {
     ...DefaultOptions,
     format: TimeFormat.HH_MM_SS_24,
+    layout: Layout.Wrapped,
+    alignment: HorizontalAlignment.End | VerticalAlignment.Top,
 };
 
 export class FormRenderer extends BaseClockRenderer<FormFont, FormGlyph> {

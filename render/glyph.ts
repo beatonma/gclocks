@@ -25,7 +25,8 @@ export enum GlyphRole {
     Hour,
     Minute,
     Second,
-    Separator,
+    Separator_Hours_Minutes,
+    Separator_Minutes_Seconds,
 }
 
 export interface GlyphLayoutInfo {
@@ -381,4 +382,6 @@ export abstract class BaseGlyph implements Glyph {
 
         canvas.paintRect("#00000033", 0, 0, width, this.layoutInfo.height);
     }
+
+    toString = () => this.key;
 }

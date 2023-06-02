@@ -7,6 +7,7 @@ import { Rect, Size } from "./render/geometry";
 import { ClockRenderer } from "./render/renderer";
 import { canvasExtensions } from "./render/canvas";
 import "./clocks.scss";
+import { measureFormClock } from "./render/precompute";
 
 canvasExtensions();
 
@@ -63,40 +64,7 @@ export const Clock = (props: ClockProps) => {
 
 export const DebugMeasureClock = () => {
     useEffect(() => {
-        const time = new Date(2023, 5, 16, 0, 0, 0);
-        let renderer = new FormRenderer({
-            ...FormOptions,
-            format: TimeFormat.SS,
-        });
-
-        const secondsBounds = new Rect();
-        for (let s = 0; s < 60; s++) {
-            time.setSeconds(s);
-            renderer.debugMeasure(time, secondsBounds);
-        }
-        console.log(`Seconds: ${secondsBounds}`);
-
-        renderer = new FormRenderer({
-            ...FormOptions,
-            format: TimeFormat.MM,
-        });
-        const minutesBounds = new Rect();
-        for (let m = 0; m < 60; m++) {
-            time.setMinutes(m);
-            renderer.debugMeasure(time, minutesBounds);
-        }
-        console.log(`Minutes: ${minutesBounds}`);
-
-        renderer = new FormRenderer({
-            ...FormOptions,
-            format: TimeFormat.HH_24,
-        });
-        const hoursBounds = new Rect();
-        for (let h = 0; h < 24; h++) {
-            time.setHours(h);
-            renderer.debugMeasure(time, hoursBounds);
-        }
-        console.log(`Hours: ${hoursBounds}`);
+        measureFormClock(TimeFormat.HH_MM_SS_24);
     }, []);
 
     return <></>;
@@ -109,7 +77,8 @@ const attachApp = (dom: Document | Element = document) => {
         const root = createRoot(container);
         root.render(
             <>
-                <Clock clock={Clocks.Form} />
+                <Clock clock={Clocks.Form} debug={true} />
+                {/*<DebugMeasureClock />*/}
             </>
         );
     } else {

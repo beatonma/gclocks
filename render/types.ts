@@ -1,9 +1,12 @@
+import { TimeResolution } from "./format";
 import { Glyph, GlyphRole } from "./glyph";
 
 export type TimeFormatter = {
+    name: string;
     roles: GlyphRole[];
     apply: (date: Date) => string;
     applyRole: <T extends Glyph>(glyph: T, index: number) => T;
+    resolution: TimeResolution;
 };
 export type Canvas = CanvasRenderingContext2D;
 
@@ -33,6 +36,7 @@ export enum Layout {
 }
 
 export enum HorizontalAlignment {
+    _ = 0,
     Start = 1 << 0,
     Center = 1 << 1,
     End = 1 << 2,
@@ -40,6 +44,7 @@ export enum HorizontalAlignment {
 }
 
 export enum VerticalAlignment {
+    _ = 0,
     Top = 2 << 4,
     Center = 2 << 5,
     Bottom = 2 << 6,

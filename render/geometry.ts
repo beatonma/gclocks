@@ -13,13 +13,29 @@ export class Rect {
         this.set(left, top, right, bottom);
     }
 
-    include = (other: Rect): Rect => {
+    /**
+     * Update the boundaries of this Rect to fully include the other.
+     *
+     * Returns true if this resulted in our boundaries changing.
+     * Returns false if other Rect was already within our boundaries.
+     */
+    include = (other: Rect): boolean => {
+        const originalArea = this.area();
         this.left = Math.min(this.left, other.left);
         this.top = Math.min(this.top, other.top);
         this.right = Math.max(this.right, other.right);
         this.bottom = Math.max(this.bottom, other.bottom);
-        return this;
+        return this.area() !== originalArea;
     };
+
+    copy = (other: Rect) => {
+        this.left = other.left;
+        this.top = other.top;
+        this.right = other.right;
+        this.bottom = other.bottom;
+    };
+
+    area = () => this.width() * this.height();
 
     set = (left: number, top: number, right: number, bottom: number) => {
         this.left = left;
@@ -42,6 +58,7 @@ export class Rect {
     height = () => this.bottom - this.top;
 
     toSize = () => new Size(this.width(), this.height());
+    isEmpty = (): boolean => this.area() === 0;
 
     *[Symbol.iterator]() {
         yield this.left;
@@ -64,12 +81,14 @@ export class Size {
         this.height = height;
     }
 
-    scaledBy(factor: number): Size {
-        return new Size(
+    scaledBy = (factor: number): Size =>
+        new Size(
             Math.floor(this.width * factor),
             Math.floor(this.height * factor)
         );
-    }
+
+    fitsIn = (other: Size): boolean =>
+        this.width <= other.width && this.height <= other.height;
 
     isEmpty = () => this.width === 0 || this.height === 0;
 
@@ -82,6 +101,14 @@ export class Size {
 }
 
 export namespace Size {
-    export const ofElement = (element: Element) =>
-        new Size(element.scrollWidth, element.scrollHeight);
+    export const ofElement = (element: Element) => {
+        const style = getComputedStyle(element);
+
+        // const inlinePadding =
+        //     parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+        // const blockPadding =
+        //     parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+
+        return new Size(element.scrollWidth, element.scrollHeight);
+    };
 }

@@ -1,7 +1,7 @@
 import { Align } from "./alignment";
 import { Font } from "./font";
 import { Rect, Size } from "./geometry";
-import { Glyph, GlyphStateLock } from "./glyph";
+import { Glyph, GlyphRole, GlyphStateLock } from "./glyph";
 import { progress } from "./math";
 import { PerformanceTracker } from "./metrics";
 import { Canvas, Layout, Options, Paints, PaintStyle } from "./types";
@@ -87,10 +87,10 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
     animationFrameRef: number = undefined;
     nextFrameDelayRef: ReturnType<typeof setTimeout> = undefined;
 
-    font: T;
-    glyphs: G[];
-    locks: GlyphStateLock[];
-    stringLength: number;
+    readonly font: T;
+    readonly glyphs: G[];
+    readonly locks: GlyphStateLock[];
+    readonly stringLength: number;
     animatedGlyphCount: number = 0;
     animatedGlyphIndices: number[];
 
@@ -100,18 +100,54 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
      */
     animationTimeMillis: number = 0;
 
+    /**
+     * The maximum size the clock can be with 1x scaling.
+     * Based on the values of `options.format` and `options.layout`.
+     */
+    readonly nativeSize: Size = new Size();
+
+    /**
+     * The size that is given to us for rendering within.
+     */
     availableSize: Size = new Size();
+
+    /**
+     * The size that the clock actually uses *at some point*. The actual rendered
+     * clock may not use all of this space at any given time, but will need it
+     * at least once per day.
+     *
+     * This must be <= availableSize.
+     *
+     * Horizontal alignment is applied relative to this area.
+     *
+     * Equivalent to nativeSize * scale.
+     */
     measuredSize: Size = new Size();
-    nativeSize: Size = new Size();
+
+    /**
+     * The size of *each line* of the *current* time.
+     * Only valid for a single animation frame.
+     *
+     * This must be <= measuredSize
+     */
+    currentNativeSize: Size[] = undefined;
 
     scale: number = 0;
-    measureStrategy: MeasureStrategy;
-    isDebug: boolean;
+    readonly measureStrategy: MeasureStrategy;
+    readonly isDebug: boolean;
+    readonly debugOptions = {
+        charmap: false, // Show debugMap instead of the current time.
+        boundaries: true,
+        frames: false,
+    };
 
-    options: Options;
-    paints: Paints;
+    readonly options: Options;
+    readonly paints: Paints;
 
-    performanceTracker: PerformanceTracker;
+    // Rect singleton to be used during layoutPass
+    readonly layoutPassRect: Rect = new Rect();
+
+    readonly performanceTracker: PerformanceTracker;
 
     abstract buildFont(): T;
 
@@ -126,10 +162,10 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
         this.measureStrategy =
             renderOptions.measureStrategy ??
             DefaultRenderOptions.measureStrategy;
-        this.isDebug = renderOptions.debug ?? DefaultRenderOptions.debug;
+        this.isDebug = renderOptions.debug;
 
         this.stringLength = options.format.apply(new Date()).length;
-        if (this.isDebug) {
+        if (this.isDebug && this.debugOptions.charmap) {
             this.stringLength = debugStartString.length;
         }
         this.glyphs = new Array(this.stringLength);
@@ -148,7 +184,7 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
             options.spacingPx
         );
 
-        if (renderOptions.debug) {
+        if (this.isDebug && this.debugOptions.frames) {
             this.performanceTracker = new PerformanceTracker();
         }
     }
@@ -199,7 +235,8 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
     }
 
     update(date?: Date) {
-        if (this.isDebug) return this.updateDebug();
+        if (this.isDebug && this.debugOptions.charmap)
+            return this.updateDebug();
 
         const now = date ?? new Date();
         const nowString = this.options.format.apply(now);
@@ -246,13 +283,37 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
         this.animatedGlyphCount = animatedGlyphCount;
     }
 
-    measureFrame(): Size {
+    /**
+     * Measure the size of the clock for the current animation frame.
+     * This is used to determine offsets for alignment when drawing.
+     *
+     * Returns a tuple of:
+     * - the overall measured (scaled) size, and
+     * - an array of the *native* (unscaled) size of each row.
+     */
+    measureFrame(): [Size, Size[]] {
         const drawBounds = new Rect();
+        const lines: Size[] = [];
+        let currentLine: Rect = new Rect();
 
         this.layoutPass((glyph, glyphAnimationProgress, rect) => {
             drawBounds.include(rect);
+
+            if (rect.top !== currentLine.top) {
+                if (!currentLine.isEmpty()) {
+                    lines.push(currentLine.toSize());
+                }
+                currentLine.copy(rect);
+            } else {
+                currentLine.include(rect);
+            }
         });
-        return drawBounds.toSize().scaledBy(this.scale);
+
+        if (!currentLine.isEmpty()) {
+            lines.push(currentLine.toSize());
+        }
+
+        return [drawBounds.toSize().scaledBy(this.scale), lines];
     }
 
     draw(canvas: Canvas) {
@@ -268,11 +329,37 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
         canvas.lineCap = canvas.lineJoin = "round";
         canvas.lineWidth = paints.strokeWidth;
 
+        // Pre-measure current frame for alignment.
+        let frameMeasure: Size;
+        [frameMeasure, this.currentNativeSize] = this.measureFrame();
+
         const [x, y] = Align.apply(
             this.options.alignment,
-            this.measureFrame(),
+            frameMeasure,
             this.measuredSize
         );
+
+        if (this.isDebug && this.debugOptions.boundaries) {
+            // Show measured boundaries
+            canvas.withPaintStyle(PaintStyle.Stroke, () => {
+                canvas.lineWidth = 12;
+                canvas.paintRect(
+                    "green",
+                    0,
+                    0,
+                    this.measuredSize.width,
+                    this.measuredSize.height
+                );
+
+                canvas.paintRect(
+                    "yellow",
+                    0,
+                    0,
+                    frameMeasure.width,
+                    frameMeasure.height
+                );
+            });
+        }
 
         canvas.withTranslation(x, y, () => {
             canvas.withScaleUniform(scale, 0, 0, () => {
@@ -283,16 +370,17 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
                         });
                     });
 
-                    if (this.isDebug) {
-                        // Show boundary
+                    if (this.isDebug && this.debugOptions.boundaries) {
+                        // Show glyph boundary
                         canvas.withPaintStyle(PaintStyle.Stroke, () => {
+                            canvas.lineWidth = 2;
                             canvas.paintRect("black", rect);
                         });
                     }
                 });
             });
         });
-
+        this.currentNativeSize = undefined;
         this.performanceTracker?.frameComplete(canvas);
     }
 
@@ -301,46 +389,66 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
             case Layout.Horizontal:
                 return this.layoutPassHorizontal(callback);
             case Layout.Vertical:
+                return this.layoutPassVertical(callback);
             case Layout.Wrapped:
+                return this.layoutPassWrapped(callback);
+            default:
                 throw `Unhandled layout: ${this.options.layout}`;
         }
     }
 
-    layoutPassHorizontal(visitGlyph: LayoutPassCallback) {
-        const { glyphs, stringLength } = this;
-        const { spacingPx, alignment } = this.options;
-        let x = 0;
-        const rect = new Rect();
+    updateGlyph(index: number): GlyphStatus<G> {
+        const { glyphs } = this;
+        const glyph = glyphs[index];
+        if (glyph.scale === 0) return { glyph: glyph, glyphVisible: false };
 
-        for (let i = 0; i < stringLength; i++) {
-            const glyph = glyphs[i];
-            if (glyph.scale === 0) continue;
+        let glyphProgress = this.getGlyphAnimationProgress(index);
 
-            let glyphProgress = this.getGlyphAnimationProgress(i);
+        if (glyphProgress === 1) {
+            glyph.key = glyph.getCanonicalEndGlyph();
+            glyphProgress = 0;
+        }
 
-            if (glyphProgress === 1) {
-                glyph.key = glyph.getCanonicalEndGlyph();
-                glyphProgress = 0;
-            }
-
-            if (glyphProgress !== 0) {
-                glyph.setActivating();
-                if (i > 0) {
-                    const previousGlyph = glyphs[i - 1];
-                    const previousCanonical =
-                        previousGlyph.getCanonicalStartGlyph();
-                    if (
-                        previousCanonical !== "#" &&
-                        previousCanonical !== ":"
-                    ) {
-                        previousGlyph.setActivating();
-                    }
+        if (glyphProgress !== 0) {
+            glyph.setActivating();
+            if (index > 0) {
+                const previousGlyph = this.glyphs[index - 1];
+                const previousCanonical =
+                    previousGlyph.getCanonicalStartGlyph();
+                if (previousCanonical !== "#" && previousCanonical !== ":") {
+                    previousGlyph.setActivating();
                 }
             }
+        }
 
-            const glyphWidth =
-                glyph.getWidthAtProgress(glyphProgress) * glyph.scale;
-            const glyphHeight = glyph.layoutInfo.height * glyph.scale;
+        const glyphWidth =
+            glyph.getWidthAtProgress(glyphProgress) * glyph.scale;
+        const glyphHeight = glyph.layoutInfo.height * glyph.scale;
+
+        return {
+            glyph: glyph,
+            glyphVisible: true,
+            glyphProgress: glyphProgress,
+            glyphWidth: glyphWidth,
+            glyphHeight: glyphHeight,
+        };
+    }
+
+    layoutPassHorizontal(visitGlyph: LayoutPassCallback) {
+        const { stringLength } = this;
+        const { spacingPx, alignment } = this.options;
+        let x = 0;
+
+        for (let i = 0; i < stringLength; i++) {
+            const {
+                glyph,
+                glyphVisible,
+                glyphProgress,
+                glyphWidth,
+                glyphHeight,
+            } = this.updateGlyph(i);
+
+            if (!glyphVisible) continue;
 
             const left = x;
             const top = Align.applyVertical(
@@ -354,7 +462,127 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
             visitGlyph(
                 glyph,
                 glyphProgress,
-                rect.set(left, top, right, bottom)
+                this.layoutPassRect.set(left, top, right, bottom)
+            );
+            x += glyphWidth + spacingPx * glyph.scale;
+        }
+    }
+
+    layoutPassVertical(visitGlyph: LayoutPassCallback) {
+        const { stringLength } = this;
+        const { spacingPx, alignment } = this.options;
+
+        const maxLineWidth = !!this.currentNativeSize
+            ? this.currentNativeSize
+                  .map(it => it.width)
+                  .reduce((total, current) => Math.max(total, current))
+            : 0;
+        let currentLineIndex = 0;
+        let x = !!this.currentNativeSize
+            ? Align.applyHorizontal(
+                  alignment,
+                  this.currentNativeSize[currentLineIndex].width,
+                  maxLineWidth
+              )
+            : 0;
+        let y = 0;
+
+        for (let i = 0; i < stringLength; i++) {
+            const {
+                glyph,
+                glyphVisible,
+                glyphProgress,
+                glyphWidth,
+                glyphHeight,
+            } = this.updateGlyph(i);
+
+            if (glyph.key === ":") {
+                currentLineIndex += 1;
+
+                if (this.currentNativeSize === undefined) {
+                    x = 0;
+                } else {
+                    x = Align.applyHorizontal(
+                        alignment,
+                        this.currentNativeSize[currentLineIndex].width,
+                        maxLineWidth
+                    );
+                }
+                y += glyph.layoutInfo.height + spacingPx;
+                continue;
+            }
+
+            if (!glyphVisible) continue;
+
+            const left = x;
+            const top = y;
+            const right = left + glyphWidth;
+            const bottom = top + glyphHeight;
+
+            visitGlyph(
+                glyph,
+                glyphProgress,
+                this.layoutPassRect.set(left, top, right, bottom)
+            );
+            x += glyphWidth + spacingPx * glyph.scale;
+        }
+    }
+
+    layoutPassWrapped(visitGlyph: LayoutPassCallback) {
+        const { stringLength } = this;
+        const { spacingPx, alignment } = this.options;
+
+        const maxLineWidth = !!this.currentNativeSize
+            ? this.currentNativeSize
+                  .map(it => it.width)
+                  .reduce((total, current) => Math.max(total, current))
+            : 0;
+        let currentLineIndex = 0;
+        let x = !!this.currentNativeSize
+            ? Align.applyHorizontal(
+                  alignment,
+                  this.currentNativeSize[currentLineIndex].width,
+                  maxLineWidth
+              )
+            : 0;
+        let y = 0;
+
+        for (let i = 0; i < stringLength; i++) {
+            const {
+                glyph,
+                glyphVisible,
+                glyphProgress,
+                glyphWidth,
+                glyphHeight,
+            } = this.updateGlyph(i);
+
+            if (glyph.role === GlyphRole.Separator_Minutes_Seconds) {
+                currentLineIndex += 1;
+
+                if (this.currentNativeSize === undefined) {
+                    x = 0;
+                } else {
+                    x = Align.applyHorizontal(
+                        alignment,
+                        this.currentNativeSize[currentLineIndex].width,
+                        maxLineWidth
+                    );
+                }
+                y += glyph.layoutInfo.height + spacingPx;
+                continue;
+            }
+
+            if (!glyphVisible) continue;
+
+            const left = x;
+            const top = y;
+            const right = left + glyphWidth;
+            const bottom = top + glyphHeight;
+
+            visitGlyph(
+                glyph,
+                glyphProgress,
+                this.layoutPassRect.set(left, top, right, bottom)
             );
             x += glyphWidth + spacingPx * glyph.scale;
         }
@@ -413,15 +641,17 @@ export abstract class BaseClockRenderer<T extends Font<G>, G extends Glyph>
         cancelAnimationFrame(this.animationFrameRef);
     }
 
-    debugMeasure(date: Date, bounds: Rect): Rect {
+    debugMeasure(date: Date, bounds: Rect): string {
         this.update(date);
-        for (let ms = 0; ms < this.options.glyphMorphMillis; ms++) {
+        let changed = false;
+        for (let ms = 0; ms < this.options.glyphMorphMillis; ms += 10) {
             this.animationTimeMillis = ms;
             this.layoutPass((glyph, glyphAnimationProgress, rect) => {
-                bounds.include(rect);
+                changed = bounds.include(rect) || changed;
             });
         }
-        return bounds;
+
+        if (changed) return this.glyphs.map(it => it.key).join(" ");
     }
 }
 
@@ -430,3 +660,15 @@ type LayoutPassCallback = (
     glyphAnimationProgress: number,
     rect: Rect
 ) => void;
+
+interface GlyphStatus<G extends Glyph> {
+    glyph: G;
+    glyphVisible: boolean;
+    glyphProgress?: number;
+    glyphWidth?: number;
+    glyphHeight?: number;
+}
+
+const halt = () => {
+    throw "--------------------------------------";
+};
