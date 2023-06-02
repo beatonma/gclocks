@@ -3,7 +3,7 @@ import { Font } from "./font";
 import { Rect, Size } from "./geometry";
 import { Glyph, GlyphRole, GlyphStateLock } from "./glyph";
 import { progress } from "./math";
-import { PerformanceTracker } from "./metrics";
+import { PerformanceTracker } from "./dev";
 import { Canvas, Layout, Options, Paints, PaintStyle } from "./types";
 
 // const debugMap = [
