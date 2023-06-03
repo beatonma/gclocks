@@ -16,8 +16,8 @@ export const FormPaints: Paints = {
 export const FormOptions: Options = {
     ...DefaultOptions,
     format: TimeFormat.HH_MM_SS_24,
-    layout: Layout.Vertical,
-    alignment: HorizontalAlignment.Center | VerticalAlignment.Top,
+    layout: Layout.Wrapped,
+    alignment: HorizontalAlignment.End | VerticalAlignment.Top,
 };
 
 export class FormRenderer extends ClockRenderer {

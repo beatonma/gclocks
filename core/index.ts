@@ -17,5 +17,5 @@ export const DefaultOptions: Options = {
     glyphMorphMillis: 800,
     spacingPx: 16,
     alignment: HorizontalAlignment.None | VerticalAlignment.Bottom,
-    layout: Layout.Horizontal,
+    layout: Layout.Wrapped,
 };

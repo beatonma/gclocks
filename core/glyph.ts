@@ -86,6 +86,8 @@ export abstract class BaseGlyph implements Glyph {
         switch (role) {
             case GlyphRole.Second:
                 return Glyph.SecondScale;
+            case GlyphRole.Separator_Minutes_Seconds:
+                return 0;
             default:
                 return 1;
         }

@@ -18,7 +18,8 @@ export interface Options {
 }
 
 export enum Layout {
-    Horizontal, // All in one line
+    // Starting from zero causes issues with parsing from search params and switch/case.
+    Horizontal = 1, // All in one line
     Vertical, // Hours, minutes, seconds on separate lines.
     Wrapped, // Hours and seconds on one line, seconds below.
 }
@@ -33,10 +34,10 @@ export enum HorizontalAlignment {
 
 export enum VerticalAlignment {
     _ = 0,
-    Top = 2 << 4,
-    Center = 2 << 5,
-    Bottom = 2 << 6,
-    None = 2 << 7,
+    Top = 1 << 4,
+    Center = 1 << 5,
+    Bottom = 1 << 6,
+    None = 1 << 7,
 }
 
 export type Alignment = HorizontalAlignment | VerticalAlignment;

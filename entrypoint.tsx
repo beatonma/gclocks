@@ -13,6 +13,7 @@ import { ClockAnimator as ClockCoordinator } from "./core/render/clock-animator"
 import { canvasExtensions } from "./core/canvas";
 import "./clocks.scss";
 import { measureFormClock } from "./core/precompute";
+import { useClockSettings } from "./settings/settings";
 
 canvasExtensions();
 
@@ -28,7 +29,7 @@ enum Clocks {
 const renderers: Record<Clocks, () => ClockCoordinator<any>> = {
     [Clocks.Form]: () =>
         new ClockCoordinator(new ClockLayout(new FormFont(), FormOptions), [
-            new DebugBoundaryRenderer(),
+            // new DebugBoundaryRenderer(),
             new FormRenderer(),
         ]),
 };
@@ -36,14 +37,19 @@ const renderers: Record<Clocks, () => ClockCoordinator<any>> = {
 interface ClockProps {
     clockType: Clocks;
 }
-export const Clock = (props: ClockProps) => {
+export const ClockWithSettings = (props: ClockProps) => {
     const { clockType } = props;
     const [size, setSize] = useState<Size>(Size.ofElement(container()));
     const clock = useRef(renderers[clockType]());
     const canvasRef = useRef<HTMLCanvasElement>();
-    const [paints, setPaints] = useState(clock.current?.getPaints());
-    const [options, setOptions] = useState(clock.current?.getOptions());
-    const [settingsVisible, setSettingsVisible] = useState(false);
+    const [
+        paints,
+        setPaints,
+        options,
+        setOptions,
+        settingsVisible,
+        setSettingsVisible,
+    ] = useClockSettings(clock.current);
 
     useEffect(() => {
         const resize = (toElement: Element = container()) => {
@@ -59,19 +65,6 @@ export const Clock = (props: ClockProps) => {
             window.removeEventListener("resize", () => resize());
         };
     }, [canvasRef.current]);
-
-    useEffect(() => {
-        setPaints(clock.current?.getPaints());
-        setOptions(clock.current?.getOptions());
-    }, [clock]);
-
-    useEffect(() => {
-        clock.current?.setPaints(paints);
-    }, [paints]);
-
-    useEffect(() => {
-        clock.current?.setOptions(options);
-    }, [options]);
 
     return (
         <div className="clock-container">
@@ -136,6 +129,7 @@ const ClockPaints = (props: ClockPaintProps) => {
             {colors.map((color, index) => {
                 return (
                     <input
+                        key={index}
                         type="color"
                         value={color}
                         className="clock-paint-color"
@@ -169,7 +163,7 @@ const attachApp = (dom: Document | Element = document) => {
         const root = createRoot(container);
         root.render(
             <>
-                <Clock clockType={Clocks.Form} />
+                <ClockWithSettings clockType={Clocks.Form} />
                 {/*<DebugMeasureClock />*/}
             </>
         );
