@@ -1,7 +1,22 @@
 import { Size } from "../geometry";
-import { Alignment, HorizontalAlignment, VerticalAlignment } from "./types";
 
-export namespace Align {
+export enum HorizontalAlignment {
+    Default = 0,
+    Start = 1 << 0, // 1
+    Center = 1 << 1, // 2
+    End = 1 << 2, // 4
+}
+
+export enum VerticalAlignment {
+    Default = 0,
+    Top = 1 << 3, // 8
+    Center = 1 << 4, // 16
+    Bottom = 1 << 5, // 32
+}
+
+export type Alignment = HorizontalAlignment | VerticalAlignment;
+
+export namespace Alignment {
     export const apply = (
         alignment: Alignment,
         object: Size,
@@ -68,7 +83,7 @@ export namespace Align {
         return defaultY;
     };
 
-    const getHorizontalAlignment = (
+    export const getHorizontalAlignment = (
         alignment: Alignment
     ): HorizontalAlignment =>
         alignment &
@@ -76,7 +91,9 @@ export namespace Align {
             HorizontalAlignment.Start |
             HorizontalAlignment.End);
 
-    const getVerticalAlignment = (alignment: Alignment): VerticalAlignment =>
+    export const getVerticalAlignment = (
+        alignment: Alignment
+    ): VerticalAlignment =>
         alignment &
         (VerticalAlignment.Center |
             VerticalAlignment.Top |

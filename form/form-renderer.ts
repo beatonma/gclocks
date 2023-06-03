@@ -1,10 +1,10 @@
 import { ClockRenderer, DefaultOptions, TimeFormat } from "../core";
 import {
     HorizontalAlignment,
-    Layout,
-    Options,
     VerticalAlignment,
-} from "../core/options/types";
+} from "../core/options/alignment";
+import { Options } from "../core/options/options";
+import { Layout } from "../core/options/types";
 import { Paints, PaintStyle } from "../core/render/types";
 
 export const FormPaints: Paints = {

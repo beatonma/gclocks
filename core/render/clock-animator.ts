@@ -1,6 +1,6 @@
 import { Size } from "../geometry";
 import { Glyph } from "../glyph";
-import { Options } from "../options/types";
+import { Options } from "../options/options";
 import { ClockLayout } from "./clock-layout";
 import { ClockRenderer } from "./renderer";
 

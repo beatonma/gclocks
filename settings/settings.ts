@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { TimeFormat } from "../core";
-import { Options } from "../core/options/types";
+import { Options } from "../core/options/options";
 import { ClockAnimator } from "../core/render/clock-animator";
 import { Paints } from "../core/render/types";
 
@@ -27,13 +26,12 @@ export const useClockSettings = (
     }, [options]);
 
     useEffect(() => {
-        const urlOptions = parseUrlOptions(options);
-        console.log(`parsed from url: ${JSON.stringify(urlOptions)}`);
+        const urlOptions = PersistentSettings.parseUrlOptions(options);
         setOptions(urlOptions);
     }, [clock]);
 
     useEffect(() => {
-        setUrlOptions(options);
+        PersistentSettings.setUrlOptions(options);
     }, [options]);
 
     return [
@@ -46,34 +44,23 @@ export const useClockSettings = (
     ];
 };
 
-const parseUrlOptions = (defaults: Options) => {
-    const search: Record<string, any> = Object.fromEntries(
-        new URLSearchParams(location.search)
-    );
+export namespace PersistentSettings {
+    export const parseUrlOptions = (
+        defaults: Options,
+        params?: string
+    ): Options => {
+        const opts = Options.fromSearchParams(params ?? location.search);
 
-    Object.entries(search).forEach(([key, value]) => {
-        search[key] = parseInt(value) || value;
-    });
-
-    const formatKey: keyof Options = "format";
-    if (formatKey in search) {
-        const formatterName = search[formatKey] as keyof typeof TimeFormat;
-        search[formatKey] = TimeFormat[formatterName];
-    }
-    return {
-        ...defaults,
-        ...search,
+        return defaults.merge(opts);
     };
-};
 
-const setUrlOptions = (options: Options) => {
-    const currentUrlOptions = location.search;
+    export const setUrlOptions = (options: Options, params?: string) => {
+        const updated = options
+            .updateSearchParams(new URLSearchParams(params ?? location.search))
+            .toString();
 
-    const newUrlOptions = new URLSearchParams(
-        Object.entries(options)
-    ).toString();
+        history.replaceState({}, null, `?${updated}`);
 
-    if (currentUrlOptions !== newUrlOptions) {
-        history.replaceState({}, null, `?${newUrlOptions}`);
-    }
-};
+        return updated;
+    };
+}

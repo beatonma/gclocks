@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { DebugBoundaryRenderer } from "./core/render/debug";
+import { Options } from "./core/options/options";
 import { ClockLayout } from "./core/render/clock-layout";
 import { Paints } from "./core/render/types";
-import { Options } from "./core/options/types";
 import { FormRenderer } from "./form";
 import { FormFont } from "./form/form-font";
 import { FormOptions } from "./form/form-renderer";

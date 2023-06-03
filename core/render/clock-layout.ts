@@ -1,9 +1,10 @@
-import { Align } from "../options/alignment";
+import { Alignment } from "../options/alignment";
 import { Font } from "../font";
 import { Rect, Size } from "../geometry";
 import { Glyph, GlyphRole, GlyphStateLock } from "../glyph";
 import { progress } from "../math";
-import { Layout, Options } from "../options/types";
+import { Options } from "../options/options";
+import { Layout } from "../options/types";
 
 // TODO Add a small space around the clock to allow for paint stroke lines to stay within bounds.
 const OutlinePaddingPx = 8;
@@ -162,7 +163,7 @@ export class ClockLayout<G extends Glyph> {
         this.currentNativeSize = lines;
         const { scale, measuredSize } = this;
 
-        const translation = Align.apply(
+        const translation = Alignment.apply(
             this.options.alignment,
             drawBounds.toSize().scaledBy(scale),
             measuredSize
@@ -203,7 +204,7 @@ export class ClockLayout<G extends Glyph> {
             if (!glyphVisible) continue;
 
             const left = x;
-            const top = Align.applyVertical(
+            const top = Alignment.applyVertical(
                 alignment,
                 glyphHeight,
                 glyph.layoutInfo.height
@@ -231,7 +232,7 @@ export class ClockLayout<G extends Glyph> {
             : 0;
         let currentLineIndex = 0;
         let x = !!this.currentNativeSize
-            ? Align.applyHorizontal(
+            ? Alignment.applyHorizontal(
                   alignment,
                   this.currentNativeSize[currentLineIndex].width,
                   maxLineWidth
@@ -254,7 +255,7 @@ export class ClockLayout<G extends Glyph> {
                 if (this.currentNativeSize === undefined) {
                     x = 0;
                 } else {
-                    x = Align.applyHorizontal(
+                    x = Alignment.applyHorizontal(
                         alignment,
                         this.currentNativeSize[currentLineIndex].width,
                         maxLineWidth
@@ -291,7 +292,7 @@ export class ClockLayout<G extends Glyph> {
             : 0;
         let currentLineIndex = 0;
         let x = !!this.currentNativeSize
-            ? Align.applyHorizontal(
+            ? Alignment.applyHorizontal(
                   alignment,
                   this.currentNativeSize[currentLineIndex].width,
                   maxLineWidth
@@ -314,7 +315,7 @@ export class ClockLayout<G extends Glyph> {
                 if (this.currentNativeSize === undefined) {
                     x = 0;
                 } else {
-                    x = Align.applyHorizontal(
+                    x = Alignment.applyHorizontal(
                         alignment,
                         this.currentNativeSize[currentLineIndex].width,
                         maxLineWidth

@@ -64,15 +64,16 @@ class TimeFormatterImpl implements TimeFormatter {
     toString = () => this.name;
 }
 
-const hoursMinsSeconds = (date: Date) => {
+const hoursMinsSeconds = (date: Date, mod: 12 | 24 = 24) => {
     return {
-        hours: date.getHours(),
+        hours: date.getHours() % mod,
         minutes: date.getMinutes(),
         seconds: date.getSeconds(),
     };
 };
 
-const zeroPad = (value: number): string => value.toString().padStart(2, "0");
+const pad = (value: number, padWith: string = "0") =>
+    value.toString().padStart(2, padWith);
 
 export const TimeFormat = {
     // 24-hour, zero-padded hours, minutes, seconds
@@ -82,7 +83,7 @@ export const TimeFormat = {
         Roles.HH_MM_SS,
         (date: Date) => {
             const { hours, minutes, seconds } = hoursMinsSeconds(date);
-            return `${zeroPad(hours)}:${zeroPad(minutes)}:${zeroPad(seconds)}`;
+            return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
         }
     ),
 
@@ -93,7 +94,7 @@ export const TimeFormat = {
         Roles.HH_MM_SS,
         (date: Date) => {
             const { hours, minutes, seconds } = hoursMinsSeconds(date);
-            return `${hours}:${zeroPad(minutes)}:${zeroPad(seconds)}`;
+            return `${pad(hours, " ")}:${pad(minutes)}:${pad(seconds)}`;
         }
     ),
 
@@ -103,10 +104,8 @@ export const TimeFormat = {
         TimeResolution.Seconds,
         Roles.HH_MM_SS,
         (date: Date) => {
-            const { hours, minutes, seconds } = hoursMinsSeconds(date);
-            return `${zeroPad(hours % 12)}:${zeroPad(minutes)}:${zeroPad(
-                seconds
-            )}`;
+            const { hours, minutes, seconds } = hoursMinsSeconds(date, 12);
+            return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
         }
     ),
 
@@ -116,8 +115,8 @@ export const TimeFormat = {
         TimeResolution.Seconds,
         Roles.HH_MM_SS,
         (date: Date) => {
-            const { hours, minutes, seconds } = hoursMinsSeconds(date);
-            return `${hours % 12}:${zeroPad(minutes)}:${zeroPad(seconds)}`;
+            const { hours, minutes, seconds } = hoursMinsSeconds(date, 12);
+            return `${pad(hours, " ")}:${pad(minutes)}:${pad(seconds)}`;
         }
     ),
 
@@ -128,7 +127,7 @@ export const TimeFormat = {
         Roles.HH_MM,
         (date: Date) => {
             const { hours, minutes, seconds } = hoursMinsSeconds(date);
-            return `${zeroPad(hours)}:${zeroPad(minutes)}`;
+            return `${pad(hours)}:${pad(minutes)}`;
         }
     ),
     H_MM_24: timeFormatter(
@@ -137,7 +136,7 @@ export const TimeFormat = {
         Roles.HH_MM,
         (date: Date) => {
             const { hours, minutes, seconds } = hoursMinsSeconds(date);
-            return `${hours}:${zeroPad(minutes)}`;
+            return `${pad(hours, " ")}:${pad(minutes)}`;
         }
     ),
     HH_MM_12: timeFormatter(
@@ -145,8 +144,8 @@ export const TimeFormat = {
         TimeResolution.Minutes,
         Roles.HH_MM,
         (date: Date) => {
-            const { hours, minutes, seconds } = hoursMinsSeconds(date);
-            return `${zeroPad(hours % 12)}:${zeroPad(minutes)}`;
+            const { hours, minutes, seconds } = hoursMinsSeconds(date, 12);
+            return `${pad(hours)}:${pad(minutes)}`;
         }
     ),
     H_MM_12: timeFormatter(
@@ -154,8 +153,8 @@ export const TimeFormat = {
         TimeResolution.Minutes,
         Roles.HH_MM,
         (date: Date) => {
-            const { hours, minutes, seconds } = hoursMinsSeconds(date);
-            return `${hours % 12}:${zeroPad(minutes)}`;
+            const { hours, minutes, seconds } = hoursMinsSeconds(date, 12);
+            return `${pad(hours, " ")}:${pad(minutes)}`;
         }
     ),
 
@@ -166,7 +165,7 @@ export const TimeFormat = {
         Roles.HH,
         (date: Date) => {
             const { hours } = hoursMinsSeconds(date);
-            return `${zeroPad(hours)}`;
+            return `${pad(hours)}`;
         }
     ),
     H_24: timeFormatter(
@@ -175,7 +174,7 @@ export const TimeFormat = {
         Roles.HH,
         (date: Date) => {
             const { hours } = hoursMinsSeconds(date);
-            return hours.toString();
+            return pad(hours, " ");
         }
     ),
     HH_12: timeFormatter(
@@ -183,8 +182,8 @@ export const TimeFormat = {
         TimeResolution.Hours,
         Roles.HH,
         (date: Date) => {
-            const { hours } = hoursMinsSeconds(date);
-            return `${zeroPad(hours % 12)}`;
+            const { hours } = hoursMinsSeconds(date, 12);
+            return `${pad(hours)}`;
         }
     ),
     H_12: timeFormatter(
@@ -192,16 +191,16 @@ export const TimeFormat = {
         TimeResolution.Hours,
         Roles.HH,
         (date: Date) => {
-            const { hours } = hoursMinsSeconds(date);
-            return (hours % 12).toString();
+            const { hours } = hoursMinsSeconds(date, 12);
+            return pad(hours, " ");
         }
     ),
     MM: timeFormatter("MM", TimeResolution.Minutes, Roles.MM, (date: Date) => {
         const { minutes } = hoursMinsSeconds(date);
-        return `${zeroPad(minutes)}`;
+        return `${pad(minutes)}`;
     }),
     SS: timeFormatter("SS", TimeResolution.Seconds, Roles.SS, (date: Date) => {
         const { seconds } = hoursMinsSeconds(date);
-        return `${zeroPad(seconds)}`;
+        return `${pad(seconds)}`;
     }),
 };
