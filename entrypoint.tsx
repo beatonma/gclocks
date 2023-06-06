@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { HTMLProps, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Options } from "./core/options/options";
 import { ClockLayout } from "./core/render/clock-layout";
@@ -34,13 +34,12 @@ const renderers: Record<Clocks, () => ClockCoordinator<any>> = {
 };
 
 interface ClockProps {
-    clockType: Clocks;
+    clock?: ClockCoordinator<any>;
+    clockType?: Clocks;
 }
 export const ClockWithSettings = (props: ClockProps) => {
     const { clockType } = props;
-    const [size, setSize] = useState<Size>(Size.ofElement(container()));
     const clock = useRef(renderers[clockType]());
-    const canvasRef = useRef<HTMLCanvasElement>();
     const [
         paints,
         setPaints,
@@ -49,6 +48,32 @@ export const ClockWithSettings = (props: ClockProps) => {
         settingsVisible,
         setSettingsVisible,
     ] = useClockSettings(clock.current);
+
+    return (
+        <div className="clock-container">
+            <Clock
+                clock={clock.current}
+                onClick={() => setSettingsVisible(!settingsVisible)}
+            />
+
+            <ClockSettings
+                isVisible={settingsVisible}
+                hideSettings={() => setSettingsVisible(false)}
+                options={options}
+                setOptions={setOptions}
+                paints={paints}
+                setPaints={setPaints}
+            />
+        </div>
+    );
+};
+
+const Clock = (props: ClockProps & HTMLProps<HTMLCanvasElement>) => {
+    const { clock: inheritedClock, clockType, width, height, ...rest } = props;
+
+    const clock = useRef(inheritedClock ?? renderers[clockType]());
+    const [size, setSize] = useState<Size>(Size.ofElement(container()));
+    const canvasRef = useRef<HTMLCanvasElement>();
 
     useEffect(() => {
         const resize = (toElement: Element = container()) => {
@@ -66,24 +91,13 @@ export const ClockWithSettings = (props: ClockProps) => {
     }, [canvasRef.current]);
 
     return (
-        <div className="clock-container">
-            <canvas
-                ref={canvasRef}
-                className="clock"
-                width={size.width}
-                height={size.height}
-                onClick={() => setSettingsVisible(!settingsVisible)}
-            />
-
-            <ClockSettings
-                isVisible={settingsVisible}
-                hideSettings={() => setSettingsVisible(false)}
-                options={options}
-                setOptions={setOptions}
-                paints={paints}
-                setPaints={setPaints}
-            />
-        </div>
+        <canvas
+            ref={canvasRef}
+            className="clock"
+            width={size.width}
+            height={size.height}
+            {...rest}
+        />
     );
 };
 

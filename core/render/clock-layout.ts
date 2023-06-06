@@ -221,23 +221,29 @@ export class ClockLayout<G extends Glyph> {
         }
     }
 
-    layoutPassVertical(visitGlyph: LayoutPassCallback) {
-        const { stringLength } = this;
-        const { spacingPx, alignment } = this.options;
-
-        const maxLineWidth = !!this.currentNativeSize
+    maxLineWidth = () =>
+        !!this.currentNativeSize
             ? this.currentNativeSize
                   .map(it => it.width)
                   .reduce((total, current) => Math.max(total, current))
             : 0;
+
+    layoutPassVertical(visitGlyph: LayoutPassCallback) {
+        const { stringLength } = this;
+        const { spacingPx, alignment } = this.options;
+        const maxLineWidth = this.maxLineWidth();
+
+        const newLineX = () =>
+            !!this.currentNativeSize
+                ? Alignment.applyHorizontal(
+                      alignment,
+                      this.currentNativeSize[currentLineIndex].width,
+                      maxLineWidth
+                  )
+                : 0;
+
         let currentLineIndex = 0;
-        let x = !!this.currentNativeSize
-            ? Alignment.applyHorizontal(
-                  alignment,
-                  this.currentNativeSize[currentLineIndex].width,
-                  maxLineWidth
-              )
-            : 0;
+        let x = newLineX();
         let y = 0;
 
         for (let i = 0; i < stringLength; i++) {
@@ -252,30 +258,18 @@ export class ClockLayout<G extends Glyph> {
             if (glyph.key === ":") {
                 currentLineIndex += 1;
 
-                if (this.currentNativeSize === undefined) {
-                    x = 0;
-                } else {
-                    x = Alignment.applyHorizontal(
-                        alignment,
-                        this.currentNativeSize[currentLineIndex].width,
-                        maxLineWidth
-                    );
-                }
+                x = newLineX();
+
                 y += glyph.layoutInfo.height + spacingPx;
                 continue;
             }
 
             if (!glyphVisible) continue;
 
-            const left = x;
-            const top = y;
-            const right = left + glyphWidth;
-            const bottom = top + glyphHeight;
-
             visitGlyph(
                 glyph,
                 glyphProgress,
-                this.layoutPassRect.set(left, top, right, bottom)
+                this.layoutPassRect.set(x, y, x + glyphWidth, y + glyphHeight)
             );
             x += glyphWidth + spacingPx * glyph.scale;
         }
@@ -285,19 +279,19 @@ export class ClockLayout<G extends Glyph> {
         const { stringLength } = this;
         const { spacingPx, alignment } = this.options;
 
-        const maxLineWidth = !!this.currentNativeSize
-            ? this.currentNativeSize
-                  .map(it => it.width)
-                  .reduce((total, current) => Math.max(total, current))
-            : 0;
+        const maxLineWidth = this.maxLineWidth();
+
+        const newLineX = () =>
+            !!this.currentNativeSize
+                ? Alignment.applyHorizontal(
+                      alignment,
+                      this.currentNativeSize[currentLineIndex].width,
+                      maxLineWidth
+                  )
+                : 0;
+
         let currentLineIndex = 0;
-        let x = !!this.currentNativeSize
-            ? Alignment.applyHorizontal(
-                  alignment,
-                  this.currentNativeSize[currentLineIndex].width,
-                  maxLineWidth
-              )
-            : 0;
+        let x = newLineX();
         let y = 0;
 
         for (let i = 0; i < stringLength; i++) {
@@ -327,15 +321,10 @@ export class ClockLayout<G extends Glyph> {
 
             if (!glyphVisible) continue;
 
-            const left = x;
-            const top = y;
-            const right = left + glyphWidth;
-            const bottom = top + glyphHeight;
-
             visitGlyph(
                 glyph,
                 glyphProgress,
-                this.layoutPassRect.set(left, top, right, bottom)
+                this.layoutPassRect.set(x, y, x + glyphWidth, y + glyphHeight)
             );
             x += glyphWidth + spacingPx * glyph.scale;
         }
