@@ -61,16 +61,18 @@ describe("Settings persistence tests", () => {
 
     describe("Saving", () => {
         test("Options are added to search params", () => {
-            const result = DefaultOptions().updateSearchParams(
-                new URLSearchParams()
+            const result = PersistentSettings.setUrlOptions(
+                DefaultOptions(),
+                ""
             );
 
             expect(result.get("format")).toBe("H_MM_SS_24");
         });
 
         test("Options do not remove unrelated params", () => {
-            const result = DefaultOptions().updateSearchParams(
-                new URLSearchParams("?unrelated=312")
+            const result = PersistentSettings.setUrlOptions(
+                DefaultOptions(),
+                "?unrelated=312"
             );
 
             expect(result.get("unrelated")).toBe("312");
