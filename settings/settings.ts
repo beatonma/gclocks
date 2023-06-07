@@ -86,10 +86,7 @@ export namespace PersistentSettings {
     export const setUrlPaints = (paints: Paints, params?: string) => {
         const searchParams = new URLSearchParams(params ?? location.search);
 
-        searchParams.set(
-            "colors",
-            listOf(...paints.colors.map(it => it.replace("#", "")))
-        );
+        searchParams.set("colors", listOf(...paints.colors));
         history.replaceState({}, null, `?${searchParams}`);
         return searchParams;
     };
@@ -100,14 +97,28 @@ export namespace PersistentSettings {
     ): Paints => {
         const searchParams = new URLSearchParams(params ?? location.search);
 
-        let colors = defaults.colors;
+        const colorsString = decodeURIComponent(searchParams.get("colors"));
+        if (!!colorsString) {
+            let documentStyle: CSSStyleDeclaration = undefined;
 
-        const colorsString = searchParams.get("colors");
-        if (colorsString?.match(new RegExp(`(${Separator}|[a-fA-F])+`, "g"))) {
-            colors = splitList(colorsString).map(it => `#${it}`);
+            const colors = splitList(colorsString)
+                .map(it => {
+                    if (/--.+/.test(it)) {
+                        if (!documentStyle) {
+                            documentStyle = getComputedStyle(
+                                document.documentElement
+                            );
+                        }
+                        return documentStyle.getPropertyValue(it);
+                    }
+                    return it;
+                })
+                .filter(Boolean);
+
+            if (colors.length === defaults.colors.length) {
+                defaults.colors = colors;
+            }
         }
-
-        defaults.colors = colors;
 
         return defaults;
     };
