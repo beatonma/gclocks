@@ -6,12 +6,13 @@ import {
     VerticalAlignment,
 } from "../core/options/alignment";
 import { Options, OptionsInit } from "../core/options/options";
-import { Layout } from "../core/options/types";
+import { Layout, TimeFormatter } from "../core/options/types";
 import { ClockAnimator } from "../core/render/clock-animator";
 
 import { Paints } from "../core/render/types";
 
 export const useClockSettings = (
+    parentElement: HTMLElement,
     clock?: ClockAnimator<any>
 ): [
     Paints,
@@ -26,21 +27,23 @@ export const useClockSettings = (
     const [settingsVisible, setSettingsVisible] = useState(false);
 
     useEffect(() => {
-        const urlPaints = PersistentSettings.parseUrlPaints(paints);
+        const urlPaints = Settings.parseUrlPaints(paints);
         setPaints(urlPaints);
 
-        const urlOptions = PersistentSettings.parseUrlOptions(options);
+        const urlOptions = Settings.parseUrlOptions(options);
         setOptions(urlOptions);
     }, [clock]);
 
     useEffect(() => {
         clock?.setPaints(paints);
-        PersistentSettings.setUrlPaints(paints);
+        Settings.setUrlPaints(paints);
     }, [paints]);
 
     useEffect(() => {
         clock?.setOptions(options);
-        PersistentSettings.setUrlOptions(options);
+        Settings.setUrlOptions(options);
+
+        parentElement.style.backgroundColor = options.backgroundColor;
     }, [options]);
 
     return [
@@ -53,12 +56,28 @@ export const useClockSettings = (
     ];
 };
 
-export namespace PersistentSettings {
+export namespace Settings {
     const Separator = "__";
 
-    export const listOf = (...args: string[]): string => args.join(Separator);
+    const PaintParam: Record<keyof Paints, keyof Paints> = {
+        colors: "colors",
+        defaultPaintStyle: "defaultPaintStyle",
+        strokeWidth: "strokeWidth",
+    };
+
+    const OptionParam: Record<keyof OptionsInit, keyof OptionsInit> = {
+        format: "format",
+        glyphMorphMillis: "glyphMorphMillis",
+        spacingPx: "spacingPx",
+        alignment: "alignment",
+        layout: "layout",
+        backgroundColor: "backgroundColor",
+    };
+
+    export const listOf = (...args: string[]): string =>
+        encodeURIComponent(args.join(Separator));
     export const splitList = (value: string): string[] =>
-        value.split(Separator);
+        decodeURIComponent(value).split(Separator);
 
     export const parseUrlOptions = (
         defaults: Options,
@@ -86,7 +105,7 @@ export namespace PersistentSettings {
     export const setUrlPaints = (paints: Paints, params?: string) => {
         const searchParams = new URLSearchParams(params ?? location.search);
 
-        searchParams.set("colors", listOf(...paints.colors));
+        searchParams.set(PaintParam.colors, listOf(...paints.colors));
         history.replaceState({}, null, `?${searchParams}`);
         return searchParams;
     };
@@ -97,22 +116,12 @@ export namespace PersistentSettings {
     ): Paints => {
         const searchParams = new URLSearchParams(params ?? location.search);
 
-        const colorsString = decodeURIComponent(searchParams.get("colors"));
+        const colorsString = decodeURIComponent(
+            searchParams.get(PaintParam.colors)
+        );
         if (!!colorsString) {
-            let documentStyle: CSSStyleDeclaration = undefined;
-
             const colors = splitList(colorsString)
-                .map(it => {
-                    if (/--.+/.test(it)) {
-                        if (!documentStyle) {
-                            documentStyle = getComputedStyle(
-                                document.documentElement
-                            );
-                        }
-                        return documentStyle.getPropertyValue(it);
-                    }
-                    return it;
-                })
+                .map(Parse.color)
                 .filter(Boolean);
 
             if (colors.length === defaults.colors.length) {
@@ -137,18 +146,21 @@ export namespace PersistentSettings {
             ];
 
         const serialized: Record<string, string> = {
-            format: options.format.name,
-            glyphMorphMillis: `${options.glyphMorphMillis}`,
-            spacingPx: `${options.spacingPx}`,
-            alignment: PersistentSettings.listOf(
+            [OptionParam.format]: options.format.name,
+            [OptionParam.glyphMorphMillis]: `${options.glyphMorphMillis}`,
+            [OptionParam.spacingPx]: `${options.spacingPx}`,
+            [OptionParam.alignment]: Settings.listOf(
                 horizontalAlignment,
                 verticalAlignment
             ),
-            layout: Layout[options.layout],
+            [OptionParam.layout]: Layout[options.layout],
+            [OptionParam.backgroundColor]: options.backgroundColor,
         };
 
         Object.entries(serialized).forEach(([key, value]) => {
-            params.set(key, value);
+            if (value != undefined) {
+                params.set(key, value);
+            }
         });
         return params;
     };
@@ -156,49 +168,51 @@ export namespace PersistentSettings {
     const paramsToOptions = (params: string): Options => {
         const searchParams = new URLSearchParams(params);
 
-        const formatKey: keyof Options = "format";
-        const glyphMorphMillisKey: keyof Options = "glyphMorphMillis";
-        const spacingPxKey: keyof Options = "spacingPx";
-        const alignmentKey: keyof Options = "alignment";
-        const layoutKey: keyof Options = "layout";
-
         const parsed: OptionsInit = {
-            format: undefined,
+            format: Parse.timeFormat(searchParams.get(OptionParam.format)),
             glyphMorphMillis:
-                parseInt(searchParams.get(glyphMorphMillisKey)) || undefined,
-            spacingPx: parseInt(searchParams.get(spacingPxKey)) || undefined,
-            alignment: undefined,
-            layout: undefined,
+                parseInt(searchParams.get(OptionParam.glyphMorphMillis)) ||
+                undefined,
+            spacingPx:
+                parseInt(searchParams.get(OptionParam.spacingPx)) || undefined,
+            alignment: Parse.alignment(searchParams.get(OptionParam.alignment)),
+            layout: Parse.layout(searchParams.get(OptionParam.layout)),
+            backgroundColor: Parse.color(
+                searchParams.get(OptionParam.backgroundColor)
+            ),
         };
-
-        if (searchParams.has(formatKey)) {
-            const formatterName = searchParams.get(
-                formatKey
-            ) as keyof typeof TimeFormat;
-            parsed.format = TimeFormat[formatterName];
-        }
-
-        if (searchParams.has(alignmentKey)) {
-            const alignmentName = searchParams.get(alignmentKey);
-            const [horizontal, vertical] =
-                PersistentSettings.splitList(alignmentName);
-
-            parsed.alignment =
-                HorizontalAlignment[
-                    horizontal as keyof typeof HorizontalAlignment
-                ] |
-                VerticalAlignment[vertical as keyof typeof VerticalAlignment];
-        }
-
-        if (searchParams.has(layoutKey)) {
-            const layoutName = searchParams.get(layoutKey);
-            parsed.layout = Layout[layoutName as keyof typeof Layout];
-        }
 
         return new Options(parsed);
     };
+}
 
-    const updateUrlParams = (params: URLSearchParams) => {
-        history.replaceState({}, null, `?${params}`);
+namespace Parse {
+    export const color = (color: string) => {
+        if (/--.+/.test(color)) {
+            const documentStyle = getComputedStyle(document.documentElement);
+            return documentStyle.getPropertyValue(color);
+        }
+        return color;
+    };
+
+    export const alignment = (value: string): Alignment => {
+        if (!value) return null;
+        const [horizontal, vertical] = Settings.splitList(value);
+
+        return (
+            HorizontalAlignment[
+                horizontal as keyof typeof HorizontalAlignment
+            ] | VerticalAlignment[vertical as keyof typeof VerticalAlignment]
+        );
+    };
+
+    export const layout = (value: string): Layout => {
+        if (!value) return null;
+        return Layout[value as keyof typeof Layout];
+    };
+
+    export const timeFormat = (value: string): TimeFormatter => {
+        if (!value) return null;
+        return TimeFormat[value as keyof typeof TimeFormat];
     };
 }

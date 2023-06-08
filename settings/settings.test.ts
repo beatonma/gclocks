@@ -6,7 +6,7 @@ import {
 } from "../core/options/alignment";
 import { Options } from "../core/options/options";
 import { Layout } from "../core/options/types";
-import { PersistentSettings } from "./settings";
+import { Settings } from "./settings";
 
 const DefaultOptions = () =>
     new Options({
@@ -20,7 +20,7 @@ const DefaultOptions = () =>
 describe("Settings persistence tests", () => {
     describe("Restoring", () => {
         const parse = (params: string) =>
-            PersistentSettings.parseUrlOptions(DefaultOptions(), params);
+            Settings.parseUrlOptions(DefaultOptions(), params);
 
         test("Options are restored from search query params", () => {
             const result = parse(
@@ -61,16 +61,13 @@ describe("Settings persistence tests", () => {
 
     describe("Saving", () => {
         test("Options are added to search params", () => {
-            const result = PersistentSettings.setUrlOptions(
-                DefaultOptions(),
-                ""
-            );
+            const result = Settings.setUrlOptions(DefaultOptions(), "");
 
             expect(result.get("format")).toBe("H_MM_SS_24");
         });
 
         test("Options do not remove unrelated params", () => {
-            const result = PersistentSettings.setUrlOptions(
+            const result = Settings.setUrlOptions(
                 DefaultOptions(),
                 "?unrelated=312"
             );

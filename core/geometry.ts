@@ -101,14 +101,6 @@ export class Size {
 }
 
 export namespace Size {
-    export const ofElement = (element: Element) => {
-        const style = getComputedStyle(element);
-
-        // const inlinePadding =
-        //     parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
-        // const blockPadding =
-        //     parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
-
-        return new Size(element.scrollWidth, element.scrollHeight);
-    };
+    export const ofElement = (element: Element) =>
+        new Size(element.scrollWidth, element.scrollHeight);
 }

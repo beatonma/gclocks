@@ -21,7 +21,7 @@ export const FormOptions: Options = {
 };
 
 export class FormRenderer extends ClockRenderer {
-    constructor() {
-        super(FormPaints);
+    constructor(paints?: Paints) {
+        super(paints ?? FormPaints);
     }
 }

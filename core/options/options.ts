@@ -7,6 +7,7 @@ export interface OptionsInit {
     spacingPx?: number;
     alignment?: Alignment;
     layout?: Layout;
+    backgroundColor?: string;
 }
 
 export class Options implements OptionsInit {
@@ -15,6 +16,7 @@ export class Options implements OptionsInit {
     spacingPx: number;
     alignment: Alignment;
     layout: Layout;
+    backgroundColor: string | null;
 
     constructor(init: OptionsInit) {
         this.merge(init);
@@ -30,6 +32,7 @@ export class Options implements OptionsInit {
         this.spacingPx = other.spacingPx ?? this.spacingPx;
         this.alignment = other.alignment ?? this.alignment;
         this.layout = other.layout ?? this.layout;
+        this.backgroundColor = other.backgroundColor ?? this.backgroundColor;
 
         return this;
     };
