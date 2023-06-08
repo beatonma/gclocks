@@ -2,17 +2,21 @@ import { FormFont } from "../form/form-font";
 import { FormOptions } from "../form/form-renderer";
 import { Rect } from "./geometry";
 import { TimeFormatter } from "./options/types";
-import { ClockLayout } from "./render/clock-layout";
+import { ClockLayout, MeasureStrategy } from "./render/clock-layout";
 
 export const measureFormClock = (format: TimeFormatter) => {
     console.log(`measure ${format}`);
     const time = new Date(2023, 4, 16, 0, 0, 0);
 
-    const layout = new ClockLayout(new FormFont(), {
-        ...FormOptions,
-        spacingPx: 0,
-        format: format,
-    });
+    const layout = new ClockLayout(
+        new FormFont(),
+        {
+            ...FormOptions,
+            spacingPx: 0,
+            format: format,
+        },
+        MeasureStrategy.FillWidth
+    );
 
     const bounds = new Rect();
     let widest: string = undefined;

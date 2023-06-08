@@ -77,8 +77,8 @@ export class ClockAnimator<G extends Glyph> {
 
     resetCanvas = () => {
         const canvas = this.canvas;
-        const [availableWidth, availableHeight] = this.layout.availableSize;
-        canvas.clearRect(0, 0, availableWidth, availableHeight);
+        const [measuredWidth, measuredHeight] = this.layout.measuredSize;
+        canvas.clearRect(0, 0, measuredWidth, measuredHeight);
         canvas.lineCap = canvas.lineJoin = "round";
     };
 }

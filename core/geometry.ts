@@ -67,9 +67,8 @@ export class Rect {
         yield this.bottom;
     }
 
-    toString = () => {
-        return `Rect(${this.left}, ${this.top}, ${this.right}, ${this.bottom})`;
-    };
+    toString = () =>
+        `Rect(${this.left}, ${this.top}, ${this.right}, ${this.bottom})`;
 }
 
 export class Size {
@@ -87,9 +86,6 @@ export class Size {
             Math.floor(this.height * factor)
         );
 
-    fitsIn = (other: Size): boolean =>
-        this.width <= other.width && this.height <= other.height;
-
     isEmpty = () => this.width === 0 || this.height === 0;
 
     *[Symbol.iterator]() {
@@ -102,5 +98,5 @@ export class Size {
 
 export namespace Size {
     export const ofElement = (element: Element) =>
-        new Size(element.scrollWidth, element.scrollHeight);
+        new Size(element.clientWidth, element.clientHeight);
 }

@@ -7,34 +7,49 @@ import { ClockWithSettings } from "./webapp";
 
 canvasExtensions();
 
-enum Context {
-    Webapp = "webapp", // The clock controls the entire view, customisable settings.
-    Embedded = "embedded", // Embedded in a page, locked settings.
+/**
+ * How is this clock being displayed?
+ */
+export enum ClockContext {
+    /**
+     * The clock controls the entire view, customisable settings.
+     * */
+    Webapp = "webapp",
+    /**
+     * Embedded in a page, locked settings.
+     * */
+    Embedded = "embedded",
 }
 
 export const renderClockApp = (container: HTMLElement) => {
     const root = createRoot(container);
-    const context = container.dataset.context ?? Context.Webapp;
+    const context = container.dataset.context ?? ClockContext.Webapp;
     const customSettings = container.dataset.settings;
     const clockType =
         (container.dataset.clock as ClockType.Form) ?? ClockType.Form;
 
+    // Apply defaults to container.
+    container.dataset.context = context;
+    container.dataset.clockType = clockType;
+
     switch (context) {
-        case Context.Embedded:
+        case ClockContext.Embedded:
             root.render(
                 <EmbeddedClock
                     element={container}
                     clockType={clockType}
                     embeddedSettings={customSettings}
+                    context={context}
                 />
             );
             break;
-        case Context.Webapp:
+        case ClockContext.Webapp:
             root.render(
                 <ClockWithSettings
                     element={container}
                     clockType={clockType}
                     embeddedSettings={customSettings}
+                    context={context}
                 />
             );
             break;

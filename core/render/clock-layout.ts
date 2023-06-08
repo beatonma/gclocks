@@ -6,12 +6,9 @@ import { progress } from "../math";
 import { Options } from "../options/options";
 import { Layout } from "../options/types";
 
-// TODO Add a small space around the clock to allow for paint stroke lines to stay within bounds.
-const OutlinePaddingPx = 8;
-
 export enum MeasureStrategy {
     Fit, // Respect the existing boundaries of the container.
-    Fill, // Use existing value for either width or height to determine the other.
+    FillWidth, // Use existing value for width to determine the height.
 }
 
 export class ClockLayout<G extends Glyph> {
@@ -40,7 +37,7 @@ export class ClockLayout<G extends Glyph> {
      *
      * Equivalent to nativeSize * scale.
      */
-    measuredSize: Size;
+    measuredSize: Size = new Size();
 
     /**
      * The size of *each line* of the *current* time.
@@ -62,10 +59,14 @@ export class ClockLayout<G extends Glyph> {
     animatedGlyphIndices: number[];
     animatedGlyphCount: number;
 
-    constructor(font: Font<G>, options: Options) {
+    constructor(
+        font: Font<G>,
+        options: Options,
+        measureStrategy: MeasureStrategy
+    ) {
         this.font = font;
-        this.measureStrategy = MeasureStrategy.Fit;
         this.setOptions(options);
+        this.measureStrategy = measureStrategy;
     }
 
     setOptions = (options: Options) => {
@@ -94,15 +95,17 @@ export class ClockLayout<G extends Glyph> {
     setAvailableSize(available: Size): Size {
         this.availableSize = available;
 
-        const { width: availableWidth, height: availableHeight } = available;
+        const [availableWidth, availableHeight] = available;
         if (availableWidth === 0 && availableHeight === 0) {
             this.scale = 0;
             return;
         }
-        const { width: nativeWidth, height: nativeHeight } = this.nativeSize;
+        const [nativeWidth, nativeHeight] = this.nativeSize;
 
         const strategy =
-            availableHeight === 0 ? MeasureStrategy.Fill : this.measureStrategy;
+            availableHeight === 0
+                ? MeasureStrategy.FillWidth
+                : this.measureStrategy;
 
         switch (strategy) {
             case MeasureStrategy.Fit:
@@ -112,7 +115,7 @@ export class ClockLayout<G extends Glyph> {
 
                 return this.setScale(scale);
 
-            case MeasureStrategy.Fill:
+            case MeasureStrategy.FillWidth:
                 if (availableWidth > 0) {
                     return this.setScale(availableWidth / nativeWidth);
                 } else {

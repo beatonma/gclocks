@@ -1,10 +1,11 @@
 import React, { HTMLProps, useEffect, useRef, useState } from "react";
 import { Size } from "../core/geometry";
 import { ClockAnimator } from "../core/render/clock-animator";
-import { ClockLayout } from "../core/render/clock-layout";
+import { ClockLayout, MeasureStrategy } from "../core/render/clock-layout";
 import { FormFont } from "../form/form-font";
 import { FormOptions, FormPaints, FormRenderer } from "../form/form-renderer";
 import { Settings } from "../settings/settings";
+import { ClockContext } from "./index";
 
 export enum ClockType {
     Form = "form",
@@ -12,11 +13,21 @@ export enum ClockType {
     // Io18,
 }
 
+const contextMeasureStrategy = (context: ClockContext) => {
+    switch (context) {
+        case ClockContext.Embedded:
+            return MeasureStrategy.FillWidth;
+        case ClockContext.Webapp:
+        default:
+            return MeasureStrategy.Fit;
+    }
+};
+
 const renderers: Record<
     ClockType,
-    (defaultSettings?: string) => ClockAnimator<any>
+    (context: ClockContext, defaultSettings: string) => ClockAnimator<any>
 > = {
-    [ClockType.Form]: (defaultSettings?: string) => {
+    [ClockType.Form]: (context: ClockContext, defaultSettings: string) => {
         const paints = Settings.parseUrlPaints(
             FormPaints,
             defaultSettings ?? ""
@@ -26,10 +37,17 @@ const renderers: Record<
             defaultSettings ?? ""
         );
 
-        return new ClockAnimator(new ClockLayout(new FormFont(), options), [
-            // new DebugBoundaryRenderer(),
-            new FormRenderer(paints),
-        ]);
+        return new ClockAnimator(
+            new ClockLayout(
+                new FormFont(),
+                options,
+                contextMeasureStrategy(context)
+            ),
+            [
+                // new DebugBoundaryRenderer(),
+                new FormRenderer(paints),
+            ]
+        );
     },
 };
 
@@ -37,14 +55,13 @@ export interface ClockContainerProps {
     element: HTMLElement;
     clockType: ClockType;
     embeddedSettings: string;
+    context: ClockContext;
 }
 
 export const useClockAnimator = (props: ClockContainerProps) => {
-    const { clockType, embeddedSettings } = props;
+    const { clockType, context, embeddedSettings } = props;
 
-    const clock = useRef(renderers[clockType](embeddedSettings));
-
-    return clock;
+    return useRef(renderers[clockType](context, embeddedSettings));
 };
 
 export interface ClockProps {
@@ -65,17 +82,21 @@ export const Clock = (props: ClockProps & HTMLProps<HTMLCanvasElement>) => {
     const canvasRef = useRef<HTMLCanvasElement>();
 
     useEffect(() => {
-        const resize = (toElement: Element = parentElement) => {
-            setSize(clock.setAvailableSize(Size.ofElement(toElement)));
-        };
+        const resize = () => {
+            const elementSize = Size.ofElement(parentElement);
 
-        window.addEventListener("resize", () => resize());
+            setSize(clock.setAvailableSize(elementSize));
+        };
+        const resizeObserver = new ResizeObserver(resize);
+
+        resizeObserver.observe(parentElement);
+
         clock.attach(canvasRef.current);
-        resize(canvasRef.current);
+        resize();
 
         return () => {
             clock?.detach();
-            window.removeEventListener("resize", () => resize());
+            resizeObserver.unobserve(parentElement);
         };
     }, [canvasRef.current]);
 

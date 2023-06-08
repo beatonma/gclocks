@@ -11,18 +11,13 @@
   &[data-context="webapp"] {
     resize: both;
     overflow: hidden;
-    height: 100%;
+    height: 100dvh;
   }
 
   canvas {
     display: block;
-    margin-block: 1em;
-  }
-
-  canvas.clock {
-    display: block;
     max-width: 100vw;
-    max-height: 100dvh;
+    max-height: 100lvh;
   }
 
   .clock-settings {
