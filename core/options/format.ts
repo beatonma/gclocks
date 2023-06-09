@@ -65,8 +65,10 @@ class TimeFormatterImpl implements TimeFormatter {
 }
 
 const hoursMinsSeconds = (date: Date, mod: 12 | 24 = 24) => {
+    let hours = date.getHours() % mod;
+    if (mod === 12 && hours === 0) hours = 12;
     return {
-        hours: date.getHours() % mod,
+        hours: hours,
         minutes: date.getMinutes(),
         seconds: date.getSeconds(),
     };
