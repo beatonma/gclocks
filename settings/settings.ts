@@ -12,7 +12,6 @@ import { ClockAnimator } from "../core/render/clock-animator";
 import { Paints } from "../core/render/types";
 
 export const useClockSettings = (
-    parentElement: HTMLElement,
     clock?: ClockAnimator<any>
 ): [
     Paints,
@@ -42,8 +41,6 @@ export const useClockSettings = (
     useEffect(() => {
         clock?.setOptions(options);
         Settings.setUrlOptions(options);
-
-        parentElement.style.backgroundColor = options.backgroundColor;
     }, [options]);
 
     return [

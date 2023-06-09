@@ -1,7 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { canvasExtensions } from "../core/canvas";
-import { ClockType } from "./clock";
+import { ClockContainerProps, ClockType } from "./clock";
 import { EmbeddedClock } from "./embedded";
 import { ClockWithSettings } from "./webapp";
 
@@ -23,35 +23,33 @@ export enum ClockContext {
 
 export const renderClockApp = (container: HTMLElement) => {
     const root = createRoot(container);
-    const context = container.dataset.context ?? ClockContext.Webapp;
-    const customSettings = container.dataset.settings;
+    const context = (container.dataset.context ??
+        ClockContext.Webapp) as ClockContext;
+    const embeddedSettings = container.dataset.settings;
     const clockType =
         (container.dataset.clock as ClockType.Form) ?? ClockType.Form;
 
     // Apply defaults to container.
     container.dataset.context = context;
     container.dataset.clockType = clockType;
+    root.render(
+        <ClockApp
+            element={container}
+            clockType={clockType}
+            context={context}
+            embeddedSettings={embeddedSettings}
+        />
+    );
+};
 
-    switch (context) {
+const ClockApp = (props: ClockContainerProps) => {
+    const { element, ...rest } = props;
+
+    switch (props.context) {
         case ClockContext.Embedded:
-            root.render(
-                <EmbeddedClock
-                    element={container}
-                    clockType={clockType}
-                    embeddedSettings={customSettings}
-                    context={context}
-                />
-            );
-            break;
+            return <EmbeddedClock {...props} />;
+
         case ClockContext.Webapp:
-            root.render(
-                <ClockWithSettings
-                    element={container}
-                    clockType={clockType}
-                    embeddedSettings={customSettings}
-                    context={context}
-                />
-            );
-            break;
+            return <ClockWithSettings {...props} />;
     }
 };

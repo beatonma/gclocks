@@ -14,7 +14,7 @@ export const ClockWithSettings = (props: ClockContainerProps) => {
         setOptions,
         settingsVisible,
         setSettingsVisible,
-    ] = useClockSettings(element, clock.current);
+    ] = useClockSettings(clock.current);
 
     return (
         <>

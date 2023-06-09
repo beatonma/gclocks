@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
-import "./clocks.scss";
 import { renderClockApp } from "./app";
 import { TimeFormat } from "./core";
 import { measureFormClock } from "./core/precompute";
+import "./clocks.scss";
 
 const CONTAINER_ID = "clocks_container";
 
@@ -15,13 +15,13 @@ export const DebugMeasureClock = () => {
 };
 
 const attachApp = (dom: Document | Element = document) => {
-    const container = dom.querySelector(`#${CONTAINER_ID}`) as HTMLElement;
+    const containers = dom.querySelectorAll(
+        `#${CONTAINER_ID}, .clock-container`
+    );
 
-    if (container) {
-        renderClockApp(container);
-    } else {
-        console.warn(`Root container not found! #${CONTAINER_ID}`);
-    }
+    containers.forEach((it: HTMLElement) => {
+        renderClockApp(it);
+    });
 };
 
 attachApp();

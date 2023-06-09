@@ -1,5 +1,6 @@
 import React, { HTMLProps, useEffect, useRef, useState } from "react";
 import { Size } from "../core/geometry";
+import { Options } from "../core/options/options";
 import { ClockAnimator } from "../core/render/clock-animator";
 import { ClockLayout, MeasureStrategy } from "../core/render/clock-layout";
 import { FormFont } from "../form/form-font";
@@ -29,11 +30,11 @@ const renderers: Record<
 > = {
     [ClockType.Form]: (context: ClockContext, defaultSettings: string) => {
         const paints = Settings.parseUrlPaints(
-            FormPaints,
+            { ...FormPaints },
             defaultSettings ?? ""
         );
         const options = Settings.parseUrlOptions(
-            FormOptions,
+            new Options(FormOptions),
             defaultSettings ?? ""
         );
 

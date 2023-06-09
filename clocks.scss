@@ -1,7 +1,7 @@
-#clocks_container {
+.clock-container, #clocks_container {
   width: 100%;
-  max-width: 100vw;
-  max-height: 100vh;
+  max-width: 100lvw;
+  max-height: 100lvh;
   transition: background-color 300ms;
 
   &[data-context="embedded"] {
@@ -9,18 +9,43 @@
   }
 
   &[data-context="webapp"] {
-    resize: both;
-    overflow: hidden;
-    height: 100dvh;
+    height: 100lvh;
+
+    .clock-resizable-wrapper {
+      resize: both;
+      overflow: hidden;
+    }
   }
 
-  canvas {
-    display: block;
-    max-width: 100vw;
+  .clock-background {
+    width: 100%;
+    height: 100%;
+    max-width: 100lvw;
     max-height: 100lvh;
+    transition: background-color 300ms;
+
+    .clock-resizable-wrapper {
+      width: 100%;
+      height: 100%;
+      max-width: 100lvw;
+      max-height: 100lvh;
+    }
+
+    canvas {
+      display: block;
+      max-width: 100lvw;
+      max-height: 100lvh;
+    }
   }
+
 
   .clock-settings {
+    background-color: var(--surface);
+    color: var(--on-surface);
+    position: absolute;
+    bottom: 0;
+    right: 0;
+
     input[type="color"] {
       width: 64px;
       height: auto;
