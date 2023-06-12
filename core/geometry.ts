@@ -1,3 +1,5 @@
+import { constrain } from "./math";
+
 export class Rect {
     left: number;
     top: number;
@@ -60,6 +62,18 @@ export class Rect {
     toSize = () => new Size(this.width(), this.height());
     isEmpty = (): boolean => this.area() === 0;
 
+    constrainedTranslate = (x: number, y: number) => {
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+
+        return this.set(
+            constrain(this.left + x, 0, windowWidth),
+            constrain(this.top + y, 0, windowHeight),
+            constrain(this.right + x, 0, windowWidth),
+            constrain(this.bottom + y, 0, windowHeight)
+        );
+    };
+
     *[Symbol.iterator]() {
         yield this.left;
         yield this.top;
@@ -98,5 +112,5 @@ export class Size {
 
 export namespace Size {
     export const ofElement = (element: Element) =>
-        new Size(element.clientWidth, element.clientHeight);
+        new Size(element?.clientWidth ?? 0, element?.clientHeight ?? 0);
 }

@@ -32,8 +32,11 @@ export class ClockAnimator<G extends Glyph> {
     getOptions = () => this.layout.options;
     getPaints = () => this.primaryRenderer().paints;
 
-    setAvailableSize = (available: Size) =>
-        this.layout.setAvailableSize(available);
+    setAvailableSize = (available: Size) => {
+        const measuredSize = this.layout.setAvailableSize(available);
+        this.onRescale();
+        return measuredSize;
+    };
 
     tick = () => {
         this.layout.update();
@@ -69,7 +72,7 @@ export class ClockAnimator<G extends Glyph> {
         cancelAnimationFrame(this.animationFrameRef);
     }
 
-    onRescale = (scale: number) => {
+    onRescale = () => {
         clearTimeout(this.nextFrameDelayRef);
         cancelAnimationFrame(this.animationFrameRef);
         this.tick();

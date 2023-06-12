@@ -98,7 +98,7 @@ export class ClockLayout<G extends Glyph> {
         const [availableWidth, availableHeight] = available;
         if (availableWidth === 0 && availableHeight === 0) {
             this.scale = 0;
-            return;
+            return available;
         }
         const [nativeWidth, nativeHeight] = this.nativeSize;
 

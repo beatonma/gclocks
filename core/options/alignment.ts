@@ -98,4 +98,11 @@ export namespace Alignment {
         (VerticalAlignment.Center |
             VerticalAlignment.Top |
             VerticalAlignment.Bottom);
+
+    export const unpack = (
+        alignment: Alignment
+    ): [HorizontalAlignment, VerticalAlignment] => [
+        getHorizontalAlignment(alignment),
+        getVerticalAlignment(alignment),
+    ];
 }

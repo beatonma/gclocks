@@ -34,7 +34,6 @@ export const renderClockApp = (container: HTMLElement) => {
     container.dataset.clockType = clockType;
     root.render(
         <ClockApp
-            element={container}
             clockType={clockType}
             context={context}
             embeddedSettings={embeddedSettings}
@@ -43,8 +42,6 @@ export const renderClockApp = (container: HTMLElement) => {
 };
 
 const ClockApp = (props: ClockContainerProps) => {
-    const { element, ...rest } = props;
-
     switch (props.context) {
         case ClockContext.Embedded:
             return <EmbeddedClock {...props} />;

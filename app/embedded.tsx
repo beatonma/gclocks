@@ -3,7 +3,7 @@ import { Settings } from "../settings/settings";
 import { Clock, ClockContainerProps, useClockAnimator } from "./clock";
 
 export const EmbeddedClock = (props: ClockContainerProps) => {
-    const { embeddedSettings, element } = props;
+    const { embeddedSettings } = props;
     const clock = useClockAnimator(props);
 
     useEffect(() => {
@@ -26,5 +26,5 @@ export const EmbeddedClock = (props: ClockContainerProps) => {
         return () => window.removeEventListener("themechange", refreshCss);
     }, []);
 
-    return <Clock clock={clock.current} parentElement={element} />;
+    return <Clock clock={clock.current} />;
 };

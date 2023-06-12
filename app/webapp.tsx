@@ -5,28 +5,17 @@ import { useClockSettings } from "../settings/settings";
 import { Clock, ClockContainerProps, useClockAnimator } from "./clock";
 
 export const ClockWithSettings = (props: ClockContainerProps) => {
-    const { element } = props;
     const clock = useClockAnimator(props);
-    const [
-        paints,
-        setPaints,
-        options,
-        setOptions,
-        settingsVisible,
-        setSettingsVisible,
-    ] = useClockSettings(clock.current);
+    const [paints, setPaints, options, setOptions, isEditMode, setEditMode] =
+        useClockSettings(clock.current);
 
     return (
         <>
-            <Clock
-                clock={clock.current}
-                parentElement={element}
-                onClick={() => setSettingsVisible(!settingsVisible)}
-            />
+            <Clock clock={clock.current} editMode={isEditMode} />
 
             <ClockSettings
-                isVisible={settingsVisible}
-                hideSettings={() => setSettingsVisible(false)}
+                isVisible={isEditMode}
+                hideSettings={() => setEditMode(false)}
                 options={options}
                 setOptions={setOptions}
                 paints={paints}
