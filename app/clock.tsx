@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Rect, Size } from "../core/geometry";
+import { constrain } from "../core/math";
 import {
     Alignment,
     HorizontalAlignment,
@@ -81,35 +82,43 @@ export const Clock = (props: ClockProps) => {
     const canvasRef = useRef<HTMLCanvasElement>();
     const backgroundRef = useRef<HTMLDivElement>();
     const resizableWrapperRef = useRef<HTMLDivElement>();
+
+    // Size of the canvas element.
     const [size, setSize] = useState<Size>(
         Size.ofElement(resizableWrapperRef.current)
     );
-    const [bounds, setBounds] = useState(new Rect());
+
+    // Boundary of the available space for the clock, expressed as a fraction of the parent element dimensions.
+    const [fractionalBounds, setFractionalBounds] = useState(
+        new Rect(0, 0, 1, 1)
+    );
+
+    // CSS padding used to position the clock within .clock-resizable-wrapper
     const [padding, setPadding] = useState({});
+    const [resizeFlag, requestResize] = useFlag();
+
+    const bounds = resolveBounds(
+        fractionalBounds,
+        Size.ofElement(backgroundRef.current)
+    );
+
+    const resizeControls = useTouchBehaviour((x, y, location) =>
+        setFractionalBounds(
+            boundsToFractional(
+                updateBoundsFromDrag(bounds, x, y, location),
+                Size.ofElement(backgroundRef.current)
+            )
+        )
+    );
 
     useEffect(() => {
         clock.attach(canvasRef.current);
 
-        return () => {
-            clock?.detach();
-        };
+        return () => clock?.detach();
     }, [canvasRef.current]);
 
     useEffect(() => {
-        const resize = () => {
-            const available = Size.ofElement(backgroundRef.current);
-
-            setBounds(
-                new Rect(
-                    bounds.left,
-                    bounds.top,
-                    bounds.left + available.width,
-                    bounds.top + available.height
-                )
-            );
-        };
-
-        const resizer = new ResizeObserver(resize);
+        const resizer = new ResizeObserver(requestResize);
         resizer.observe(backgroundRef.current);
 
         return () => resizer.unobserve(backgroundRef.current);
@@ -135,17 +144,7 @@ export const Clock = (props: ClockProps) => {
                     window.innerHeight
                 ) - bounds.bottom,
         });
-    }, [bounds]);
-
-    useEffect(() => {
-        const available = Size.ofElement(resizableWrapperRef.current);
-
-        setBounds(new Rect(0, 0, available.width, available.height));
-    }, []);
-
-    const resizeControls = useTouchBehaviour((x, y, location) =>
-        setBounds(updateBounds(bounds, x, y, location))
-    );
+    }, [fractionalBounds, resizeFlag]);
 
     return (
         <div
@@ -184,36 +183,65 @@ export const Clock = (props: ClockProps) => {
     );
 };
 
-const updateBounds = (
-    bounds: Rect,
-    x: number,
-    y: number,
-    location: Alignment
+const updateBoundsFromDrag = (
+    existingFractionalBounds: Rect,
+    dragX: number,
+    dragY: number,
+    dragArea: Alignment
 ): Rect => {
-    const [horizontal, vertical] = Alignment.unpack(location);
-    const newBounds = new Rect(...bounds);
+    const [horizontal, vertical] = Alignment.unpack(dragArea);
+    const newBounds = new Rect(...existingFractionalBounds);
 
-    if (location === (HorizontalAlignment.Center | VerticalAlignment.Center)) {
-        return newBounds.constrainedTranslate(x, y);
+    if (dragArea === (HorizontalAlignment.Center | VerticalAlignment.Center)) {
+        return newBounds.constrainedTranslate(dragX, dragY);
     }
 
     switch (horizontal) {
         case HorizontalAlignment.Start:
-            newBounds.left = newBounds.left + x;
+            newBounds.left = newBounds.left + dragX;
             break;
         case HorizontalAlignment.End:
-            newBounds.right = newBounds.right + x;
+            newBounds.right = newBounds.right + dragX;
             break;
     }
 
     switch (vertical) {
         case VerticalAlignment.Top:
-            newBounds.top = newBounds.top + y;
+            newBounds.top = newBounds.top + dragY;
             break;
         case VerticalAlignment.Bottom:
-            newBounds.bottom = newBounds.bottom + y;
+            newBounds.bottom = newBounds.bottom + dragY;
             break;
     }
 
     return newBounds;
+};
+
+const boundsToFractional = (bounds: Rect, containerSize: Size) => {
+    const { width, height } = containerSize;
+    return new Rect(
+        constrain(bounds.left / width, 0, 1),
+        constrain(bounds.top / height, 0, 1),
+        constrain(bounds.right / width, 0, 1),
+        constrain(bounds.bottom / height, 0, 1)
+    );
+};
+
+const resolveBounds = (fractional: Rect, containerSize: Size) => {
+    const { width, height } = containerSize;
+    return new Rect(
+        fractional.left * width,
+        fractional.top * height,
+        fractional.right * width,
+        fractional.bottom * height
+    );
+};
+
+const useFlag = (): [unknown, () => void] => {
+    const [flag, setFlag] = useState(false);
+    const toggleFlag = () => {
+        setFlag(prevFlag => !prevFlag);
+    };
+
+    return [flag, toggleFlag];
 };
