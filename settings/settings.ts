@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { TimeFormat } from "../core";
 import {
     Alignment,
@@ -15,11 +15,11 @@ export const useClockSettings = (
     clock?: ClockAnimator<any>
 ): [
     Paints,
-    (setState: Paints) => void,
+    Dispatch<SetStateAction<Paints>>,
     Options,
-    (setState: Options) => void,
+    Dispatch<SetStateAction<Options>>,
     boolean,
-    (setState: boolean) => void
+    Dispatch<SetStateAction<boolean>>
 ] => {
     const [paints, setPaints] = useState(clock?.getPaints());
     const [options, setOptions] = useState(clock?.getOptions());

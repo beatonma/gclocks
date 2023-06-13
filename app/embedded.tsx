@@ -1,10 +1,15 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { Size } from "../core/geometry";
 import { Settings } from "../settings/settings";
 import { Clock, ClockContainerProps, useClockAnimator } from "./clock";
 
 export const EmbeddedClock = (props: ClockContainerProps) => {
     const { embeddedSettings } = props;
     const clock = useClockAnimator(props);
+    const backgroundRef = useRef<HTMLDivElement>();
+    const [size, setSize] = useState<Size>(
+        Size.ofElement(backgroundRef.current)
+    );
 
     useEffect(() => {
         const refreshCss = () => {
@@ -26,5 +31,22 @@ export const EmbeddedClock = (props: ClockContainerProps) => {
         return () => window.removeEventListener("themechange", refreshCss);
     }, []);
 
-    return <Clock clock={clock.current} />;
+    useEffect(() => {
+        const resize = () => {
+            const available = Size.ofElement(backgroundRef.current);
+            const measured = clock.current.setAvailableSize(available);
+
+            setSize(measured);
+        };
+
+        const resizer = new ResizeObserver(resize);
+        resizer.observe(backgroundRef.current);
+        return () => resizer.unobserve(backgroundRef.current);
+    }, [backgroundRef.current]);
+
+    return (
+        <div className="clock-background" ref={backgroundRef}>
+            <Clock clock={clock.current} size={size} />
+        </div>
+    );
 };
