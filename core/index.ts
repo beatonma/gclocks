@@ -3,6 +3,7 @@ export { TimeFormat } from "./options/format";
 export { BaseGlyph } from "./glyph";
 export { BaseFont } from "./font";
 import "./canvas";
+import { Rect } from "./geometry";
 import { HorizontalAlignment, VerticalAlignment } from "./options/alignment";
 
 import { TimeFormat } from "./options/format";
@@ -16,4 +17,5 @@ export const DefaultOptions: Options = new Options({
     alignment: HorizontalAlignment.Start | VerticalAlignment.Bottom,
     layout: Layout.Wrapped,
     backgroundColor: null,
+    bounds: new Rect(0, 0, 0.5, 0.5),
 });

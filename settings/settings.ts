@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { TimeFormat } from "../core";
+import { Rect } from "../core/geometry";
 import {
     Alignment,
     HorizontalAlignment,
@@ -31,6 +32,8 @@ export const useClockSettings = (
 
         const urlOptions = Settings.parseUrlOptions(options);
         setOptions(urlOptions);
+
+        console.log(`parsed options: ${urlOptions}`);
     }, [clock]);
 
     useEffect(() => {
@@ -55,6 +58,19 @@ export const useClockSettings = (
 
 export namespace Settings {
     const Separator = "__";
+    let updateHistoryStateTimer: ReturnType<typeof setTimeout> = undefined;
+
+    const updateHistoryState = (query: string) => {
+        // Apply rate-limiting to history state updates to avoid throttling by browser.
+        const RateLimitMillis = 250;
+
+        if (updateHistoryStateTimer != undefined) {
+            clearTimeout(updateHistoryStateTimer);
+        }
+        updateHistoryStateTimer = setTimeout(() => {
+            history.replaceState({}, null, query);
+        }, RateLimitMillis);
+    };
 
     const PaintParam: Record<keyof Paints, keyof Paints> = {
         colors: "colors",
@@ -69,6 +85,7 @@ export namespace Settings {
         alignment: "alignment",
         layout: "layout",
         backgroundColor: "backgroundColor",
+        bounds: "bounds",
     };
 
     export const listOf = (...args: string[]): string =>
@@ -94,7 +111,7 @@ export namespace Settings {
             new URLSearchParams(params ?? location.search)
         );
 
-        history.replaceState({}, null, `?${updated}`);
+        updateHistoryState(`?${updated}`);
 
         return updated;
     };
@@ -103,7 +120,7 @@ export namespace Settings {
         const searchParams = new URLSearchParams(params ?? location.search);
 
         searchParams.set(PaintParam.colors, listOf(...paints.colors));
-        history.replaceState({}, null, `?${searchParams}`);
+        updateHistoryState(`?${searchParams}`);
         return searchParams;
     };
 
@@ -152,6 +169,9 @@ export namespace Settings {
             ),
             [OptionParam.layout]: Layout[options.layout],
             [OptionParam.backgroundColor]: options.backgroundColor,
+            [OptionParam.bounds]: Settings.listOf(
+                ...[...options.bounds].map(it => it.toString())
+            ),
         };
 
         Object.entries(serialized).forEach(([key, value]) => {
@@ -177,6 +197,7 @@ export namespace Settings {
             backgroundColor: Parse.color(
                 searchParams.get(OptionParam.backgroundColor)
             ),
+            bounds: Parse.bounds(searchParams.get(OptionParam.bounds)),
         };
 
         return new Options(parsed);
@@ -184,6 +205,7 @@ export namespace Settings {
 }
 
 namespace Parse {
+    import splitList = Settings.splitList;
     export const color = (color: string) => {
         if (/--.+/.test(color)) {
             const documentStyle = getComputedStyle(document.documentElement);
@@ -211,5 +233,20 @@ namespace Parse {
     export const timeFormat = (value: string): TimeFormatter => {
         if (!value) return null;
         return TimeFormat[value as keyof typeof TimeFormat];
+    };
+
+    export const bounds = (value: string): Rect => {
+        const values = splitList(value);
+
+        try {
+            if (values.length === 4) {
+                return new Rect(...values.map(parseFloat));
+            }
+        } catch {
+            console.warn(
+                `Unexpected value for bounds: '${value}'. Using default bounds instead.`
+            );
+        }
+        return new Rect(0, 0, 1, 1);
     };
 }

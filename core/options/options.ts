@@ -1,3 +1,4 @@
+import { Rect } from "../geometry";
 import { Alignment } from "./alignment";
 import { Layout, TimeFormatter } from "./types";
 
@@ -8,6 +9,7 @@ export interface OptionsInit {
     alignment?: Alignment;
     layout?: Layout;
     backgroundColor?: string;
+    bounds?: Rect;
 }
 
 export class Options implements OptionsInit {
@@ -17,6 +19,7 @@ export class Options implements OptionsInit {
     alignment: Alignment;
     layout: Layout;
     backgroundColor: string | null;
+    bounds: Rect;
 
     constructor(init: OptionsInit) {
         this.merge(init);
@@ -33,6 +36,7 @@ export class Options implements OptionsInit {
         this.alignment = other.alignment ?? this.alignment;
         this.layout = other.layout ?? this.layout;
         this.backgroundColor = other.backgroundColor ?? this.backgroundColor;
+        this.bounds = other.bounds ?? this.bounds;
 
         return this;
     };

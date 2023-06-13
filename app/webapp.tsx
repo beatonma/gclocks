@@ -15,16 +15,12 @@ import { useTouchBehaviour } from "./interactions";
 export const ClockWithSettings = (props: ClockContainerProps) => {
     const clock = useClockAnimator(props);
 
-    const backgroundRef = useRef<HTMLDivElement>();
-    const resizableWrapperRef = useRef<HTMLDivElement>();
-
     const [paints, setPaints, options, setOptions, isEditMode, setEditMode] =
         useClockSettings(clock.current);
 
-    // Boundary of the available space for the clock, expressed as a fraction of the parent element dimensions.
-    const [fractionalBounds, setFractionalBounds] = useState(
-        new Rect(0, 0, 1, 1)
-    );
+    const backgroundRef = useRef<HTMLDivElement>();
+    const resizableWrapperRef = useRef<HTMLDivElement>();
+
     const [size, setSize] = useState<Size>(
         Size.ofElement(resizableWrapperRef.current)
     );
@@ -32,6 +28,10 @@ export const ClockWithSettings = (props: ClockContainerProps) => {
     // CSS padding used to position the clock within .clock-wrapper
     const [padding, setPadding] = useState({});
     const [resizeFlag, requestResize] = useFlag();
+
+    const setFractionalBounds = (rect: Rect) => {
+        setOptions({ ...options, bounds: rect });
+    };
 
     useEffect(() => {
         const resizer = new ResizeObserver(requestResize);
@@ -41,7 +41,7 @@ export const ClockWithSettings = (props: ClockContainerProps) => {
     }, [backgroundRef.current]);
 
     const bounds = resolveBounds(
-        fractionalBounds,
+        options.bounds,
         Size.ofElement(backgroundRef.current)
     );
 
@@ -62,6 +62,7 @@ export const ClockWithSettings = (props: ClockContainerProps) => {
         const available = new Size(bounds.width(), bounds.height());
         const measured = clock.current.setAvailableSize(available);
 
+        setFractionalBounds(options.bounds);
         setSize(measured);
 
         setPadding({
@@ -78,7 +79,7 @@ export const ClockWithSettings = (props: ClockContainerProps) => {
                     window.innerHeight
                 ) - bounds.bottom,
         });
-    }, [fractionalBounds, resizeFlag]);
+    }, [options.bounds, resizeFlag]);
 
     return (
         <>
@@ -122,35 +123,29 @@ export const ClockWithSettings = (props: ClockContainerProps) => {
     );
 };
 
-interface ClockOptionProps {
+interface ClockSettingsProps {
     options: Options;
     setOptions: (options: Options) => void;
-}
-interface ClockPaintProps {
     paints: Paints;
     setPaints: (paints: Paints) => void;
 }
-type ClockSettingsProps = {
-    isVisible: boolean;
-    hideSettings: () => void;
-} & ClockOptionProps &
-    ClockPaintProps;
-const ClockSettings = (props: ClockSettingsProps) => {
-    const { isVisible, hideSettings, options, setOptions, paints, setPaints } =
-        props;
+const ClockSettings = (
+    props: { isVisible: boolean; hideSettings: () => void } & ClockSettingsProps
+) => {
+    const { isVisible, hideSettings, ...rest } = props;
 
     if (!isVisible) return null;
 
     return (
         <div className="clock-settings">
-            <ClockPaints paints={paints} setPaints={setPaints} />
-            <ClockOptions options={options} setOptions={setOptions} />
+            <ClockPaints {...rest} />
+            <ClockOptions {...rest} />
             <button onClick={() => hideSettings()}>Close</button>
         </div>
     );
 };
 
-const ClockPaints = (props: ClockPaintProps) => {
+const ClockPaints = (props: ClockSettingsProps) => {
     const { paints, setPaints } = props;
     const [colors, setColors] = useState(paints.colors);
 
@@ -178,7 +173,7 @@ const ClockPaints = (props: ClockPaintProps) => {
         </div>
     );
 };
-const ClockOptions = (props: ClockOptionProps) => {
+const ClockOptions = (props: ClockSettingsProps) => {
     return <div className="clock-options">TODO options</div>;
 };
 
