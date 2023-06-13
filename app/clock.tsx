@@ -96,6 +96,26 @@ export const Clock = (props: ClockProps) => {
     }, [canvasRef.current]);
 
     useEffect(() => {
+        const resize = () => {
+            const available = Size.ofElement(backgroundRef.current);
+
+            setBounds(
+                new Rect(
+                    bounds.left,
+                    bounds.top,
+                    bounds.left + available.width,
+                    bounds.top + available.height
+                )
+            );
+        };
+
+        const resizer = new ResizeObserver(resize);
+        resizer.observe(backgroundRef.current);
+
+        return () => resizer.unobserve(backgroundRef.current);
+    }, [backgroundRef.current]);
+
+    useEffect(() => {
         const available = new Size(bounds.width(), bounds.height());
         const measured = clock.setAvailableSize(available);
 
