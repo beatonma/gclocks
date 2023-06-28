@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { TimeFormat } from "../core";
+import { DefaultOptions, TimeFormat } from "../core";
 import { Rect } from "../core/geometry";
 import {
     Alignment,
@@ -24,7 +24,7 @@ export const useClockSettings = (
 ] => {
     const [paints, setPaints] = useState(clock?.getPaints());
     const [options, setOptions] = useState(clock?.getOptions());
-    const [settingsVisible, setSettingsVisible] = useState(false);
+    const [settingsVisible, setSettingsVisible] = useState(true);
 
     useEffect(() => {
         const urlPaints = Settings.parseUrlPaints(paints);
@@ -32,8 +32,6 @@ export const useClockSettings = (
 
         const urlOptions = Settings.parseUrlOptions(options);
         setOptions(urlOptions);
-
-        console.log(`parsed options: ${urlOptions}`);
     }, [clock]);
 
     useEffect(() => {
@@ -170,7 +168,7 @@ export namespace Settings {
             [OptionParam.layout]: Layout[options.layout],
             [OptionParam.backgroundColor]: options.backgroundColor,
             [OptionParam.bounds]: Settings.listOf(
-                ...[...options.bounds].map(it => it.toString())
+                ...[...options.bounds].map(floatToString)
             ),
         };
 
@@ -247,6 +245,11 @@ namespace Parse {
                 `Unexpected value for bounds: '${value}'. Using default bounds instead.`
             );
         }
-        return new Rect(0, 0, 1, 1);
+        return DefaultOptions.bounds;
     };
 }
+
+const floatToString = (float: number): string => {
+    const formattedNumber = float.toFixed(3);
+    return parseFloat(formattedNumber).toString();
+};

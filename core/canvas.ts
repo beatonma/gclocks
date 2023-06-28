@@ -1,3 +1,4 @@
+import { Rect, Size } from "./geometry";
 import { toRadians } from "./math";
 import { PaintStyle } from "./render/types";
 

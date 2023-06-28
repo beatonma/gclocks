@@ -66,6 +66,8 @@ interface CanvasRenderingContext2D {
 
     paintPath(color: string, block: () => void): void;
 
+    strokePath(color: string, block: () => void): void;
+
     withCheckpoint(block: () => void): void;
 
     withTranslation(x: number, y: number, block: () => void): void;

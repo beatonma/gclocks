@@ -16,6 +16,6 @@ export const DefaultOptions: Options = new Options({
     spacingPx: 16,
     alignment: HorizontalAlignment.Start | VerticalAlignment.Bottom,
     layout: Layout.Wrapped,
-    backgroundColor: null,
-    bounds: new Rect(0, 0, 0.5, 0.5),
+    backgroundColor: "#292929",
+    bounds: new Rect(0.1, 0.1, 0.9, 0.9),
 });

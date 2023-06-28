@@ -1,16 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Rect, Size } from "../core/geometry";
-import { constrain } from "../core/math";
+import { Rect, Size } from "../../core/geometry";
+import { constrain } from "../../core/math";
 import {
     Alignment,
     HorizontalAlignment,
     VerticalAlignment,
-} from "../core/options/alignment";
-import { Options } from "../core/options/options";
-import { Paints } from "../core/render/types";
-import { useClockSettings } from "../settings/settings";
-import { Clock, ClockContainerProps, useClockAnimator } from "./clock";
-import { useTouchBehaviour } from "./interactions";
+} from "../../core/options/alignment";
+import { useClockSettings } from "../../settings/settings";
+import { Clock, ClockContainerProps, useClockAnimator } from "../clock";
+import { useTouchBehaviour } from "../interactions";
+import { ClockSettings } from "./settings";
 
 export const ClockWithSettings = (props: ClockContainerProps) => {
     const clock = useClockAnimator(props);
@@ -79,7 +78,7 @@ export const ClockWithSettings = (props: ClockContainerProps) => {
                     window.innerHeight
                 ) - bounds.bottom,
         });
-    }, [options.bounds, resizeFlag]);
+    }, [options.layout, options.bounds, options.spacingPx, resizeFlag]);
 
     return (
         <>
@@ -121,60 +120,6 @@ export const ClockWithSettings = (props: ClockContainerProps) => {
             />
         </>
     );
-};
-
-interface ClockSettingsProps {
-    options: Options;
-    setOptions: (options: Options) => void;
-    paints: Paints;
-    setPaints: (paints: Paints) => void;
-}
-const ClockSettings = (
-    props: { isVisible: boolean; hideSettings: () => void } & ClockSettingsProps
-) => {
-    const { isVisible, hideSettings, ...rest } = props;
-
-    if (!isVisible) return null;
-
-    return (
-        <div className="clock-settings">
-            <ClockPaints {...rest} />
-            <ClockOptions {...rest} />
-            <button onClick={() => hideSettings()}>Close</button>
-        </div>
-    );
-};
-
-const ClockPaints = (props: ClockSettingsProps) => {
-    const { paints, setPaints } = props;
-    const [colors, setColors] = useState(paints.colors);
-
-    useEffect(() => {
-        setColors(paints.colors);
-    }, [paints]);
-
-    return (
-        <div className="clock-paints">
-            {colors.map((color, index) => {
-                return (
-                    <input
-                        key={index}
-                        type="color"
-                        value={color}
-                        className="clock-paint-color"
-                        onChange={ev => {
-                            const newColors = [...colors];
-                            newColors[index] = ev.target.value;
-                            setPaints({ ...paints, colors: newColors });
-                        }}
-                    />
-                );
-            })}
-        </div>
-    );
-};
-const ClockOptions = (props: ClockSettingsProps) => {
-    return <div className="clock-options">TODO options</div>;
 };
 
 const boundsToFractional = (bounds: Rect, containerSize: Size) => {

@@ -3,9 +3,15 @@ import { GlyphLayoutInfo } from "../core/glyph";
 import { decelerate5, interpolate, progress } from "../core/math";
 import { Canvas, Paints } from "../core/render/types";
 
+export namespace StaticFormGlyph {
+    export const layoutInfo: GlyphLayoutInfo = {
+        height: 144,
+        isMonospace: false,
+    };
+}
+
 export class FormGlyph extends BaseGlyph {
-    height = 144;
-    maxWidth = 144;
+    layoutInfo = StaticFormGlyph.layoutInfo;
 
     draw0_1 = (canvas: Canvas, glyphProgress: number, paints: Paints): void => {
         const [_, color2, color3] = paints.colors;
@@ -14,12 +20,17 @@ export class FormGlyph extends BaseGlyph {
 
         // 0
         canvas.withCheckpoint(() => {
-            canvas.translate(interpolate(d1, 0, interpolate(d2, 24, 0)), 0);
+            const stretchX = interpolate(d1, 0, interpolate(d2, 72, -36));
+
+            // canvas.translate(interpolate(d1, 0, interpolate(d2, 24, 0)), 0);
+            canvas.translate(
+                interpolate(d1, interpolate(d1, 0, 24), interpolate(d2, 24, 0)),
+                0
+            );
             canvas.scaleUniformWithPivot(interpolate(d1, 1, 2 / 3), 72, 144);
             canvas.scaleUniformWithPivot(interpolate(d2, 1, 0.7), 72, 96);
             canvas.rotateWithPivot(interpolate(d1, 45, 0), 72, 72);
 
-            const stretchX = interpolate(d1, 0, interpolate(d2, 72, -36));
             canvas.paintPath(color2, () => {
                 canvas.moveTo(72 - stretchX, 144);
                 canvas.boundedArc(-stretchX, 0, 144 - stretchX, 144, 90, 180);
@@ -939,7 +950,7 @@ export class FormGlyph extends BaseGlyph {
                 return interpolate(
                     decelerate5(progress(glyphProgress, 0.5, 1)),
                     interpolate(
-                        decelerate5(progress(glyphProgress, 0, 0.5)),
+                        decelerate5(progress(glyphProgress, 0, 0.4)),
                         144,
                         192
                     ),

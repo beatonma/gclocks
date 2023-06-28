@@ -1,10 +1,21 @@
-.clock-background {
+#clocks_container {
   width: -webkit-fill-available;
   height: -webkit-fill-available;
-  transition: background-color 300ms;
   max-width: 100lvw;
   max-height: 100lvh;
   overflow: hidden;
+}
+
+
+.clock-background {
+  width: -webkit-fill-available;
+  height: -webkit-fill-available;
+  max-width: 100lvw;
+  max-height: 100lvh;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 
   canvas {
     display: block;
@@ -19,12 +30,13 @@
   &[data-is-edit-mode="true"] {
     canvas {
       background-color: #ffffff33;
+      outline: 2px dashed #ffffff55;
     }
 
     .resizer {
       opacity: 1;
       position: absolute;
-      border: 2px dashed white;
+      outline: 2px dashed white;
     }
   }
 }
@@ -38,16 +50,60 @@
 }
 
 .clock-settings {
+  max-width: 48ch;
+  border-radius: var(--space-2x);
+  padding: var(--space-2x);
   background-color: var(--surface);
   color: var(--on-surface);
-  position: absolute;
+  position: fixed;
+  margin: var(--space-2x);
   bottom: 0;
-  right: 0;
 
   input[type="color"] {
     width: 64px;
     height: auto;
     aspect-ratio: 1;
+    background: none;
+  }
+
+  input[type="number"] {
+    max-width: 8ch;
+    padding: var(--space);
+    background-color: var(--muted);
+    color: var(--on-muted);
+  }
+
+  select {
+    background-color: var(--muted);
+    color: var(--on-muted);
+    padding: var(--space);
+
+    option::selection {
+      background-color: var(--vibrant);
+      color: var(--on-vibrant);
+    }
+  }
+
+
+  label {
+    font-size: var(--fs-label);
+    margin-right: var(--space);
+  }
+
+  .input-wrapper {
+    margin-block: var(--space);
+  }
+
+  .settings-group {
+    margin-bottom: var(--space-2x) !important;
+  }
+
+  .buttons-group {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: baseline;
+    gap: var(--space);
   }
 }
 
@@ -55,7 +111,6 @@
   width: 100%;
   max-width: 100lvw;
   max-height: 100lvh;
-  transition: background-color 300ms;
 
   &[data-context="webapp"] {
     height: 100lvh;

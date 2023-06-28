@@ -7,6 +7,7 @@ import {
 import { Options } from "../core/options/options";
 import { Layout } from "../core/options/types";
 import { Settings } from "./settings";
+import { Rect } from "../core/geometry";
 
 const DefaultOptions = () =>
     new Options({
@@ -15,6 +16,7 @@ const DefaultOptions = () =>
         glyphMorphMillis: 800,
         layout: Layout.Wrapped,
         spacingPx: 16,
+        bounds: new Rect()
     });
 
 describe("Settings persistence tests", () => {
