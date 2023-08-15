@@ -87,21 +87,16 @@ const ClockOptions = (props: ClockSettingsProps) => {
     const { options, setOptions } = props;
 
     const updateOptions = (newOptions: OptionsInit) => {
-        const result = new Options({ ...options, ...newOptions });
-        console.log(result);
-        setOptions(result);
+        setOptions(new Options({ ...options, ...newOptions }));
     };
-
-    console.log(options.layout);
 
     return (
         <div className="clock-options">
             <Select
                 label="Layout"
+                value={Layout[options.layout]}
                 values={namedKeys(Layout)}
-                value={Layout.Wrapped}
                 onChange={newValue => {
-                    console.log(`onChange ${newValue}`);
                     updateOptions({
                         layout: Layout[newValue as keyof typeof Layout],
                     });
