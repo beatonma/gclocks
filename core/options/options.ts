@@ -1,6 +1,6 @@
-import { Rect } from "../geometry";
-import { Alignment } from "./alignment";
-import { Layout, TimeFormatter } from "./types";
+import { Rect } from "core/geometry";
+import { Alignment } from "core/options/alignment";
+import { Layout, TimeFormatter } from "core/options/types";
 
 export interface OptionsInit {
     format?: TimeFormatter;

@@ -1,6 +1,6 @@
-import { ClockRenderer, DefaultOptions } from "../core";
-import { Options } from "../core/options/options";
-import { Paints, PaintStyle } from "../core/render/types";
+import { ClockRenderer, DefaultOptions } from "core";
+import { Options } from "core/options/options";
+import { Paints, PaintStyle } from "core/render/types";
 
 export const Io18Paints: Paints = {
     defaultPaintStyle: PaintStyle.Fill,

@@ -1,10 +1,10 @@
-import { MouseEvent, Touch, TouchEvent, useEffect, useState } from "react";
-import { distance } from "../core/math";
+import { distance } from "core/math";
 import {
     Alignment,
     HorizontalAlignment,
     VerticalAlignment,
-} from "../core/options/alignment";
+} from "core/options/alignment";
+import { MouseEvent, Touch, TouchEvent, useEffect, useState } from "react";
 
 const SlopPx = 8;
 const ClickDurationMaxMillis = 300;
@@ -31,7 +31,7 @@ type InputEvent = MouseEvent | Touch;
 
 export const useTouchBehaviour = (
     onDrag: (distanceX: number, distanceY: number, location: Alignment) => void,
-    onClick?: () => void
+    onClick?: () => void,
 ): DragEvents => {
     const [location, setLocation] = useState<Alignment>();
     const [startTime, setStartTime] = useState<number>();
@@ -44,7 +44,7 @@ export const useTouchBehaviour = (
             onDrag(
                 current[0] - previous[0],
                 current[1] - previous[1],
-                location
+                location,
             );
         }
         setPrevious(current);

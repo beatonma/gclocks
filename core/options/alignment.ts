@@ -1,4 +1,4 @@
-import { Size } from "../geometry";
+import { Size } from "core/geometry";
 
 export enum HorizontalAlignment {
     Default = 0,
@@ -22,20 +22,20 @@ export namespace Alignment {
         object: Size,
         space: Size,
         defaultX: number = 0,
-        defaultY: number = 0
+        defaultY: number = 0,
     ): [number, number] => {
         return [
             applyHorizontal(
                 getHorizontalAlignment(alignment),
                 object.width,
                 space.width,
-                defaultX
+                defaultX,
             ),
             applyVertical(
                 getVerticalAlignment(alignment),
                 object.height,
                 space.height,
-                defaultY
+                defaultY,
             ),
         ];
     };
@@ -44,7 +44,7 @@ export namespace Alignment {
         alignment: Alignment,
         objectWidth: number,
         spaceWidth: number,
-        defaultX: number = 0
+        defaultX: number = 0,
     ): number => {
         if (
             HorizontalAlignment.Start ===
@@ -69,7 +69,7 @@ export namespace Alignment {
         gravity: Alignment,
         objectHeight: number,
         spaceHeight: number,
-        defaultY: number = 0
+        defaultY: number = 0,
     ): number => {
         if (VerticalAlignment.Top === (gravity & VerticalAlignment.Top)) {
             return 0;
@@ -84,7 +84,7 @@ export namespace Alignment {
     };
 
     export const getHorizontalAlignment = (
-        alignment: Alignment
+        alignment: Alignment,
     ): HorizontalAlignment =>
         alignment &
         (HorizontalAlignment.Center |
@@ -92,7 +92,7 @@ export namespace Alignment {
             HorizontalAlignment.End);
 
     export const getVerticalAlignment = (
-        alignment: Alignment
+        alignment: Alignment,
     ): VerticalAlignment =>
         alignment &
         (VerticalAlignment.Center |
@@ -100,7 +100,7 @@ export namespace Alignment {
             VerticalAlignment.Bottom);
 
     export const unpack = (
-        alignment: Alignment
+        alignment: Alignment,
     ): [HorizontalAlignment, VerticalAlignment] => [
         getHorizontalAlignment(alignment),
         getVerticalAlignment(alignment),

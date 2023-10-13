@@ -1,3 +1,7 @@
+import { DefaultOptions } from "core";
+import { Options, OptionsInit } from "core/options/options";
+import { Layout } from "core/options/types";
+import { Paints } from "core/render/types";
 import React, {
     ChangeEvent,
     HTMLProps,
@@ -5,10 +9,6 @@ import React, {
     useId,
     useState,
 } from "react";
-import { DefaultOptions } from "../../core";
-import { Options, OptionsInit } from "../../core/options/options";
-import { Layout } from "../../core/options/types";
-import { Paints } from "../../core/render/types";
 
 interface ClockSettingsProps {
     options: Options;
@@ -17,7 +17,10 @@ interface ClockSettingsProps {
     setPaints: (paints: Paints) => void;
 }
 export const ClockSettings = (
-    props: { isVisible: boolean; hideSettings: () => void } & ClockSettingsProps
+    props: {
+        isVisible: boolean;
+        hideSettings: () => void;
+    } & ClockSettingsProps,
 ) => {
     const { isVisible, hideSettings, ...rest } = props;
 
@@ -74,7 +77,7 @@ const ClockPaints = (props: ClockSettingsProps) => {
                 }
                 onChange={newColor => {
                     setOptions(
-                        new Options({ ...options, backgroundColor: newColor })
+                        new Options({ ...options, backgroundColor: newColor }),
                     );
                 }}
                 title="Background"

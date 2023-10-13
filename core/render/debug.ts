@@ -1,7 +1,6 @@
-import { Rect } from "../geometry";
-import { ClockRenderer } from "./renderer";
-import { Canvas, Paints, PaintStyle } from "./types";
-
+import { Rect } from "core/geometry";
+import { ClockRenderer } from "core/render/renderer";
+import { Canvas, Paints, PaintStyle } from "core/render/types";
 
 export class DebugBoundaryRenderer extends ClockRenderer {
     constructor() {

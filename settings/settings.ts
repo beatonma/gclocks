@@ -1,26 +1,25 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { DefaultOptions, TimeFormat } from "../core";
-import { Rect } from "../core/geometry";
+import { DefaultOptions, TimeFormat } from "core";
+import { Rect } from "core/geometry";
 import {
     Alignment,
     HorizontalAlignment,
     VerticalAlignment,
-} from "../core/options/alignment";
-import { Options, OptionsInit } from "../core/options/options";
-import { Layout, TimeFormatter } from "../core/options/types";
-import { ClockAnimator } from "../core/render/clock-animator";
-
-import { Paints } from "../core/render/types";
+} from "core/options/alignment";
+import { Options, OptionsInit } from "core/options/options";
+import { Layout, TimeFormatter } from "core/options/types";
+import { ClockAnimator } from "core/render/clock-animator";
+import { Paints } from "core/render/types";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 export const useClockSettings = (
-    clock?: ClockAnimator<any>
+    clock?: ClockAnimator<any>,
 ): [
     Paints,
     Dispatch<SetStateAction<Paints>>,
     Options,
     Dispatch<SetStateAction<Options>>,
     boolean,
-    Dispatch<SetStateAction<boolean>>
+    Dispatch<SetStateAction<boolean>>,
 ] => {
     const [paints, setPaints] = useState(clock?.getPaints());
     const [options, setOptions] = useState(clock?.getOptions());
@@ -93,7 +92,7 @@ export namespace Settings {
 
     export const parseUrlOptions = (
         defaults: Options,
-        params?: string
+        params?: string,
     ): Options => {
         const opts = paramsToOptions(params ?? location.search);
 
@@ -102,11 +101,11 @@ export namespace Settings {
 
     export const setUrlOptions = (
         options: Options,
-        params?: string
+        params?: string,
     ): URLSearchParams => {
         const updated = optionsToParams(
             options,
-            new URLSearchParams(params ?? location.search)
+            new URLSearchParams(params ?? location.search),
         );
 
         updateHistoryState(`?${updated}`);
@@ -124,12 +123,12 @@ export namespace Settings {
 
     export const parseUrlPaints = (
         defaults: Paints,
-        params?: string
+        params?: string,
     ): Paints => {
         const searchParams = new URLSearchParams(params ?? location.search);
 
         const colorsString = decodeURIComponent(
-            searchParams.get(PaintParam.colors)
+            searchParams.get(PaintParam.colors),
         );
         if (!!colorsString) {
             const colors = splitList(colorsString)
@@ -146,7 +145,7 @@ export namespace Settings {
 
     const optionsToParams = (
         options: Options,
-        params: URLSearchParams
+        params: URLSearchParams,
     ): URLSearchParams => {
         const horizontalAlignment =
             HorizontalAlignment[
@@ -163,12 +162,12 @@ export namespace Settings {
             [OptionParam.spacingPx]: `${options.spacingPx}`,
             [OptionParam.alignment]: Settings.listOf(
                 horizontalAlignment,
-                verticalAlignment
+                verticalAlignment,
             ),
             [OptionParam.layout]: Layout[options.layout],
             [OptionParam.backgroundColor]: options.backgroundColor,
             [OptionParam.bounds]: Settings.listOf(
-                ...[...options.bounds].map(floatToString)
+                ...[...options.bounds].map(floatToString),
             ),
         };
 
@@ -193,7 +192,7 @@ export namespace Settings {
             alignment: Parse.alignment(searchParams.get(OptionParam.alignment)),
             layout: Parse.layout(searchParams.get(OptionParam.layout)),
             backgroundColor: Parse.color(
-                searchParams.get(OptionParam.backgroundColor)
+                searchParams.get(OptionParam.backgroundColor),
             ),
             bounds: Parse.bounds(searchParams.get(OptionParam.bounds)),
         };
@@ -242,7 +241,7 @@ namespace Parse {
             }
         } catch {
             console.warn(
-                `Unexpected value for bounds: '${value}'. Using default bounds instead.`
+                `Unexpected value for bounds: '${value}'. Using default bounds instead.`,
             );
         }
         return DefaultOptions.bounds;

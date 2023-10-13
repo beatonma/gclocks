@@ -1,12 +1,12 @@
+import { ClockContext } from "app";
+import { Size } from "core/geometry";
+import { Options } from "core/options/options";
+import { ClockAnimator } from "core/render/clock-animator";
+import { ClockLayout, MeasureStrategy } from "core/render/clock-layout";
+import { FormFont } from "form/form-font";
+import { FormOptions, FormPaints, FormRenderer } from "form/form-renderer";
 import React, { useEffect, useRef } from "react";
-import { Size } from "../core/geometry";
-import { Options } from "../core/options/options";
-import { ClockAnimator } from "../core/render/clock-animator";
-import { ClockLayout, MeasureStrategy } from "../core/render/clock-layout";
-import { FormFont } from "../form/form-font";
-import { FormOptions, FormPaints, FormRenderer } from "../form/form-renderer";
-import { Settings } from "../settings/settings";
-import { ClockContext } from "./index";
+import { Settings } from "settings/settings";
 
 export enum ClockType {
     Form = "form",
@@ -31,23 +31,23 @@ const renderers: Record<
     [ClockType.Form]: (context: ClockContext, defaultSettings: string) => {
         const paints = Settings.parseUrlPaints(
             { ...FormPaints },
-            defaultSettings ?? ""
+            defaultSettings ?? "",
         );
         const options = Settings.parseUrlOptions(
             new Options(FormOptions),
-            defaultSettings ?? ""
+            defaultSettings ?? "",
         );
 
         return new ClockAnimator(
             new ClockLayout(
                 new FormFont(),
                 options,
-                contextMeasureStrategy(context)
+                contextMeasureStrategy(context),
             ),
             [
                 // new DebugBoundaryRenderer(),
                 new FormRenderer(paints),
-            ]
+            ],
         );
     },
 };

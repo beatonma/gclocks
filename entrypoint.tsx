@@ -1,8 +1,8 @@
+import { renderClockApp } from "app";
+import { TimeFormat } from "core";
+import { measureFormClock } from "core/precompute";
 import React, { useEffect } from "react";
-import { renderClockApp } from "./app";
-import { TimeFormat } from "./core";
-import { measureFormClock } from "./core/precompute";
-import "./clocks.scss";
+import "src/webapp/clocks/clocks.scss";
 
 const CONTAINER_ID = "clocks_container";
 
@@ -16,7 +16,7 @@ export const DebugMeasureClock = () => {
 
 const attachApp = (dom: Document | Element = document) => {
     const containers = dom.querySelectorAll(
-        `#${CONTAINER_ID}, .clock-container`
+        `#${CONTAINER_ID}, .clock-container`,
     );
 
     containers.forEach((it: HTMLElement) => {

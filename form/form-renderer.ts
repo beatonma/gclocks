@@ -1,11 +1,8 @@
-import { ClockRenderer, DefaultOptions, TimeFormat } from "../core";
-import {
-    HorizontalAlignment,
-    VerticalAlignment,
-} from "../core/options/alignment";
-import { Options } from "../core/options/options";
-import { Layout } from "../core/options/types";
-import { Paints, PaintStyle } from "../core/render/types";
+import { ClockRenderer, DefaultOptions, TimeFormat } from "core";
+import { HorizontalAlignment, VerticalAlignment } from "core/options/alignment";
+import { Options } from "core/options/options";
+import { Layout } from "core/options/types";
+import { Paints, PaintStyle } from "core/render/types";
 
 export const FormPaints: Paints = {
     defaultPaintStyle: PaintStyle.Fill,

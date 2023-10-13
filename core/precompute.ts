@@ -1,8 +1,8 @@
-import { FormFont } from "../form/form-font";
-import { FormOptions } from "../form/form-renderer";
-import { Rect } from "./geometry";
-import { TimeFormatter } from "./options/types";
-import { ClockLayout, MeasureStrategy } from "./render/clock-layout";
+import { Rect } from "core/geometry";
+import { TimeFormatter } from "core/options/types";
+import { ClockLayout, MeasureStrategy } from "core/render/clock-layout";
+import { FormFont } from "form/form-font";
+import { FormOptions } from "form/form-renderer";
 
 export const measureFormClock = (format: TimeFormatter) => {
     console.log(`measure ${format}`);
@@ -15,7 +15,7 @@ export const measureFormClock = (format: TimeFormatter) => {
             spacingPx: 0,
             format: format,
         },
-        MeasureStrategy.FillWidth
+        MeasureStrategy.FillWidth,
     );
 
     const bounds = new Rect();

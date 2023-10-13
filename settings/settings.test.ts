@@ -1,13 +1,10 @@
 import { describe, test, expect } from "@jest/globals";
-import { TimeFormat } from "../core";
-import {
-    HorizontalAlignment,
-    VerticalAlignment,
-} from "../core/options/alignment";
-import { Options } from "../core/options/options";
-import { Layout } from "../core/options/types";
-import { Settings } from "./settings";
-import { Rect } from "../core/geometry";
+import { TimeFormat } from "core";
+import { Rect } from "core/geometry";
+import { HorizontalAlignment, VerticalAlignment } from "core/options/alignment";
+import { Options } from "core/options/options";
+import { Layout } from "core/options/types";
+import { Settings } from "settings/settings";
 
 const DefaultOptions = () =>
     new Options({
@@ -16,7 +13,7 @@ const DefaultOptions = () =>
         glyphMorphMillis: 800,
         layout: Layout.Wrapped,
         spacingPx: 16,
-        bounds: new Rect()
+        bounds: new Rect(),
     });
 
 describe("Settings persistence tests", () => {
@@ -26,10 +23,10 @@ describe("Settings persistence tests", () => {
 
         test("Options are restored from search query params", () => {
             const result = parse(
-                "?alignment=End__Bottom&glyphMorphMillis=500&format=HH_MM_SS_12&layout=Horizontal&spacingPx=32"
+                "?alignment=End__Bottom&glyphMorphMillis=500&format=HH_MM_SS_12&layout=Horizontal&spacingPx=32",
             );
             expect(result.alignment).toBe(
-                HorizontalAlignment.End | VerticalAlignment.Bottom
+                HorizontalAlignment.End | VerticalAlignment.Bottom,
             );
             expect(result.format).toBe(TimeFormat.HH_MM_SS_12);
             expect(result.glyphMorphMillis).toBe(500);
@@ -39,12 +36,12 @@ describe("Settings persistence tests", () => {
 
         test("Undefined options are not overwritten", () => {
             const result = parse(
-                "?glyphMorphMillis=500&format=HH_MM_SS_12&layout=Horizontal"
+                "?glyphMorphMillis=500&format=HH_MM_SS_12&layout=Horizontal",
             );
             // Unchanged
             expect(result.spacingPx).toBe(16);
             expect(result.alignment).toBe(
-                HorizontalAlignment.Start | VerticalAlignment.Top
+                HorizontalAlignment.Start | VerticalAlignment.Top,
             );
             // Updated
             expect(result.glyphMorphMillis).toBe(500);
@@ -53,10 +50,10 @@ describe("Settings persistence tests", () => {
 
         test("alignment parsing is correct", () => {
             expect(parse("?alignment=Center__Center").alignment).toBe(
-                HorizontalAlignment.Center | VerticalAlignment.Center
+                HorizontalAlignment.Center | VerticalAlignment.Center,
             );
             expect(parse("?alignment=Center__Default").alignment).toBe(
-                HorizontalAlignment.Center | VerticalAlignment.Default
+                HorizontalAlignment.Center | VerticalAlignment.Default,
             );
         });
     });
@@ -71,7 +68,7 @@ describe("Settings persistence tests", () => {
         test("Options do not remove unrelated params", () => {
             const result = Settings.setUrlOptions(
                 DefaultOptions(),
-                "?unrelated=312"
+                "?unrelated=312",
             );
 
             expect(result.get("unrelated")).toBe("312");

@@ -1,5 +1,5 @@
-import { Alignment } from "../core/options/alignment";
-import { Canvas, PaintStyle } from "../core/render/types";
+import { Alignment } from "core/options/alignment";
+import { Canvas, PaintStyle } from "core/render/types";
 
 abstract class Io18Animation {
     x: number;
@@ -31,7 +31,7 @@ abstract class GridAnimation extends Io18Animation {
         y: number,
         rows: number,
         columns: number,
-        spaceBetweenPx: number
+        spaceBetweenPx: number,
     ) {
         super(x, y);
         this.rows = rows;
@@ -50,7 +50,7 @@ export class SquareGrid extends GridAnimation {
         top: number,
         width: number,
         height: number,
-        alignment: Alignment
+        alignment: Alignment,
     ): SquareGrid => {
         const spaceBetween = 13;
         const paintWidth = 3;
@@ -62,13 +62,13 @@ export class SquareGrid extends GridAnimation {
             alignment,
             cols * spaceBetween + paintWidth,
             width,
-            left
+            left,
         );
         const y = Alignment.applyVertical(
             alignment,
             rows * spaceBetween * paintWidth,
             height,
-            top
+            top,
         );
 
         return new SquareGrid(x, y, rows, cols, spaceBetween);
@@ -105,7 +105,7 @@ export class SquareGrid extends GridAnimation {
             column * this.spaceBetweenPx + this.x,
             row * this.spaceBetweenPx + this.y,
             (column + 1) * this.spaceBetweenPx,
-            (row + 1) * this.spaceBetweenPx
+            (row + 1) * this.spaceBetweenPx,
         );
     }
 

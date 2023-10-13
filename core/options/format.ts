@@ -1,6 +1,5 @@
-import { Glyph, GlyphRole } from "../glyph";
-
-import { TimeFormatter } from "./types";
+import { Glyph, GlyphRole } from "core/glyph";
+import { TimeFormatter } from "core/options/types";
 
 export enum TimeResolution {
     Hours,
@@ -35,7 +34,7 @@ const timeFormatter = (
     name: string,
     resolution: TimeResolution,
     roles: GlyphRole[],
-    apply: (date: Date) => string
+    apply: (date: Date) => string,
 ): TimeFormatter => new TimeFormatterImpl(name, resolution, roles, apply);
 
 class TimeFormatterImpl implements TimeFormatter {
@@ -48,7 +47,7 @@ class TimeFormatterImpl implements TimeFormatter {
         name: string,
         resolution: TimeResolution,
         roles: GlyphRole[],
-        apply: (date: Date) => string
+        apply: (date: Date) => string,
     ) {
         this.name = name;
         this.resolution = resolution;
@@ -86,7 +85,7 @@ export const TimeFormat = {
         (date: Date) => {
             const { hours, minutes, seconds } = hoursMinsSeconds(date);
             return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-        }
+        },
     ),
 
     // 24-hour, non-padded hours, minutes, seconds
@@ -97,7 +96,7 @@ export const TimeFormat = {
         (date: Date) => {
             const { hours, minutes, seconds } = hoursMinsSeconds(date);
             return `${pad(hours, " ")}:${pad(minutes)}:${pad(seconds)}`;
-        }
+        },
     ),
 
     // 12-hour, zero-padded hours, minutes, seconds
@@ -108,7 +107,7 @@ export const TimeFormat = {
         (date: Date) => {
             const { hours, minutes, seconds } = hoursMinsSeconds(date, 12);
             return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-        }
+        },
     ),
 
     // 12-hour, non-padded hours, minutes, seconds
@@ -119,7 +118,7 @@ export const TimeFormat = {
         (date: Date) => {
             const { hours, minutes, seconds } = hoursMinsSeconds(date, 12);
             return `${pad(hours, " ")}:${pad(minutes)}:${pad(seconds)}`;
-        }
+        },
     ),
 
     // Hours and minutes only
@@ -130,7 +129,7 @@ export const TimeFormat = {
         (date: Date) => {
             const { hours, minutes, seconds } = hoursMinsSeconds(date);
             return `${pad(hours)}:${pad(minutes)}`;
-        }
+        },
     ),
     H_MM_24: timeFormatter(
         "H_MM_24",
@@ -139,7 +138,7 @@ export const TimeFormat = {
         (date: Date) => {
             const { hours, minutes, seconds } = hoursMinsSeconds(date);
             return `${pad(hours, " ")}:${pad(minutes)}`;
-        }
+        },
     ),
     HH_MM_12: timeFormatter(
         "HH_MM_12",
@@ -148,7 +147,7 @@ export const TimeFormat = {
         (date: Date) => {
             const { hours, minutes, seconds } = hoursMinsSeconds(date, 12);
             return `${pad(hours)}:${pad(minutes)}`;
-        }
+        },
     ),
     H_MM_12: timeFormatter(
         "H_MM_12",
@@ -157,7 +156,7 @@ export const TimeFormat = {
         (date: Date) => {
             const { hours, minutes, seconds } = hoursMinsSeconds(date, 12);
             return `${pad(hours, " ")}:${pad(minutes)}`;
-        }
+        },
     ),
 
     // Fragments, used for debugging.
@@ -168,7 +167,7 @@ export const TimeFormat = {
         (date: Date) => {
             const { hours } = hoursMinsSeconds(date);
             return `${pad(hours)}`;
-        }
+        },
     ),
     H_24: timeFormatter(
         "H_24",
@@ -177,7 +176,7 @@ export const TimeFormat = {
         (date: Date) => {
             const { hours } = hoursMinsSeconds(date);
             return pad(hours, " ");
-        }
+        },
     ),
     HH_12: timeFormatter(
         "HH_12",
@@ -186,7 +185,7 @@ export const TimeFormat = {
         (date: Date) => {
             const { hours } = hoursMinsSeconds(date, 12);
             return `${pad(hours)}`;
-        }
+        },
     ),
     H_12: timeFormatter(
         "H_12",
@@ -195,7 +194,7 @@ export const TimeFormat = {
         (date: Date) => {
             const { hours } = hoursMinsSeconds(date, 12);
             return pad(hours, " ");
-        }
+        },
     ),
     MM: timeFormatter("MM", TimeResolution.Minutes, Roles.MM, (date: Date) => {
         const { minutes } = hoursMinsSeconds(date);

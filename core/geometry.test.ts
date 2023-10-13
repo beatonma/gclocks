@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@jest/globals";
-import { Rect } from "./geometry";
+import { Rect } from "core/geometry";
 
 describe("Geometry tests", () => {
     test("Rect.include()", () => {

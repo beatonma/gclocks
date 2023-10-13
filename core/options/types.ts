@@ -1,5 +1,5 @@
-import { Glyph, GlyphRole } from "../glyph";
-import { TimeResolution } from "./format";
+import { Glyph, GlyphRole } from "core/glyph";
+import { TimeResolution } from "core/options/format";
 
 export interface TimeFormatter {
     name: string;

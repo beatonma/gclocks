@@ -1,10 +1,10 @@
-import { Alignment } from "../options/alignment";
-import { Font } from "../font";
-import { Rect, Size } from "../geometry";
-import { Glyph, GlyphRole, GlyphStateLock } from "../glyph";
-import { progress } from "../math";
-import { Options } from "../options/options";
-import { Layout } from "../options/types";
+import { Font } from "core/font";
+import { Rect, Size } from "core/geometry";
+import { Glyph, GlyphRole, GlyphStateLock } from "core/glyph";
+import { progress } from "core/math";
+import { Alignment } from "core/options/alignment";
+import { Options } from "core/options/options";
+import { Layout } from "core/options/types";
 
 export enum MeasureStrategy {
     Fit, // Respect the existing boundaries of the container.
@@ -62,7 +62,7 @@ export class ClockLayout<G extends Glyph> {
     constructor(
         font: Font<G>,
         options: Options,
-        measureStrategy: MeasureStrategy
+        measureStrategy: MeasureStrategy,
     ) {
         this.font = font;
         this.setOptions(options);
@@ -75,7 +75,7 @@ export class ClockLayout<G extends Glyph> {
         this.nativeSize = font.measure(
             options.format,
             options.layout,
-            options.spacingPx
+            options.spacingPx,
         );
 
         this.stringLength = options.format.apply(new Date()).length;
@@ -169,7 +169,7 @@ export class ClockLayout<G extends Glyph> {
         const translation = Alignment.apply(
             this.options.alignment,
             drawBounds.toSize().scaledBy(scale),
-            measuredSize
+            measuredSize,
         );
 
         draw(translation, scale);
@@ -210,7 +210,7 @@ export class ClockLayout<G extends Glyph> {
             const top = Alignment.applyVertical(
                 alignment,
                 glyphHeight,
-                glyph.layoutInfo.height
+                glyph.layoutInfo.height,
             );
             const right = left + glyphWidth;
             const bottom = top + glyphHeight;
@@ -218,7 +218,7 @@ export class ClockLayout<G extends Glyph> {
             visitGlyph(
                 glyph,
                 glyphProgress,
-                this.layoutPassRect.set(left, top, right, bottom)
+                this.layoutPassRect.set(left, top, right, bottom),
             );
             x += glyphWidth + spacingPx * glyph.scale;
         }
@@ -241,7 +241,7 @@ export class ClockLayout<G extends Glyph> {
                 ? Alignment.applyHorizontal(
                       alignment,
                       this.currentNativeSize[currentLineIndex].width,
-                      maxLineWidth
+                      maxLineWidth,
                   )
                 : 0;
 
@@ -272,7 +272,7 @@ export class ClockLayout<G extends Glyph> {
             visitGlyph(
                 glyph,
                 glyphProgress,
-                this.layoutPassRect.set(x, y, x + glyphWidth, y + glyphHeight)
+                this.layoutPassRect.set(x, y, x + glyphWidth, y + glyphHeight),
             );
             x += glyphWidth + spacingPx * glyph.scale;
         }
@@ -289,7 +289,7 @@ export class ClockLayout<G extends Glyph> {
                 ? Alignment.applyHorizontal(
                       alignment,
                       this.currentNativeSize[currentLineIndex].width,
-                      maxLineWidth
+                      maxLineWidth,
                   )
                 : 0;
 
@@ -315,7 +315,7 @@ export class ClockLayout<G extends Glyph> {
                     x = Alignment.applyHorizontal(
                         alignment,
                         this.currentNativeSize[currentLineIndex].width,
-                        maxLineWidth
+                        maxLineWidth,
                     );
                 }
                 y += glyph.layoutInfo.height + spacingPx;
@@ -327,7 +327,7 @@ export class ClockLayout<G extends Glyph> {
             visitGlyph(
                 glyph,
                 glyphProgress,
-                this.layoutPassRect.set(x, y, x + glyphWidth, y + glyphHeight)
+                this.layoutPassRect.set(x, y, x + glyphWidth, y + glyphHeight),
             );
             x += glyphWidth + spacingPx * glyph.scale;
         }
@@ -387,7 +387,7 @@ export class ClockLayout<G extends Glyph> {
         return progress(
             this.animationTimeMillis,
             0,
-            this.options.glyphMorphMillis
+            this.options.glyphMorphMillis,
         );
     }
 
@@ -441,5 +441,5 @@ interface GlyphStatus<G extends Glyph> {
 type LayoutPassCallback = (
     glyph: Glyph,
     glyphAnimationProgress: number,
-    rect: Rect
+    rect: Rect,
 ) => void;

@@ -1,6 +1,6 @@
-import { Size } from "./geometry";
-import { Glyph } from "./glyph";
-import { Layout, TimeFormatter } from "./options/types";
+import { Size } from "core/geometry";
+import { Glyph } from "core/glyph";
+import { Layout, TimeFormatter } from "core/options/types";
 
 export interface Font<G extends Glyph> {
     getGlyph: (index: number) => G;
@@ -16,6 +16,6 @@ export abstract class BaseFont<G extends Glyph> implements Font<G> {
     abstract measure(
         format: TimeFormatter,
         layout: Layout,
-        spacingPx: number
+        spacingPx: number,
     ): Size;
 }

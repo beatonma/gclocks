@@ -1,7 +1,7 @@
-import { Rect } from "../geometry";
-import { Glyph } from "../glyph";
-import { ClockLayout } from "./clock-layout";
-import { Canvas, Paints } from "./types";
+import { Rect } from "core/geometry";
+import { Glyph } from "core/glyph";
+import { ClockLayout } from "core/render/clock-layout";
+import { Canvas, Paints } from "core/render/types";
 
 export abstract class ClockRenderer {
     paints: Paints;
@@ -41,9 +41,9 @@ export abstract class ClockRenderer {
                                 glyph,
                                 canvas,
                                 glyphAnimationProgress,
-                                paints
+                                paints,
                             );
-                        }
+                        },
                     );
                 });
             });
@@ -56,7 +56,7 @@ export abstract class ClockRenderer {
         glyph: Glyph,
         canvas: Canvas,
         glyphAnimationProgress: number,
-        paints: Paints
+        paints: Paints,
     ) => {
         glyph.draw(canvas, glyphAnimationProgress, paints);
     };

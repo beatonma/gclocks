@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@jest/globals";
-import { constrain, progress, toRadians } from "./math";
+import { constrain, progress, toRadians } from "core/math";
 
 describe("webapp.clocks math", () => {
     test("math.constrain", () => {

@@ -1,4 +1,4 @@
-import { Canvas, Paints, PaintStyle } from "./render/types";
+import { Canvas, Paints, PaintStyle } from "core/render/types";
 
 type OnStateChange = (state: GlyphState) => void;
 
@@ -100,97 +100,97 @@ export abstract class BaseGlyph implements Glyph {
     abstract draw0_1: (
         canvas: Canvas,
         glyphProgress: number,
-        paints: Paints
+        paints: Paints,
     ) => void;
     abstract draw1_2: (
         canvas: Canvas,
         glyphProgress: number,
-        paints: Paints
+        paints: Paints,
     ) => void;
     abstract draw2_3: (
         canvas: Canvas,
         glyphProgress: number,
-        paints: Paints
+        paints: Paints,
     ) => void;
     abstract draw3_4: (
         canvas: Canvas,
         glyphProgress: number,
-        paints: Paints
+        paints: Paints,
     ) => void;
     abstract draw4_5: (
         canvas: Canvas,
         glyphProgress: number,
-        paints: Paints
+        paints: Paints,
     ) => void;
     abstract draw5_6: (
         canvas: Canvas,
         glyphProgress: number,
-        paints: Paints
+        paints: Paints,
     ) => void;
     abstract draw6_7: (
         canvas: Canvas,
         glyphProgress: number,
-        paints: Paints
+        paints: Paints,
     ) => void;
     abstract draw7_8: (
         canvas: Canvas,
         glyphProgress: number,
-        paints: Paints
+        paints: Paints,
     ) => void;
     abstract draw8_9: (
         canvas: Canvas,
         glyphProgress: number,
-        paints: Paints
+        paints: Paints,
     ) => void;
     abstract draw9_0: (
         canvas: Canvas,
         glyphProgress: number,
-        paints: Paints
+        paints: Paints,
     ) => void;
     abstract draw__1: (
         canvas: Canvas,
         glyphProgress: number,
-        paints: Paints
+        paints: Paints,
     ) => void;
     abstract draw1__: (
         canvas: Canvas,
         glyphProgress: number,
-        paints: Paints
+        paints: Paints,
     ) => void;
     abstract draw2__: (
         canvas: Canvas,
         glyphProgress: number,
-        paints: Paints
+        paints: Paints,
     ) => void;
     abstract draw2_1: (
         canvas: Canvas,
         glyphProgress: number,
-        paints: Paints
+        paints: Paints,
     ) => void;
     abstract draw2_0: (
         canvas: Canvas,
         glyphProgress: number,
-        paints: Paints
+        paints: Paints,
     ) => void;
     abstract draw3_0: (
         canvas: Canvas,
         glyphProgress: number,
-        paints: Paints
+        paints: Paints,
     ) => void;
     abstract draw5_0: (
         canvas: Canvas,
         glyphProgress: number,
-        paints: Paints
+        paints: Paints,
     ) => void;
     abstract draw_: (
         canvas: Canvas,
         glyphProgress: number,
-        paints: Paints
+        paints: Paints,
     ) => void;
     abstract drawSeparator: (
         canvas: Canvas,
         glyphProgress: number,
-        paints: Paints
+        paints: Paints,
     ) => void;
 
     setState(state: GlyphState) {
@@ -373,7 +373,7 @@ export abstract class BaseGlyph implements Glyph {
             centerX - 2,
             centerY - 2,
             centerX + 2,
-            centerY + 2
+            centerY + 2,
         );
         canvas.withPaintStyle(PaintStyle.Stroke, () => {
             canvas.paintPath("red", () => {

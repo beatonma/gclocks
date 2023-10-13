@@ -1,9 +1,9 @@
-import { BaseFont } from "../core";
-import { TimeResolution } from "../core/options/format";
-import { Size } from "../core/geometry";
-import { Glyph } from "../core/glyph";
-import { Layout, TimeFormatter } from "../core/options/types";
-import { FormGlyph, StaticFormGlyph } from "./form-glyph";
+import { BaseFont } from "core";
+import { Size } from "core/geometry";
+import { Glyph } from "core/glyph";
+import { TimeResolution } from "core/options/format";
+import { Layout, TimeFormatter } from "core/options/types";
+import { FormGlyph, StaticFormGlyph } from "form/form-glyph";
 
 export class FormFont extends BaseFont<FormGlyph> {
     getGlyph = () => new FormGlyph();
@@ -23,21 +23,21 @@ export class FormFont extends BaseFont<FormGlyph> {
 
                 return new Size(
                     digitsWidth + separatorWidth + spacingWidth,
-                    lineHeight
+                    lineHeight,
                 );
 
             case Layout.Vertical:
                 return new Size(
                     pairWidth + spacingPx,
                     lineHeight * (2 + (hasSeconds ? Glyph.SecondScale : 0)) +
-                        spacingPx * 2
+                        spacingPx * 2,
                 );
 
             case Layout.Wrapped:
                 return new Size(
                     pairWidth * 2 + spacingPx * 4,
                     lineHeight * (1 + (hasSeconds ? Glyph.SecondScale : 0)) +
-                        spacingPx
+                        spacingPx,
                 );
         }
     }

@@ -1,10 +1,9 @@
-import { Size } from "../geometry";
-import { Glyph } from "../glyph";
-import { Options } from "../options/options";
-import { ClockLayout } from "./clock-layout";
-import { ClockRenderer } from "./renderer";
-
-import { Canvas, Paints } from "./types";
+import { Size } from "core/geometry";
+import { Glyph } from "core/glyph";
+import { Options } from "core/options/options";
+import { ClockLayout } from "core/render/clock-layout";
+import { ClockRenderer } from "core/render/renderer";
+import { Canvas, Paints } from "core/render/types";
 
 export class ClockAnimator<G extends Glyph> {
     layout: ClockLayout<G>;
@@ -44,7 +43,7 @@ export class ClockAnimator<G extends Glyph> {
         this.resetCanvas();
 
         this.renderers.forEach(renderer =>
-            renderer.draw(this.canvas, this.layout)
+            renderer.draw(this.canvas, this.layout),
         );
 
         const scheduleNext = () => {

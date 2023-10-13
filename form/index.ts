@@ -1,1 +1,1 @@
-export { FormRenderer } from "./form-renderer";
+export { FormRenderer } from "form/form-renderer";

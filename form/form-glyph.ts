@@ -1,7 +1,7 @@
-import { BaseGlyph } from "../core";
-import { GlyphLayoutInfo } from "../core/glyph";
-import { decelerate5, interpolate, progress } from "../core/math";
-import { Canvas, Paints } from "../core/render/types";
+import { BaseGlyph } from "core";
+import { GlyphLayoutInfo } from "core/glyph";
+import { decelerate5, interpolate, progress } from "core/math";
+import { Canvas, Paints } from "core/render/types";
 
 export namespace StaticFormGlyph {
     export const layoutInfo: GlyphLayoutInfo = {
@@ -25,7 +25,7 @@ export class FormGlyph extends BaseGlyph {
             // canvas.translate(interpolate(d1, 0, interpolate(d2, 24, 0)), 0);
             canvas.translate(
                 interpolate(d1, interpolate(d1, 0, 24), interpolate(d2, 24, 0)),
-                0
+                0,
             );
             canvas.scaleUniformWithPivot(interpolate(d1, 1, 2 / 3), 72, 144);
             canvas.scaleUniformWithPivot(interpolate(d2, 1, 0.7), 72, 96);
@@ -47,7 +47,7 @@ export class FormGlyph extends BaseGlyph {
                 144 + stretchX,
                 144,
                 -90,
-                180
+                180,
             );
         });
 
@@ -58,7 +58,7 @@ export class FormGlyph extends BaseGlyph {
                 interpolate(d2, 28, 0),
                 interpolate(d2, 72, 0),
                 100,
-                interpolate(d2, 144, 48)
+                interpolate(d2, 144, 48),
             );
             canvas.paintRect(color3, 28, interpolate(d2, 144, 48), 100, 144);
         }
@@ -91,7 +91,7 @@ export class FormGlyph extends BaseGlyph {
                     interpolate(d2, 72, 8),
                     0,
                     interpolate(d2, 144, 108),
-                    72
+                    72,
                 );
             });
 
@@ -106,7 +106,7 @@ export class FormGlyph extends BaseGlyph {
                     interpolate(d, 28, 0),
                     interpolate(d, 72, 0),
                     100,
-                    interpolate(d, 144, 48)
+                    interpolate(d, 144, 48),
                 );
                 canvas.paintRect(color3, 28, interpolate(d, 144, 48), 100, 144);
             });
@@ -124,7 +124,7 @@ export class FormGlyph extends BaseGlyph {
             interpolate(d1, 0, 28),
             interpolate(d1, 0, 72),
             100,
-            interpolate(d1, 48, 144)
+            interpolate(d1, 48, 144),
         );
 
         if (d1 < 1) {
@@ -160,7 +160,7 @@ export class FormGlyph extends BaseGlyph {
                 interpolate(d1, 0, 72),
                 () => {
                     canvas.paintBoundedArc(color1, -36, 0, 36, 72, -90, 180);
-                }
+                },
             );
 
             canvas.withTranslation(0, interpolate(d1, 0, 72), () => {
@@ -169,7 +169,7 @@ export class FormGlyph extends BaseGlyph {
                     interpolate(d, 8, 28),
                     0,
                     interpolate(d, 108, 100),
-                    72
+                    72,
                 );
             });
 
@@ -183,7 +183,7 @@ export class FormGlyph extends BaseGlyph {
                 interpolate(d2, 28, 0),
                 interpolate(d2, 72, 0),
                 100,
-                interpolate(d2, 144, 48)
+                interpolate(d2, 144, 48),
             );
             canvas.paintRect(color3, 28, interpolate(d2, 144, 48), 100, 144);
         }
@@ -224,7 +224,7 @@ export class FormGlyph extends BaseGlyph {
                         108 + 36,
                         72 + interpolate(d, 0, 72),
                         -90,
-                        180
+                        180,
                     );
 
                     canvas.paintRect(
@@ -232,7 +232,7 @@ export class FormGlyph extends BaseGlyph {
                         interpolate(d, 8, 72),
                         interpolate(d, 0, 72),
                         interpolate(d, 108, 144),
-                        interpolate(d, 72, 144)
+                        interpolate(d, 72, 144),
                     );
                 }
                 canvas.paintRect(color2, 72, 72, 144, 144);
@@ -254,7 +254,7 @@ export class FormGlyph extends BaseGlyph {
             interpolate(d1, 56, 0),
             interpolate(d1, 72, 96),
             interpolate(d1, 128, 80),
-            interpolate(d1, 144, 144)
+            interpolate(d1, 144, 144),
         );
 
         // top part with triangle
@@ -270,7 +270,7 @@ export class FormGlyph extends BaseGlyph {
                 interpolate(d1, 56, 0),
                 0,
                 interpolate(d1, 128, 80),
-                interpolate(d1, 72, 48)
+                interpolate(d1, 72, 48),
             );
         });
 
@@ -280,7 +280,7 @@ export class FormGlyph extends BaseGlyph {
             interpolate(d1, 56, 32),
             interpolate(d1, 72, 48),
             interpolate(d1, 128, 80),
-            interpolate(d1, 144, 96)
+            interpolate(d1, 144, 96),
         );
     };
 
@@ -311,7 +311,7 @@ export class FormGlyph extends BaseGlyph {
                     interpolate(d, 8, 72),
                     interpolate(d, 0, 72),
                     interpolate(d, 108, 144),
-                    interpolate(d, 72, 144)
+                    interpolate(d, 72, 144),
                 );
             }
 
@@ -349,7 +349,7 @@ export class FormGlyph extends BaseGlyph {
                 interpolate(d1, interpolate(d2, 32, 80), 0),
                 96,
                 80,
-                144
+                144,
             );
 
             // middle rectangle
@@ -383,7 +383,7 @@ export class FormGlyph extends BaseGlyph {
                     interpolate(d1, 56, 32),
                     interpolate(d1, 72, 48),
                     interpolate(d1, 128, 80),
-                    interpolate(d1, 144, 96)
+                    interpolate(d1, 144, 96),
                 );
 
                 // half-circle
@@ -399,9 +399,9 @@ export class FormGlyph extends BaseGlyph {
                             128,
                             144,
                             -90,
-                            180
+                            180,
                         );
-                    }
+                    },
                 );
 
                 // bottom rectangle
@@ -410,7 +410,7 @@ export class FormGlyph extends BaseGlyph {
                     interpolate(d1, 56, 0),
                     interpolate(d1, 72, 96),
                     interpolate(d1, 128, 80),
-                    interpolate(d1, 144, 144)
+                    interpolate(d1, 144, 144),
                 );
 
                 // top part with triangle
@@ -433,7 +433,7 @@ export class FormGlyph extends BaseGlyph {
                             interpolate(d1, 56, 0),
                             0,
                             interpolate(d1, 128, 80),
-                            interpolate(d1, 72, 48)
+                            interpolate(d1, 72, 48),
                         );
                     }
                 });
@@ -449,7 +449,7 @@ export class FormGlyph extends BaseGlyph {
                 interpolate(d2, 72, 0),
                 interpolate(d2, 144, 72),
                 144,
-                interpolate(d2, 144, 108)
+                interpolate(d2, 144, 108),
             );
 
             // triangle
@@ -468,7 +468,7 @@ export class FormGlyph extends BaseGlyph {
                 72,
                 interpolate(d2, 72, 0),
                 144,
-                interpolate(d2, 144, 72)
+                interpolate(d2, 144, 72),
             );
         }
     };
@@ -486,7 +486,7 @@ export class FormGlyph extends BaseGlyph {
                 interpolate(d, 72, 0),
                 108,
                 interpolate(d, 144, 72),
-                144
+                144,
             );
 
             // top rectangle
@@ -495,7 +495,7 @@ export class FormGlyph extends BaseGlyph {
                 interpolate(d, 72, 0),
                 interpolate(d, 0, 72),
                 interpolate(d, 144, 72),
-                interpolate(d, 72, 144)
+                interpolate(d, 72, 144),
             );
 
             // triangle
@@ -514,7 +514,7 @@ export class FormGlyph extends BaseGlyph {
                 0,
                 72,
                 interpolate(d, 144, 72),
-                interpolate(d, 108, 144)
+                interpolate(d, 108, 144),
             );
         } else {
             // 5
@@ -524,7 +524,7 @@ export class FormGlyph extends BaseGlyph {
                 80,
                 interpolate(d1, 72, 0),
                 interpolate(d1, 80, 128),
-                interpolate(d1, 144, 48)
+                interpolate(d1, 144, 48),
             );
 
             // half-circle
@@ -543,7 +543,7 @@ export class FormGlyph extends BaseGlyph {
                 0,
                 interpolate(d1, 72, 0),
                 80,
-                interpolate(d1, 144, 96)
+                interpolate(d1, 144, 96),
             );
         }
     };
@@ -562,7 +562,7 @@ export class FormGlyph extends BaseGlyph {
                     80,
                     interpolate(d, 0, 48),
                     interpolate(d, 128, 80),
-                    interpolate(d, 48, 144)
+                    interpolate(d, 48, 144),
                 );
 
                 // bottom rectangle
@@ -575,7 +575,7 @@ export class FormGlyph extends BaseGlyph {
                 interpolate(d1, 0, 80),
                 interpolate(d, 0, interpolate(d1, 48, 0)),
                 80,
-                interpolate(d, 96, 144)
+                interpolate(d, 96, 144),
             );
 
             canvas.scaleUniformWithPivot(interpolate(d1, 2 / 3, 1), 80, 144);
@@ -619,7 +619,7 @@ export class FormGlyph extends BaseGlyph {
                 canvas.scaleUniformWithPivot(
                     interpolate(d1, 2 / 3, 1),
                     80,
-                    144
+                    144,
                 );
                 canvas.translate(interpolate(d1, 8, 0), 0);
                 canvas.paintBoundedArc(color3, 0, 0, 144, 144, -90, 180);
@@ -633,11 +633,11 @@ export class FormGlyph extends BaseGlyph {
                         canvas.moveTo(0, 72);
                         canvas.lineTo(
                             interpolate(d1, 0, 36),
-                            interpolate(d1, 72, 0)
+                            interpolate(d1, 72, 0),
                         );
                         canvas.lineTo(
                             interpolate(d1, 72, 108),
-                            interpolate(d1, 72, 0)
+                            interpolate(d1, 72, 0),
                         );
                         canvas.lineTo(72, 72);
                         canvas.lineTo(0, 72);
@@ -665,7 +665,7 @@ export class FormGlyph extends BaseGlyph {
                     144,
                     interpolate(d, 180, -64),
                     -180,
-                    true
+                    true,
                 );
             }
 
@@ -721,7 +721,7 @@ export class FormGlyph extends BaseGlyph {
                     canvas.scaleUniformWithPivot(
                         interpolate(d2, 0.5, 1),
                         48,
-                        144
+                        144,
                     );
                     canvas.paintBoundedArc(color1, 0, 48, 96, 144, 90, 180);
                 });
@@ -732,7 +732,7 @@ export class FormGlyph extends BaseGlyph {
                     canvas.scaleUniformWithPivot(
                         interpolate(d2, 0.5, 1),
                         96,
-                        144
+                        144,
                     );
                     canvas.paintBoundedArc(color2, 48, 48, 144, 144, -90, 180);
                 });
@@ -744,14 +744,14 @@ export class FormGlyph extends BaseGlyph {
                         48,
                         interpolate(d2, 96, 48),
                         96,
-                        144
+                        144,
                     );
                     canvas.paintRect(
                         color2,
                         interpolate(d2, 48, 96),
                         interpolate(d2, 96, 48),
                         96,
-                        144
+                        144,
                     );
                 });
             }
@@ -763,18 +763,18 @@ export class FormGlyph extends BaseGlyph {
                     interpolate(d, 0, 48),
                     interpolate(d, 0, 96),
                     interpolate(d, 72, 96),
-                    interpolate(d, 72, 144)
+                    interpolate(d, 72, 144),
                 );
 
                 // 7 parallelogram
                 canvas.paintPath(color2, () => {
                     canvas.moveTo(
                         interpolate(d, 72, 48),
-                        interpolate(d, 0, 96)
+                        interpolate(d, 0, 96),
                     );
                     canvas.lineTo(
                         interpolate(d, 144, 96),
-                        interpolate(d, 0, 96)
+                        interpolate(d, 0, 96),
                     );
                     canvas.lineTo(interpolate(d, 72, 96), 144);
                     canvas.lineTo(interpolate(d, 0, 48), 144);
@@ -815,7 +815,7 @@ export class FormGlyph extends BaseGlyph {
                     interpolate(d1, 48, 72) - 2,
                     interpolate(d1, 48, 0),
                     interpolate(d1, 96, 72) + 2,
-                    144
+                    144,
                 );
 
                 // left bottom
@@ -825,7 +825,7 @@ export class FormGlyph extends BaseGlyph {
                     144,
                     () => {
                         canvas.paintBoundedArc(color1, 0, 0, 144, 144, 90, 180);
-                    }
+                    },
                 );
 
                 // right bottom
@@ -841,9 +841,9 @@ export class FormGlyph extends BaseGlyph {
                             144,
                             144,
                             -90,
-                            180
+                            180,
                         );
-                    }
+                    },
                 );
             }
         } else {
@@ -854,11 +854,11 @@ export class FormGlyph extends BaseGlyph {
                     canvas.moveTo(0, 72);
                     canvas.lineTo(
                         interpolate(d2, 0, 36),
-                        interpolate(d2, 72, 0)
+                        interpolate(d2, 72, 0),
                     );
                     canvas.lineTo(
                         interpolate(d2, 72, 108),
-                        interpolate(d2, 72, 0)
+                        interpolate(d2, 72, 0),
                     );
                     canvas.lineTo(72, 72);
                     canvas.lineTo(0, 72);
@@ -872,7 +872,7 @@ export class FormGlyph extends BaseGlyph {
                     144,
                     144,
                     interpolate(d2, 180, 0),
-                    -180
+                    -180,
                 );
 
                 // primary arc
@@ -904,7 +904,7 @@ export class FormGlyph extends BaseGlyph {
                 144,
                 interpolate(d, 180, 0),
                 180,
-                true
+                true,
             );
             canvas.paintBoundedArc(color2, 0, 0, 144, 144, 0, 180);
         });
@@ -913,7 +913,7 @@ export class FormGlyph extends BaseGlyph {
     drawSeparator = (
         canvas: Canvas,
         glyphProgress: number,
-        paints: Paints
+        paints: Paints,
     ): void => {
         canvas.paintCircle(paints.colors[1], 24, 24, 24);
         canvas.paintCircle(paints.colors[2], 24, 120, 24);
@@ -935,7 +935,7 @@ export class FormGlyph extends BaseGlyph {
             interpolate(d2, 28, 0),
             interpolate(d2, 72, 0),
             100,
-            interpolate(d2, 144, 48)
+            interpolate(d2, 144, 48),
         );
 
         if (d2 > 0) {
@@ -952,44 +952,44 @@ export class FormGlyph extends BaseGlyph {
                     interpolate(
                         decelerate5(progress(glyphProgress, 0, 0.4)),
                         144,
-                        192
+                        192,
                     ),
-                    100
+                    100,
                 );
             case "1":
             case "1_2":
                 return interpolate(
                     decelerate5(progress(glyphProgress, 0, 0.5)),
                     100,
-                    144
+                    144,
                 );
             case "2":
             case "2_3":
                 return interpolate(
                     decelerate5(progress(glyphProgress, 0, 0.5)),
                     144,
-                    128
+                    128,
                 );
             case "3":
             case "3_4":
                 return interpolate(
                     decelerate5(progress(glyphProgress, 0, 0.5)),
                     128,
-                    144
+                    144,
                 );
             case "4":
             case "4_5":
                 return interpolate(
                     decelerate5(progress(glyphProgress, 0, 0.5)),
                     144,
-                    128
+                    128,
                 );
             case "5":
             case "5_6":
                 return interpolate(
                     decelerate5(progress(glyphProgress, 0.1, 1)),
                     128,
-                    144
+                    144,
                 );
             case "6":
             case "6_7":
@@ -1020,13 +1020,13 @@ export class FormGlyph extends BaseGlyph {
                 return interpolate(
                     decelerate5(progress(glyphProgress, 0, 0.5)),
                     0,
-                    100
+                    100,
                 );
             case "1_ ":
                 return interpolate(
                     decelerate5(progress(glyphProgress, 0.5, 1)),
                     100,
-                    0
+                    0,
                 );
             case "2_ ":
                 return interpolate(
@@ -1035,26 +1035,26 @@ export class FormGlyph extends BaseGlyph {
                     interpolate(
                         decelerate5(progress(glyphProgress, 0.5, 1)),
                         72,
-                        0
-                    )
+                        0,
+                    ),
                 );
             case "2_1":
                 return interpolate(
                     decelerate5(progress(glyphProgress, 0, 0.5)),
                     144,
-                    100
+                    100,
                 );
             case "3_0":
                 return interpolate(
                     decelerate5(progress(glyphProgress, 0, 0.5)),
                     128,
-                    144
+                    144,
                 );
             case "5_0":
                 return interpolate(
                     decelerate5(progress(glyphProgress, 0, 0.5)),
                     128,
-                    144
+                    144,
                 );
             case "2_0":
                 return 144;

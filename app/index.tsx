@@ -1,9 +1,9 @@
+import { ClockContainerProps, ClockType } from "app/clock";
+import { EmbeddedClock } from "app/embedded";
+import { ClockWithSettings } from "app/webapp";
+import { canvasExtensions } from "core/canvas";
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { canvasExtensions } from "../core/canvas";
-import { ClockContainerProps, ClockType } from "./clock";
-import { EmbeddedClock } from "./embedded";
-import { ClockWithSettings } from "./webapp";
 
 canvasExtensions();
 
@@ -37,7 +37,7 @@ export const renderClockApp = (container: HTMLElement) => {
             clockType={clockType}
             context={context}
             embeddedSettings={embeddedSettings}
-        />
+        />,
     );
 };
 

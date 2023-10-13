@@ -1,15 +1,15 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Rect, Size } from "../../core/geometry";
-import { constrain } from "../../core/math";
+import { Clock, ClockContainerProps, useClockAnimator } from "app/clock";
+import { useTouchBehaviour } from "app/interactions";
+import { ClockSettings } from "app/webapp/settings";
+import { Rect, Size } from "core/geometry";
+import { constrain } from "core/math";
 import {
     Alignment,
     HorizontalAlignment,
     VerticalAlignment,
-} from "../../core/options/alignment";
-import { useClockSettings } from "../../settings/settings";
-import { Clock, ClockContainerProps, useClockAnimator } from "../clock";
-import { useTouchBehaviour } from "../interactions";
-import { ClockSettings } from "./settings";
+} from "core/options/alignment";
+import React, { useEffect, useRef, useState } from "react";
+import { useClockSettings } from "settings/settings";
 
 export const ClockWithSettings = (props: ClockContainerProps) => {
     const clock = useClockAnimator(props);
@@ -21,7 +21,7 @@ export const ClockWithSettings = (props: ClockContainerProps) => {
     const resizableWrapperRef = useRef<HTMLDivElement>();
 
     const [size, setSize] = useState<Size>(
-        Size.ofElement(resizableWrapperRef.current)
+        Size.ofElement(resizableWrapperRef.current),
     );
 
     // CSS padding used to position the clock within .clock-wrapper
@@ -41,7 +41,7 @@ export const ClockWithSettings = (props: ClockContainerProps) => {
 
     const bounds = resolveBounds(
         options.bounds,
-        Size.ofElement(backgroundRef.current)
+        Size.ofElement(backgroundRef.current),
     );
 
     const resizeControls = useTouchBehaviour(
@@ -50,11 +50,11 @@ export const ClockWithSettings = (props: ClockContainerProps) => {
             setFractionalBounds(
                 boundsToFractional(
                     updateBoundsFromDrag(bounds, x, y, location),
-                    Size.ofElement(backgroundRef.current)
-                )
+                    Size.ofElement(backgroundRef.current),
+                ),
             );
         },
-        () => setEditMode(prev => !prev)
+        () => setEditMode(prev => !prev),
     );
 
     useEffect(() => {
@@ -70,12 +70,12 @@ export const ClockWithSettings = (props: ClockContainerProps) => {
             paddingRight:
                 Math.min(
                     resizableWrapperRef.current.clientWidth,
-                    window.innerWidth
+                    window.innerWidth,
                 ) - bounds.right,
             paddingBottom:
                 Math.min(
                     resizableWrapperRef.current.clientHeight,
-                    window.innerHeight
+                    window.innerHeight,
                 ) - bounds.bottom,
         });
     }, [options.layout, options.bounds, options.spacingPx, resizeFlag]);
@@ -128,7 +128,7 @@ const boundsToFractional = (bounds: Rect, containerSize: Size) => {
         constrain(bounds.left / width, 0, 1),
         constrain(bounds.top / height, 0, 1),
         constrain(bounds.right / width, 0, 1),
-        constrain(bounds.bottom / height, 0, 1)
+        constrain(bounds.bottom / height, 0, 1),
     );
 };
 
@@ -138,7 +138,7 @@ const resolveBounds = (fractional: Rect, containerSize: Size) => {
         fractional.left * width,
         fractional.top * height,
         fractional.right * width,
-        fractional.bottom * height
+        fractional.bottom * height,
     );
 };
 
@@ -155,7 +155,7 @@ const updateBoundsFromDrag = (
     existingFractionalBounds: Rect,
     dragX: number,
     dragY: number,
-    dragArea: Alignment
+    dragArea: Alignment,
 ): Rect => {
     const [horizontal, vertical] = Alignment.unpack(dragArea);
     const newBounds = new Rect(...existingFractionalBounds);

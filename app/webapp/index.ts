@@ -1,1 +1,1 @@
-export { ClockWithSettings } from "./webapp";
+export { ClockWithSettings } from "app/webapp/webapp";

@@ -1,14 +1,14 @@
-export { ClockRenderer } from "./render/renderer";
-export { TimeFormat } from "./options/format";
-export { BaseGlyph } from "./glyph";
-export { BaseFont } from "./font";
-import "./canvas";
-import { Rect } from "./geometry";
-import { HorizontalAlignment, VerticalAlignment } from "./options/alignment";
+import { Rect } from "core/geometry";
+import { HorizontalAlignment, VerticalAlignment } from "core/options/alignment";
+import { TimeFormat } from "core/options/format";
+import { Options } from "core/options/options";
+import { Layout } from "core/options/types";
+import "src/webapp/clocks/core/canvas";
 
-import { TimeFormat } from "./options/format";
-import { Options } from "./options/options";
-import { Layout } from "./options/types";
+export { ClockRenderer } from "core/render/renderer";
+export { TimeFormat } from "core/options/format";
+export { BaseGlyph } from "core/glyph";
+export { BaseFont } from "core/font";
 
 export const DefaultOptions: Options = new Options({
     format: TimeFormat.HH_MM_SS_24,

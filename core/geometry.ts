@@ -1,4 +1,4 @@
-import { constrain } from "./math";
+import { constrain } from "core/math";
 
 export class Rect {
     left: number;
@@ -10,7 +10,7 @@ export class Rect {
         left: number = 0,
         top: number = 0,
         right: number = 0,
-        bottom: number = 0
+        bottom: number = 0,
     ) {
         this.set(left, top, right, bottom);
     }
@@ -70,7 +70,7 @@ export class Rect {
             constrain(this.left + x, 0, windowWidth),
             constrain(this.top + y, 0, windowHeight),
             constrain(this.right + x, 0, windowWidth),
-            constrain(this.bottom + y, 0, windowHeight)
+            constrain(this.bottom + y, 0, windowHeight),
         );
     };
 
@@ -97,7 +97,7 @@ export class Size {
     scaledBy = (factor: number): Size =>
         new Size(
             Math.floor(this.width * factor),
-            Math.floor(this.height * factor)
+            Math.floor(this.height * factor),
         );
 
     isEmpty = () => this.width === 0 || this.height === 0;

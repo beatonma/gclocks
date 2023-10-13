@@ -1,6 +1,6 @@
-import { Rect, Size } from "./geometry";
-import { toRadians } from "./math";
-import { PaintStyle } from "./render/types";
+import { Rect, Size } from "core/geometry";
+import { toRadians } from "core/math";
+import { PaintStyle } from "core/render/types";
 
 const fontSizePx = 48;
 
@@ -22,7 +22,7 @@ export const canvasExtensions = () => {
             this.fillStyle = color;
             this.font = `${fontSizePx}px sans-serif`;
             this.fillText(text, x, y + fontSizePx);
-        }
+        },
     );
 
     addExtension(
@@ -34,7 +34,7 @@ export const canvasExtensions = () => {
                 case PaintStyle.Stroke:
                     return strokePaint(this, color);
             }
-        }
+        },
     );
 
     addExtension(
@@ -43,12 +43,12 @@ export const canvasExtensions = () => {
             color: string,
             centerX: number,
             centerY: number,
-            radius: number
+            radius: number,
         ) {
             this.paintPath(color, () => {
                 this.arc(centerX, centerY, radius, 0, Math.PI * 2);
             });
-        }
+        },
     );
 
     addExtension(
@@ -58,7 +58,7 @@ export const canvasExtensions = () => {
             leftOrGeometry: number | Rect | Size,
             top?: number,
             right?: number,
-            bottom?: number
+            bottom?: number,
         ) {
             this.paintPath(color, () => {
                 if (leftOrGeometry instanceof Rect) {
@@ -72,11 +72,11 @@ export const canvasExtensions = () => {
                         leftOrGeometry,
                         top,
                         right - leftOrGeometry,
-                        bottom - top
+                        bottom - top,
                     );
                 }
             });
-        }
+        },
     );
 
     addExtension(
@@ -92,14 +92,14 @@ export const canvasExtensions = () => {
             this.paintPath(color, () => {
                 this.roundRect(left, top, right - left, bottom - top, radii);
             });
-        }
+        },
     );
 
     addExtension(
         "scaleUniformWithPivot",
         function (scale: number, pivotX: number, pivotY: number) {
             this.scaleWithPivot(scale, scale, pivotX, pivotY);
-        }
+        },
     );
 
     addExtension(
@@ -108,12 +108,12 @@ export const canvasExtensions = () => {
             scaleX: number,
             scaleY: number,
             pivotX: number,
-            pivotY: number
+            pivotY: number,
         ) {
             this.translate(pivotX, pivotY);
             this.scale(scaleX, scaleY);
             this.translate(-pivotX, -pivotY);
-        }
+        },
     );
 
     addExtension(
@@ -123,7 +123,7 @@ export const canvasExtensions = () => {
             this.translate(pivotX, pivotY);
             this.rotate(rads, rads);
             this.translate(-pivotX, -pivotY);
-        }
+        },
     );
 
     addExtension(
@@ -135,7 +135,7 @@ export const canvasExtensions = () => {
             bottom: number,
             startAngle: number,
             sweepAngle: number,
-            counterClockwise: boolean = false
+            counterClockwise: boolean = false,
         ) {
             const centerX = (left + right) / 2;
             const centerY = (top + bottom) / 2;
@@ -150,9 +150,9 @@ export const canvasExtensions = () => {
                 0,
                 toRadians(startAngle),
                 toRadians(startAngle + sweepAngle),
-                counterClockwise
+                counterClockwise,
             );
-        }
+        },
     );
 
     addExtension(
@@ -165,7 +165,7 @@ export const canvasExtensions = () => {
             bottom: number,
             startAngle: number,
             sweepAngle: number,
-            counterClockwise: boolean = false
+            counterClockwise: boolean = false,
         ) {
             this.paintPath(color, () => {
                 this.boundedArc(
@@ -175,10 +175,10 @@ export const canvasExtensions = () => {
                     bottom,
                     startAngle,
                     sweepAngle,
-                    counterClockwise
+                    counterClockwise,
                 );
             });
-        }
+        },
     );
 
     addExtension("paintPath", function (color: string, block: () => void) {
@@ -206,7 +206,7 @@ export const canvasExtensions = () => {
                 this.translate(x, y);
                 block();
             });
-        }
+        },
     );
 
     addExtension(
@@ -216,13 +216,13 @@ export const canvasExtensions = () => {
             scaleY: number,
             pivotX: number,
             pivotY: number,
-            block: () => void
+            block: () => void,
         ) {
             this.withCheckpoint(() => {
                 this.scaleWithPivot(scaleX, scaleY, pivotX, pivotY);
                 block();
             });
-        }
+        },
     );
 
     addExtension(
@@ -231,13 +231,13 @@ export const canvasExtensions = () => {
             scale: number,
             pivotX: number,
             pivotY: number,
-            block: () => void
+            block: () => void,
         ) {
             this.withCheckpoint(() => {
                 this.scaleUniformWithPivot(scale, pivotX, pivotY);
                 block();
             });
-        }
+        },
     );
 
     addExtension(
@@ -246,13 +246,13 @@ export const canvasExtensions = () => {
             angleDegrees: number,
             pivotX: number,
             pivotY: number,
-            block: () => void
+            block: () => void,
         ) {
             this.withCheckpoint(() => {
                 this.rotateWithPivot(angleDegrees, pivotX, pivotY);
                 block();
             });
-        }
+        },
     );
 
     addExtension(
@@ -262,7 +262,7 @@ export const canvasExtensions = () => {
             this.paintStyle = paintStyle;
             block();
             this.paintStyle = previous;
-        }
+        },
     );
 
     addExtension(
@@ -271,7 +271,7 @@ export const canvasExtensions = () => {
             this.withTranslation(x, y, () => {
                 this.withScaleUniform(scale, 0, 0, block);
             });
-        }
+        },
     );
 };
 

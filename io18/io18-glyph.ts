@@ -1,7 +1,7 @@
-import { BaseGlyph } from "../core";
-import { GlyphLayoutInfo } from "../core/glyph";
-import { Canvas, Paints } from "../core/render/types";
-import { SquareGrid } from "./animations";
+import { BaseGlyph } from "core";
+import { GlyphLayoutInfo } from "core/glyph";
+import { Canvas, Paints } from "core/render/types";
+import { SquareGrid } from "io18/animations";
 
 export namespace StaticIo19Glyph {
     export const layoutInfo: GlyphLayoutInfo = {
@@ -86,7 +86,7 @@ export class Io18Glyph extends BaseGlyph {
     drawSeparator = (
         canvas: Canvas,
         glyphProgress: number,
-        paints: Paints
+        paints: Paints,
     ): void => {
         canvas.text("red", ":", 50, 50);
     };

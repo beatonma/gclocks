@@ -1,14 +1,14 @@
+import { Clock, ClockContainerProps, useClockAnimator } from "app/clock";
+import { Size } from "core/geometry";
 import React, { useEffect, useRef, useState } from "react";
-import { Size } from "../core/geometry";
-import { Settings } from "../settings/settings";
-import { Clock, ClockContainerProps, useClockAnimator } from "./clock";
+import { Settings } from "settings/settings";
 
 export const EmbeddedClock = (props: ClockContainerProps) => {
     const { embeddedSettings } = props;
     const clock = useClockAnimator(props);
     const backgroundRef = useRef<HTMLDivElement>();
     const [size, setSize] = useState<Size>(
-        Size.ofElement(backgroundRef.current)
+        Size.ofElement(backgroundRef.current),
     );
 
     useEffect(() => {
@@ -16,11 +16,11 @@ export const EmbeddedClock = (props: ClockContainerProps) => {
             const clock_ = clock.current;
             const paints = Settings.parseUrlPaints(
                 clock_.getPaints(),
-                embeddedSettings
+                embeddedSettings,
             );
             const options = Settings.parseUrlOptions(
                 clock_.getOptions(),
-                embeddedSettings
+                embeddedSettings,
             );
 
             clock_.setPaints(paints);
