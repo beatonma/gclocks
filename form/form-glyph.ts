@@ -1,5 +1,4 @@
-import { BaseGlyph } from "core";
-import { GlyphLayoutInfo } from "core/glyph";
+import { BaseGlyph, GlyphLayoutInfo } from "core/glyph";
 import { decelerate5, interpolate, progress } from "core/math";
 import { Canvas, Paints } from "core/render/types";
 

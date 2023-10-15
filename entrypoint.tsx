@@ -1,8 +1,8 @@
-import { renderClockApp } from "app";
-import { TimeFormat } from "core";
-import { measureFormClock } from "core/precompute";
+import { renderClockApp } from "./app";
+import "./clocks.scss";
+import { TimeFormat } from "./core";
+import { measureFormClock } from "./core/precompute";
 import React, { useEffect } from "react";
-import "src/webapp/clocks/clocks.scss";
 
 const CONTAINER_ID = "clocks_container";
 

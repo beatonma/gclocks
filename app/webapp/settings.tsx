@@ -1,4 +1,4 @@
-import { DefaultOptions } from "core";
+import { DefaultOptions } from "core/index";
 import { Options, OptionsInit } from "core/options/options";
 import { Layout } from "core/options/types";
 import { Paints } from "core/render/types";

@@ -1,4 +1,4 @@
-import { BaseFont } from "core";
+import { BaseFont } from "core/font";
 import { Size } from "core/geometry";
 import { Layout, TimeFormatter } from "core/options/types";
 import { StaticFormGlyph } from "form/form-glyph";

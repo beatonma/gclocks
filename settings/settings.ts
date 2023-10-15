@@ -1,5 +1,5 @@
-import { DefaultOptions, TimeFormat } from "core";
 import { Rect } from "core/geometry";
+import { DefaultOptions, TimeFormat } from "core/index";
 import {
     Alignment,
     HorizontalAlignment,

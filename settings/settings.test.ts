@@ -1,6 +1,6 @@
 import { describe, test, expect } from "@jest/globals";
-import { TimeFormat } from "core";
 import { Rect } from "core/geometry";
+import { TimeFormat } from "core/index";
 import { HorizontalAlignment, VerticalAlignment } from "core/options/alignment";
 import { Options } from "core/options/options";
 import { Layout } from "core/options/types";

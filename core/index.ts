@@ -1,9 +1,9 @@
+import "core/canvas";
 import { Rect } from "core/geometry";
 import { HorizontalAlignment, VerticalAlignment } from "core/options/alignment";
 import { TimeFormat } from "core/options/format";
 import { Options } from "core/options/options";
 import { Layout } from "core/options/types";
-import "src/webapp/clocks/core/canvas";
 
 export { ClockRenderer } from "core/render/renderer";
 export { TimeFormat } from "core/options/format";

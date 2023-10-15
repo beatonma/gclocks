@@ -1,4 +1,4 @@
-import { ClockRenderer, DefaultOptions } from "core";
+import { ClockRenderer, DefaultOptions } from "core/index";
 import { Options } from "core/options/options";
 import { Paints, PaintStyle } from "core/render/types";
 

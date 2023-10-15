@@ -1,5 +1,4 @@
-import { BaseGlyph } from "core";
-import { GlyphLayoutInfo } from "core/glyph";
+import { BaseGlyph, GlyphLayoutInfo } from "core/glyph";
 import { Canvas, Paints } from "core/render/types";
 import { SquareGrid } from "io18/animations";
 

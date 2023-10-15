@@ -1,4 +1,4 @@
-import { BaseFont } from "core";
+import { BaseFont } from "core/font";
 import { Size } from "core/geometry";
 import { Glyph } from "core/glyph";
 import { TimeResolution } from "core/options/format";

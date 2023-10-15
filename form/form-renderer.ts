@@ -1,4 +1,4 @@
-import { ClockRenderer, DefaultOptions, TimeFormat } from "core";
+import { ClockRenderer, DefaultOptions, TimeFormat } from "core/index";
 import { HorizontalAlignment, VerticalAlignment } from "core/options/alignment";
 import { Options } from "core/options/options";
 import { Layout } from "core/options/types";
