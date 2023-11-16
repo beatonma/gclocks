@@ -61,7 +61,7 @@ export namespace Settings {
         // Apply rate-limiting to history state updates to avoid throttling by browser.
         const RateLimitMillis = 250;
 
-        if (updateHistoryStateTimer != undefined) {
+        if (updateHistoryStateTimer) {
             clearTimeout(updateHistoryStateTimer);
         }
         updateHistoryStateTimer = setTimeout(() => {
@@ -172,7 +172,7 @@ export namespace Settings {
         };
 
         Object.entries(serialized).forEach(([key, value]) => {
-            if (value != undefined) {
+            if (value) {
                 params.set(key, value);
             }
         });
